@@ -11,56 +11,22 @@ Simple self-hostable secrets manager
   - Endpoint: GET /api/v1/secret?project=<project-id>&environment=<environment-name>&key=<key>
   - API key generation from dashboard.
 
-// does it need to be on cloud?
-// self host is fine as long as i can backup
+## How It Works
 
-// Making my own
-// - organize by projects / environments
-// - auth / no sharing yet.
-// - key + value pairs
-// - no versioning
-// - public api for fetching secrets GET /api/v1/secret?project=<id>&environment=<id>&key=<key>
-// - public api key
+Secrets are saved on database after encrypted with a symmetric DEK (data encryption key).
+There is one DEK per environment, and each DEK is saved on db after encrypted with the user's password.
 
-Would it make sense to decrypt secrets on server-side?
-I think the server is generally safer than the client.
-Well, the client eventually reads all secret values.
-That means we need to protect server.
-Yeah, let's not encrypt the values.
+### New API key creation flow
 
-- Client can read secrets plain text
-- Server should not store secrets plain text. They should be encrypted.
-- API key with revoke access
+- User enters the password.
+- DEK is decrypted with the user password.
+- Server generates a new public private key pair.
+- DEK gets encrypted with the public key and saved on database (as `environment_access.dek_wrapped_by_client_public_key`).
+- The private key is shown to the user so that they can store it safely. The private key is not saved on database.
 
-User
+### Secret fetch flow
 
-- id
-- password_hash
-
-Project
-
-- id
-- owner_id fk
-
-Environment
-
-- id
-- project_id fk
-- dek_wrapped_by_password
-
-Secret
-
-- key
-- value_encrypted
-
-EnvironmentAccess
-
-- environment_id fk
-- client_id fk
-- dek_wrapped_by_client_public_key
-
-ApiClient
-
-- id
-- name
-- public_key
+- Client requests a secret with the project id, environment id, and key (e.g. Portfolio + production + DATABASE_URL).
+- Server responds with the encrypted DEK and the encrypted secret value.
+- Client decrypts the DEK with its private key.
+- Client decrypts the secret value with the DEK.
