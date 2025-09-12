@@ -1,5 +1,11 @@
 import { relations } from "drizzle-orm";
-import { text, integer, pgTable, primaryKey } from "drizzle-orm/pg-core";
+import {
+  text,
+  integer,
+  pgTable,
+  primaryKey,
+  timestamp,
+} from "drizzle-orm/pg-core";
 
 export const userTable = pgTable("user", {
   id: integer().primaryKey().generatedAlwaysAsIdentity(),
@@ -9,6 +15,24 @@ export const userTable = pgTable("user", {
 
 export const userRelations = relations(userTable, ({ many }) => ({
   projects: many(projectTable),
+  sessions: many(sessionTable),
+}));
+
+export const sessionTable = pgTable("session", {
+  id: integer().primaryKey().generatedAlwaysAsIdentity(),
+  userId: integer()
+    .notNull()
+    .references(() => userTable.id, { onDelete: "cascade" }),
+  token: text().notNull().unique(),
+  expiresAt: timestamp().notNull(),
+  createdAt: timestamp().notNull().defaultNow(),
+});
+
+export const sessionRelations = relations(sessionTable, ({ one }) => ({
+  user: one(userTable, {
+    fields: [sessionTable.userId],
+    references: [userTable.id],
+  }),
 }));
 
 export const projectTable = pgTable("project", {
@@ -19,7 +43,10 @@ export const projectTable = pgTable("project", {
 });
 
 export const projectRelations = relations(projectTable, ({ one, many }) => ({
-  owner: one(userTable),
+  owner: one(userTable, {
+    fields: [projectTable.ownerId],
+    references: [userTable.id],
+  }),
   environments: many(environmentTable),
 }));
 
@@ -35,7 +62,10 @@ export const environmentTable = pgTable("environment", {
 export const environmentRelations = relations(
   environmentTable,
   ({ one, many }) => ({
-    project: one(projectTable),
+    project: one(projectTable, {
+      fields: [environmentTable.projectId],
+      references: [projectTable.id],
+    }),
     secrets: many(secretTable),
     access: many(environmentAccessTable),
   })
@@ -54,7 +84,10 @@ export const secretTable = pgTable(
 );
 
 export const secretRelations = relations(secretTable, ({ one }) => ({
-  environment: one(environmentTable),
+  environment: one(environmentTable, {
+    fields: [secretTable.environmentId],
+    references: [environmentTable.id],
+  }),
 }));
 
 export const apiClientTable = pgTable("api_client", {
@@ -84,7 +117,13 @@ export const environmentAccessTable = pgTable(
 export const environmentAccessRelations = relations(
   environmentAccessTable,
   ({ one }) => ({
-    environment: one(environmentTable),
-    client: one(apiClientTable),
+    environment: one(environmentTable, {
+      fields: [environmentAccessTable.environmentId],
+      references: [environmentTable.id],
+    }),
+    client: one(apiClientTable, {
+      fields: [environmentAccessTable.clientId],
+      references: [apiClientTable.id],
+    }),
   })
 );

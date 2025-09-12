@@ -13,15 +13,36 @@ type Pages = {
   "/": {
     params: {};
   };
+  "/logout": {
+    params: {};
+  };
+  "/signup": {
+    params: {};
+  };
+  "/login": {
+    params: {};
+  };
 };
 
 type RouteFiles = {
   "root.tsx": {
     id: "root";
-    page: "/";
+    page: "/" | "/logout" | "/signup" | "/login";
   };
   "routes/_index.tsx": {
     id: "routes/_index";
     page: "/";
+  };
+  "routes/logout.tsx": {
+    id: "routes/logout";
+    page: "/logout";
+  };
+  "routes/signup.tsx": {
+    id: "routes/signup";
+    page: "/signup";
+  };
+  "routes/login.tsx": {
+    id: "routes/login";
+    page: "/login";
   };
 };
