@@ -4,42 +4,42 @@
   "description": "",
   "type": "module",
   "scripts": {
-    "build": "react-router build",
-    "dev": "react-router dev",
-    "start": "react-router-serve ./build/server/index.js",
-    "typecheck": "react-router typegen && tsc"
+    "dev": "vite dev",
+    "build": "vite build",
+    "start": "node .output/server/index.mjs"
   },
   "author": "Danny Kim",
   "license": "MIT",
   "packageManager": "pnpm@10.12.1",
   "dependencies": {
     "@electric-sql/pglite": "^0.3.8",
-    "@flow-css/core": "^1.3.0",
+    "@flow-css/core": "^1.4.0",
+    "@hono/node-server": "^1.19.2",
+    "@noble/ciphers": "^2.0.0",
     "@noble/hashes": "^2.0.0",
-    "@react-router/fs-routes": "^7.8.2",
-    "@react-router/node": "^7.8.2",
-    "@react-router/serve": "^7.8.2",
     "@tanstack/react-form": "^1.19.5",
+    "@tanstack/react-router": "^1.131.41",
+    "@tanstack/react-start": "^1.131.43",
     "clsx": "^2.1.1",
-    "cookie": "^1.0.2",
     "dotenv": "^17.2.2",
     "drizzle-orm": "^0.44.5",
+    "hono": "^4.9.7",
     "isbot": "^5",
     "pg": "^8.16.3",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
-    "react-router": "^7.8.2",
+    "vite": "^7.1.5",
     "zod": "^4.1.8"
   },
   "devDependencies": {
-    "@flow-css/vite": "^1.3.0",
-    "@react-router/dev": "^7.8.2",
+    "@flow-css/vite": "^1.4.0",
     "@types/node": "^24.3.1",
     "@types/pg": "^8.15.5",
     "@types/react": "^19.1.12",
     "@types/react-dom": "^19.1.9",
+    "@vitejs/plugin-react": "^5.0.2",
     "drizzle-kit": "^0.31.4",
     "typescript": "^5.9.2",
-    "vite": "^7.1.5"
+    "vite-tsconfig-paths": "^5.1.4"
   }
 }

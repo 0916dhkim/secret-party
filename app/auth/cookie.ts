@@ -1,4 +1,4 @@
-import cookie from "cookie";
+import { getCookie, setCookie } from "@tanstack/react-start/server";
 
 const SESSION_COOKIE_NAME = "session_token";
 const SESSION_COOKIE_OPTIONS = {
@@ -8,17 +8,12 @@ const SESSION_COOKIE_OPTIONS = {
   path: "/",
 } as const;
 
-export function parseSessionCookie(request: Request): string | null {
-  const cookieHeader = request.headers.get("Cookie");
-  if (cookieHeader == null) {
-    return null;
-  }
-  const cookies = cookie.parse(cookieHeader);
-  return cookies[SESSION_COOKIE_NAME] || null;
+export function getSessionCookie(): string | null {
+  return getCookie(SESSION_COOKIE_NAME) ?? null;
 }
 
-export function serializeSessionCookie(value: string, maxAge: number) {
-  return cookie.serialize(SESSION_COOKIE_NAME, value, {
+export function setSessionCookie(value: string, maxAge: number) {
+  setCookie(SESSION_COOKIE_NAME, value, {
     ...SESSION_COOKIE_OPTIONS,
     maxAge,
   });

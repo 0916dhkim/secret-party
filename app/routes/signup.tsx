@@ -1,32 +1,30 @@
+import { createFileRoute, redirect } from "@tanstack/react-router";
 import { signUp } from "../auth/actions";
 import { hasFirstUser } from "../auth/session";
 import { signupSchema } from "../auth/validation";
-import type { Route } from "./+types/signup";
 import { css } from "@flow-css/core/css";
 import { useForm } from "@tanstack/react-form";
 import { clsx } from "clsx";
+import { createServerFn } from "@tanstack/react-start";
+import z from "zod";
 
-export async function loader(args: Route.LoaderArgs) {
+export const Route = createFileRoute("/signup")({
+  component: Signup,
+  beforeLoad: async () => await beforeLoad(),
+  validateSearch: z.object({
+    error: z.string().optional(),
+  }).parse,
+});
+
+const beforeLoad = createServerFn({ method: "GET" }).handler(async () => {
   if (await hasFirstUser()) {
     // If users already exist, redirect to login (block signup completely)
-    throw new Response(null, {
-      status: 302,
-      headers: {
-        Location: "/login",
-      },
-    });
+    throw redirect({ to: "/login" });
   }
+});
 
-  return { canSignup: true };
-}
-
-export async function action(args: Route.ActionArgs) {
-  const formData = await args.request.formData();
-  return signUp(formData);
-}
-
-export default function Signup({ actionData }: Route.ComponentProps) {
-  const generalError = actionData?.error;
+export default function Signup() {
+  const { error } = Route.useSearch();
 
   const form = useForm({
     defaultValues: {
@@ -63,7 +61,8 @@ export default function Signup({ actionData }: Route.ComponentProps) {
           flexDirection: "column",
           gap: "1rem",
         })}
-        method="post"
+        action={signUp.url}
+        method="POST"
       >
         <form.Field name="email">
           {(field) => (
@@ -211,7 +210,7 @@ export default function Signup({ actionData }: Route.ComponentProps) {
           )}
         </form.Field>
 
-        {generalError && (
+        {error && (
           <div
             className={css({
               color: "#dc3545",
@@ -222,7 +221,7 @@ export default function Signup({ actionData }: Route.ComponentProps) {
               borderRadius: "4px",
             })}
           >
-            {generalError}
+            {error}
           </div>
         )}
 

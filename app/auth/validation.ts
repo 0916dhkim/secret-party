@@ -38,9 +38,12 @@ export type SignupData = z.infer<typeof signupSchema>;
 /**
  * Utility function to parse form data and validate with a Zod schema
  */
-export function parseFormData<T>(formData: FormData, schema: z.ZodSchema<T>) {
+export function parseFormData<T>(formData: unknown, schema: z.ZodSchema<T>) {
+  if (!(formData instanceof FormData)) {
+    throw new Error("formData is not an instance of FormData");
+  }
   const rawData = Object.fromEntries(formData.entries());
-  return schema.safeParse(rawData);
+  return schema.parse(rawData);
 }
 
 /**

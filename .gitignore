@@ -140,3 +140,6 @@ vite.config.ts.timestamp-*
 
 # Build
 build/
+.output/
+.nitro/
+.tanstack/

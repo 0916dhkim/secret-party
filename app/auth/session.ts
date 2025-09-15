@@ -2,7 +2,8 @@ import { eq, lt, sql } from "drizzle-orm";
 import { db } from "../db/db";
 import { sessionTable, userTable } from "../db/schema";
 import { generateSessionToken } from "./hash";
-import { parseSessionCookie } from "./cookie";
+import { getSessionCookie } from "./cookie";
+import { redirect } from "@tanstack/react-router";
 
 const SESSION_DURATION_MS = 7 * 24 * 60 * 60 * 1000; // 7 days
 
@@ -39,8 +40,8 @@ export async function deleteExpiredSessions(): Promise<void> {
   await db.delete(sessionTable).where(lt(sessionTable.expiresAt, sql`NOW()`));
 }
 
-export async function getSessionFromRequest(request: Request) {
-  const token = parseSessionCookie(request);
+export async function getSession() {
+  const token = getSessionCookie();
 
   if (token == null) {
     return null;
@@ -52,19 +53,11 @@ export async function getSessionFromRequest(request: Request) {
 /**
  * Utility for protected routes - throws redirect response if not authenticated
  */
-export async function requireAuth(
-  request: Request,
-  redirectTo: string = "/login"
-) {
-  const session = await getSessionFromRequest(request);
+export async function requireAuth(redirectTo: string = "/login") {
+  const session = await getSession();
 
   if (session == null) {
-    throw new Response(null, {
-      status: 302,
-      headers: {
-        Location: redirectTo,
-      },
-    });
+    throw redirect({ to: redirectTo });
   }
 
   return session;

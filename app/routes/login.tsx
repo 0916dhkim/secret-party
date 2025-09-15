@@ -1,6 +1,5 @@
 import { login } from "../auth/actions";
 import { loginSchema } from "../auth/validation";
-import type { Route } from "./+types/login";
 import { css } from "@flow-css/core/css";
 import { useForm } from "@tanstack/react-form";
 import { clsx } from "clsx";
@@ -12,28 +11,32 @@ import {
   generalError as generalErrorStyle,
 } from "../styles/shared";
 import { hasFirstUser } from "../auth/session";
+import { createFileRoute, redirect } from "@tanstack/react-router";
+import { createServerFn } from "@tanstack/react-start";
+import { useState } from "react";
+import z from "zod";
 
-export async function loader(args: Route.LoaderArgs) {
+export const Route = createFileRoute("/login")({
+  component: Login,
+  loader: async () => await loader(),
+  validateSearch: z.object({
+    error: z.string().optional(),
+  }).parse,
+});
+
+const loader = createServerFn({
+  method: "GET",
+}).handler(async () => {
   if (!(await hasFirstUser())) {
     // Redirect the first user to sign up.
-    throw new Response(null, {
-      status: 302,
-      headers: {
-        Location: "/signup",
-      },
-    });
+    throw redirect({ to: "/signup" });
   }
 
   return null;
-}
+});
 
-export async function action(args: Route.ActionArgs) {
-  const formData = await args.request.formData();
-  return login(formData);
-}
-
-export default function Login({ actionData }: Route.ComponentProps) {
-  const generalError = actionData?.error;
+export default function Login() {
+  const [generalError, setGeneralError] = useState("");
 
   const loginForm = useForm({
     defaultValues: {
@@ -43,13 +46,17 @@ export default function Login({ actionData }: Route.ComponentProps) {
     validators: {
       onChange: loginSchema,
     },
+    async onSubmit({ value }) {
+      const { error } = await login({ data: value });
+      setGeneralError(error);
+    },
   });
 
   return (
     <div className={formContainer}>
       <h1>Login</h1>
 
-      <form className={form} method="post">
+      <form className={form} action={login.url} method="POST">
         <loginForm.Field name="email">
           {(field) => (
             <div>
