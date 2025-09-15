@@ -13,7 +13,13 @@ import { createServerRootRoute } from '@tanstack/react-start/server'
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SignupRouteImport } from './routes/signup'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as DashboardRouteImport } from './routes/dashboard'
+import { Route as ApiKeysRouteImport } from './routes/api-keys'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ProjectsProjectIdRouteImport } from './routes/projects.$projectId'
+import { Route as ApiVerifyPasswordRouteImport } from './routes/api.verify-password'
+import { Route as ApiSplatRouteImport } from './routes/api.$'
+import { Route as ProjectsProjectIdEnvironmentsEnvIdRouteImport } from './routes/projects.$projectId_.environments.$envId'
 import { ServerRoute as ApiServerRouteImport } from './routes/api'
 
 const rootServerRouteImport = createServerRootRoute()
@@ -28,11 +34,42 @@ const LoginRoute = LoginRouteImport.update({
   path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DashboardRoute = DashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiKeysRoute = ApiKeysRouteImport.update({
+  id: '/api-keys',
+  path: '/api-keys',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ProjectsProjectIdRoute = ProjectsProjectIdRouteImport.update({
+  id: '/projects/$projectId',
+  path: '/projects/$projectId',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiVerifyPasswordRoute = ApiVerifyPasswordRouteImport.update({
+  id: '/api/verify-password',
+  path: '/api/verify-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiSplatRoute = ApiSplatRouteImport.update({
+  id: '/api/$',
+  path: '/api/$',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProjectsProjectIdEnvironmentsEnvIdRoute =
+  ProjectsProjectIdEnvironmentsEnvIdRouteImport.update({
+    id: '/projects/$projectId_/environments/$envId',
+    path: '/projects/$projectId/environments/$envId',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiServerRoute = ApiServerRouteImport.update({
   id: '/api',
   path: '/api',
@@ -41,32 +78,84 @@ const ApiServerRoute = ApiServerRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/api-keys': typeof ApiKeysRoute
+  '/dashboard': typeof DashboardRoute
   '/login': typeof LoginRoute
   '/signup': typeof SignupRoute
+  '/api/$': typeof ApiSplatRoute
+  '/api/verify-password': typeof ApiVerifyPasswordRoute
+  '/projects/$projectId': typeof ProjectsProjectIdRoute
+  '/projects/$projectId/environments/$envId': typeof ProjectsProjectIdEnvironmentsEnvIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/api-keys': typeof ApiKeysRoute
+  '/dashboard': typeof DashboardRoute
   '/login': typeof LoginRoute
   '/signup': typeof SignupRoute
+  '/api/$': typeof ApiSplatRoute
+  '/api/verify-password': typeof ApiVerifyPasswordRoute
+  '/projects/$projectId': typeof ProjectsProjectIdRoute
+  '/projects/$projectId/environments/$envId': typeof ProjectsProjectIdEnvironmentsEnvIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/api-keys': typeof ApiKeysRoute
+  '/dashboard': typeof DashboardRoute
   '/login': typeof LoginRoute
   '/signup': typeof SignupRoute
+  '/api/$': typeof ApiSplatRoute
+  '/api/verify-password': typeof ApiVerifyPasswordRoute
+  '/projects/$projectId': typeof ProjectsProjectIdRoute
+  '/projects/$projectId_/environments/$envId': typeof ProjectsProjectIdEnvironmentsEnvIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/login' | '/signup'
+  fullPaths:
+    | '/'
+    | '/api-keys'
+    | '/dashboard'
+    | '/login'
+    | '/signup'
+    | '/api/$'
+    | '/api/verify-password'
+    | '/projects/$projectId'
+    | '/projects/$projectId/environments/$envId'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/login' | '/signup'
-  id: '__root__' | '/' | '/login' | '/signup'
+  to:
+    | '/'
+    | '/api-keys'
+    | '/dashboard'
+    | '/login'
+    | '/signup'
+    | '/api/$'
+    | '/api/verify-password'
+    | '/projects/$projectId'
+    | '/projects/$projectId/environments/$envId'
+  id:
+    | '__root__'
+    | '/'
+    | '/api-keys'
+    | '/dashboard'
+    | '/login'
+    | '/signup'
+    | '/api/$'
+    | '/api/verify-password'
+    | '/projects/$projectId'
+    | '/projects/$projectId_/environments/$envId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  ApiKeysRoute: typeof ApiKeysRoute
+  DashboardRoute: typeof DashboardRoute
   LoginRoute: typeof LoginRoute
   SignupRoute: typeof SignupRoute
+  ApiSplatRoute: typeof ApiSplatRoute
+  ApiVerifyPasswordRoute: typeof ApiVerifyPasswordRoute
+  ProjectsProjectIdRoute: typeof ProjectsProjectIdRoute
+  ProjectsProjectIdEnvironmentsEnvIdRoute: typeof ProjectsProjectIdEnvironmentsEnvIdRoute
 }
 export interface FileServerRoutesByFullPath {
   '/api': typeof ApiServerRoute
@@ -106,11 +195,53 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/dashboard': {
+      id: '/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof DashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api-keys': {
+      id: '/api-keys'
+      path: '/api-keys'
+      fullPath: '/api-keys'
+      preLoaderRoute: typeof ApiKeysRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/projects/$projectId': {
+      id: '/projects/$projectId'
+      path: '/projects/$projectId'
+      fullPath: '/projects/$projectId'
+      preLoaderRoute: typeof ProjectsProjectIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/verify-password': {
+      id: '/api/verify-password'
+      path: '/api/verify-password'
+      fullPath: '/api/verify-password'
+      preLoaderRoute: typeof ApiVerifyPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/$': {
+      id: '/api/$'
+      path: '/api/$'
+      fullPath: '/api/$'
+      preLoaderRoute: typeof ApiSplatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/projects/$projectId_/environments/$envId': {
+      id: '/projects/$projectId_/environments/$envId'
+      path: '/projects/$projectId/environments/$envId'
+      fullPath: '/projects/$projectId/environments/$envId'
+      preLoaderRoute: typeof ProjectsProjectIdEnvironmentsEnvIdRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
@@ -129,8 +260,15 @@ declare module '@tanstack/react-start/server' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  ApiKeysRoute: ApiKeysRoute,
+  DashboardRoute: DashboardRoute,
   LoginRoute: LoginRoute,
   SignupRoute: SignupRoute,
+  ApiSplatRoute: ApiSplatRoute,
+  ApiVerifyPasswordRoute: ApiVerifyPasswordRoute,
+  ProjectsProjectIdRoute: ProjectsProjectIdRoute,
+  ProjectsProjectIdEnvironmentsEnvIdRoute:
+    ProjectsProjectIdEnvironmentsEnvIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
