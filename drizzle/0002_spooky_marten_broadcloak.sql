@@ -1,0 +1,1 @@
+ALTER TABLE "api_client" ADD CONSTRAINT "api_client_publicKey_unique" UNIQUE("public_key");

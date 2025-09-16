@@ -15,6 +15,13 @@
       "when": 1757689372727,
       "tag": "0001_thankful_lizard",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1757993208829,
+      "tag": "0002_spooky_marten_broadcloak",
+      "breakpoints": true
     }
   ]
 }

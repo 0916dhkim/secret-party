@@ -93,7 +93,7 @@ export const secretRelations = relations(secretTable, ({ one }) => ({
 export const apiClientTable = pgTable("api_client", {
   id: integer().primaryKey().generatedAlwaysAsIdentity(),
   name: text().notNull(),
-  publicKey: text().notNull(),
+  publicKey: text().notNull().unique(),
 });
 
 export const apiClientRelations = relations(apiClientTable, ({ many }) => ({
