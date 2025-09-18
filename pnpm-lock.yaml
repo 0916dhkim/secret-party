@@ -17,6 +17,9 @@ importers:
       '@hono/node-server':
         specifier: ^1.19.2
         version: 1.19.2(hono@4.9.7)
+      '@hono/zod-validator':
+        specifier: ^0.7.2
+        version: 0.7.2(hono@4.9.7)(zod@4.1.8)
       '@noble/ciphers':
         specifier: ^2.0.0
         version: 2.0.0
@@ -560,6 +563,12 @@ packages:
     engines: {node: '>=18.14.1'}
     peerDependencies:
       hono: ^4
+
+  '@hono/zod-validator@0.7.2':
+    resolution: {integrity: sha512-ub5eL/NeZ4eLZawu78JpW/J+dugDAYhwqUIdp9KYScI6PZECij4Hx4UsrthlEUutqDDhPwRI0MscUfNkvn/mqQ==}
+    peerDependencies:
+      hono: '>=3.9.0'
+      zod: ^3.25.0 || ^4.0.0
 
   '@ioredis/commands@1.3.1':
     resolution: {integrity: sha512-bYtU8avhGIcje3IhvF9aSjsa5URMZBHnwKtOvXsT4sfYy9gppW11gLPT/9oNqlJZD47yPKveQFTAFWpHjKvUoQ==}
@@ -3210,6 +3219,11 @@ snapshots:
   '@hono/node-server@1.19.2(hono@4.9.7)':
     dependencies:
       hono: 4.9.7
+
+  '@hono/zod-validator@0.7.2(hono@4.9.7)(zod@4.1.8)':
+    dependencies:
+      hono: 4.9.7
+      zod: 4.1.8
 
   '@ioredis/commands@1.3.1': {}
 
