@@ -147,31 +147,13 @@ The following items are explicitly **not** included in this implementation:
    - Returns: status 200 with empty body
    - Authentication: API public key in Authorization header
 
-## Phase 5: Security Hardening
-
-### Security Measures:
-
-1. **Input Validation**
-
-   - Zod schemas for all API inputs
-   - XSS protection with proper escaping
-   - SQL injection prevention (parameterized queries)
-
-2. **Audit Logging**
-
-   - Log all secret access (API calls)
-   - Log all management operations (create/update/delete)
-   - Include IP, timestamp, user/API key identifier
-
 ## Implementation Order:
 
 1. ✅ Basic auth system (already exists)
 2. ✅ Database schema and migrations (already done)
 3. ✅ Encryption utilities
 4. 🔄 Dashboard UI components and pages (Remix)
-5. 🔄 Public REST API implementation (Hono)
-6. 🔄 Security hardening
-7. 🔄 Documentation
+5. ✅ Public REST API implementation (Hono)
 
 ## Technical Considerations:
 
@@ -180,6 +162,5 @@ The following items are explicitly **not** included in this implementation:
   - **Hono** - Public REST API endpoints only
   - **Shared:** Drizzle ORM + PostgreSQL (PGLite on local, pg on prod)
 - Client-side crypto operations for API key usage
-- Memory-safe handling of encryption keys (clear after use)
 - Proper error handling without information leakage
 - Backup and recovery procedures for encrypted data
