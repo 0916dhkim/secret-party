@@ -7,9 +7,15 @@ Simple self-hostable secrets manager
 - Organize your secrets by projects and environments (e.g. prod & staging)
   - Secrets are stored as key-value pairs.
   - No versioning.
-- Public API for fetching secrets.
-  - Endpoint: GET /api/v1/secret?project=<project-id>&environment=<environment-name>&key=<key>
-  - API key generation from dashboard.
+- Public API for managing secrets.
+  - Authentication: Bearer token using public key in Authorization header
+  - Endpoints:
+    - GET /api/v1/environments/:environmentId - Get environment info
+    - GET /api/v1/environments/:environmentId/secrets - List all secret keys
+    - GET /api/v1/environments/:environmentId/secrets/:key - Get specific secret
+    - POST /api/v1/environments/:environmentId/secrets/:key - Create new secret
+    - PUT /api/v1/environments/:environmentId/secrets/:key - Update existing secret
+  - API key pair generation from dashboard.
 
 ## How It Works
 
