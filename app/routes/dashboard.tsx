@@ -68,7 +68,12 @@ function Dashboard() {
           {/* Recent Activity */}
           <div className={Styles.card}>
             <h3 className={Styles.cardTitle}>Recent Activity</h3>
-            <p className={css({ color: "#6b7280", fontSize: "0.875rem" })}>
+            <p
+              className={css(({ v }) => ({
+                color: v("--c-text-muted"),
+                fontSize: "0.875rem",
+              }))}
+            >
               No recent activity
             </p>
           </div>
@@ -81,32 +86,40 @@ function Dashboard() {
             className={css({ display: "flex", gap: "1rem", flexWrap: "wrap" })}
           >
             <button
-              className={css({
-                backgroundColor: "#3b82f6",
-                color: "white",
+              className={css(({ v }) => ({
+                backgroundColor: v("--c-primary"),
+                color: v("--c-text-alt"),
                 padding: "0.75rem 1.5rem",
                 borderRadius: "6px",
                 border: "none",
                 cursor: "pointer",
                 fontSize: "0.875rem",
                 fontWeight: "500",
-                "&:hover": { backgroundColor: "#2563eb" },
-              })}
+                "&:hover": {
+                  backgroundColor: `oklch(from ${v(
+                    "--c-primary"
+                  )} calc(l - 0.05) c h)`,
+                },
+              }))}
             >
               Create New Project
             </button>
             <button
-              className={css({
-                backgroundColor: "#10b981",
-                color: "white",
+              className={css(({ v }) => ({
+                backgroundColor: v("--c-success"),
+                color: v("--c-text-alt"),
                 padding: "0.75rem 1.5rem",
                 borderRadius: "6px",
                 border: "none",
                 cursor: "pointer",
                 fontSize: "0.875rem",
                 fontWeight: "500",
-                "&:hover": { backgroundColor: "#059669" },
-              })}
+                "&:hover": {
+                  backgroundColor: `oklch(from ${v(
+                    "--c-success"
+                  )} calc(l - 0.05) c h)`,
+                },
+              }))}
             >
               Generate API Key
             </button>
@@ -114,14 +127,19 @@ function Dashboard() {
         </div>
 
         <div
-          className={css({
-            backgroundColor: "#f0f9ff",
+          className={css(({ v }) => ({
+            backgroundColor: `oklch(from ${v("--c-info")} 0.85 0.1 h)`,
             padding: "1rem",
             borderRadius: "6px",
-            border: "1px solid #0ea5e9",
-          })}
+            border: `1px solid ${v("--c-info")}`,
+          }))}
         >
-          <p className={css({ color: "#0c4a6e", fontSize: "0.875rem" })}>
+          <p
+            className={css(({ v }) => ({
+              color: `oklch(from ${v("--c-info")} 0.3 c h)`,
+              fontSize: "0.875rem",
+            }))}
+          >
             Welcome to Secret Party! This is a placeholder dashboard page. The
             actual implementation will show your projects, recent activity, and
             quick actions.
@@ -133,12 +151,12 @@ function Dashboard() {
 }
 
 const Styles = {
-  card: css({
-    backgroundColor: "#f8f9fa",
+  card: css(({ v }) => ({
+    backgroundColor: v("--c-bg"),
     padding: "1.5rem",
     borderRadius: "8px",
-    border: "1px solid #e9ecef",
-  }),
+    border: `1px solid ${v("--c-border")}`,
+  })),
   cardTitle: css({
     marginBottom: "1rem",
     fontSize: "1.25rem",

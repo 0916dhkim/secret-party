@@ -79,7 +79,12 @@ function ProjectDetail() {
             >
               {project.name}
             </h1>
-            <p className={css({ color: "#6b7280", fontSize: "1rem" })}>
+            <p
+              className={css(({ v }) => ({
+                color: v("--c-text-muted"),
+                fontSize: "1rem",
+              }))}
+            >
               {project.description}
             </p>
           </div>
@@ -100,31 +105,31 @@ function ProjectDetail() {
         >
           <div className={Styles.statCard}>
             <div
-              className={css({
+              className={css(({ v }) => ({
                 fontSize: "2rem",
                 fontWeight: "bold",
-                color: "#3b82f6",
-              })}
+                color: v("--c-primary"),
+              }))}
             >
               {project.environments.length}
             </div>
             <div
-              className={css({
+              className={css(({ v }) => ({
                 fontSize: "0.875rem",
-                color: "#6b7280",
+                color: v("--c-text-muted"),
                 marginTop: "0.5rem",
-              })}
+              }))}
             >
               Environments
             </div>
           </div>
           <div className={Styles.statCard}>
             <div
-              className={css({
+              className={css(({ v }) => ({
                 fontSize: "2rem",
                 fontWeight: "bold",
-                color: "#10b981",
-              })}
+                color: v("--c-success"),
+              }))}
             >
               {project.environments.reduce(
                 (sum: number, env: any) => sum + env.secretCount,
@@ -132,11 +137,11 @@ function ProjectDetail() {
               )}
             </div>
             <div
-              className={css({
+              className={css(({ v }) => ({
                 fontSize: "0.875rem",
-                color: "#6b7280",
+                color: v("--c-text-muted"),
                 marginTop: "0.5rem",
-              })}
+              }))}
             >
               Total Secrets
             </div>
@@ -173,11 +178,11 @@ function ProjectDetail() {
                 })}
               >
                 <h3
-                  className={css({
+                  className={css(({ v }) => ({
                     fontSize: "1.25rem",
                     fontWeight: "600",
-                    color: "#111827",
-                  })}
+                    color: v("--c-text"),
+                  }))}
                 >
                   {environment.name}
                 </h3>
@@ -190,14 +195,18 @@ function ProjectDetail() {
                       fontWeight: "500",
                     }),
                     environment.name === "Production"
-                      ? css({
-                          backgroundColor: "#fef2f2",
-                          color: "#dc2626",
-                        })
-                      : css({
-                          backgroundColor: "#f0fdf4",
-                          color: "#16a34a",
-                        })
+                      ? css(({ v }) => ({
+                          backgroundColor: `oklch(from ${v(
+                            "--c-danger"
+                          )} 0.95 0.05 h)`,
+                          color: v("--c-danger"),
+                        }))
+                      : css(({ v }) => ({
+                          backgroundColor: `oklch(from ${v(
+                            "--c-success"
+                          )} 0.95 0.05 h)`,
+                          color: v("--c-success"),
+                        }))
                   )}
                 >
                   {environment.name}
@@ -213,12 +222,18 @@ function ProjectDetail() {
                 })}
               >
                 <div
-                  className={css({ fontSize: "0.875rem", color: "#6b7280" })}
+                  className={css(({ v }) => ({
+                    fontSize: "0.875rem",
+                    color: v("--c-text-muted"),
+                  }))}
                 >
                   <strong>{environment.secretCount}</strong> secrets
                 </div>
                 <div
-                  className={css({ fontSize: "0.875rem", color: "#6b7280" })}
+                  className={css(({ v }) => ({
+                    fontSize: "0.875rem",
+                    color: v("--c-text-muted"),
+                  }))}
                 >
                   Last updated: {environment.lastUpdated}
                 </div>
@@ -234,10 +249,15 @@ function ProjectDetail() {
                 <button
                   className={clsx(
                     Styles.environmentActionButton,
-                    css({
-                      backgroundColor: "#f3f4f6",
-                      color: "#374151",
-                    })
+                    css(({ v }) => ({
+                      backgroundColor: v("--c-bg-light"),
+                      color: v("--c-text"),
+                      "&:hover": {
+                        backgroundColor: `oklch(from ${v(
+                          "--c-bg-light"
+                        )} calc(l - 0.05) c h)`,
+                      },
+                    }))
                   )}
                 >
                   Manage
@@ -245,10 +265,15 @@ function ProjectDetail() {
                 <button
                   className={clsx(
                     Styles.environmentActionButton,
-                    css({
-                      backgroundColor: "#3b82f6",
-                      color: "white",
-                    })
+                    css(({ v }) => ({
+                      backgroundColor: v("--c-primary"),
+                      color: v("--c-text-alt"),
+                      "&:hover": {
+                        backgroundColor: `oklch(from ${v(
+                          "--c-primary"
+                        )} calc(l - 0.05) c h)`,
+                      },
+                    }))
                   )}
                   onClick={() => {
                     // This would navigate to the environment detail page
@@ -265,14 +290,19 @@ function ProjectDetail() {
         </div>
 
         <div
-          className={css({
-            backgroundColor: "#f0f9ff",
+          className={css(({ v }) => ({
+            backgroundColor: `oklch(from ${v("--c-info")} 0.85 0.1 h)`,
             padding: "1rem",
             borderRadius: "6px",
-            border: "1px solid #0ea5e9",
-          })}
+            border: `1px solid ${v("--c-info")}`,
+          }))}
         >
-          <p className={css({ color: "#0c4a6e", fontSize: "0.875rem" })}>
+          <p
+            className={css(({ v }) => ({
+              color: `oklch(from ${v("--c-info")} 0.3 c h)`,
+              fontSize: "0.875rem",
+            }))}
+          >
             This is a placeholder project detail page. The actual implementation
             will show real project data, allow project management, and provide
             navigation to environment-specific secret management.
@@ -287,51 +317,53 @@ function ProjectDetail() {
 }
 
 const Styles = {
-  statCard: css({
-    backgroundColor: "#f8f9fa",
+  statCard: css(({ v }) => ({
+    backgroundColor: v("--c-bg"),
     padding: "1.5rem",
     borderRadius: "8px",
-    border: "1px solid #e9ecef",
+    border: `1px solid ${v("--c-border")}`,
     textAlign: "center",
-  }),
-  secondaryButton: css({
-    backgroundColor: "#f3f4f6",
-    color: "#374151",
+  })),
+  secondaryButton: css(({ v }) => ({
+    backgroundColor: v("--c-bg-light"),
+    color: v("--c-text"),
     padding: "0.75rem 1.5rem",
     borderRadius: "6px",
     border: "none",
     cursor: "pointer",
     fontSize: "0.875rem",
     fontWeight: "500",
+    transition: "all 0.2s",
     "&:hover": {
-      backgroundColor: "#e5e7eb",
+      backgroundColor: `oklch(from ${v("--c-bg-light")} calc(l - 0.05) c h)`,
     },
-  }),
-  primaryButton: css({
-    backgroundColor: "#10b981",
-    color: "white",
+  })),
+  primaryButton: css(({ v }) => ({
+    backgroundColor: v("--c-success"),
+    color: v("--c-text-alt"),
     padding: "0.75rem 1.5rem",
     borderRadius: "6px",
     border: "none",
     cursor: "pointer",
     fontSize: "0.875rem",
     fontWeight: "500",
+    transition: "all 0.2s",
     "&:hover": {
-      backgroundColor: "#059669",
+      backgroundColor: `oklch(from ${v("--c-success")} calc(l - 0.05) c h)`,
     },
-  }),
-  environmentCard: css({
-    backgroundColor: "white",
+  })),
+  environmentCard: css(({ v }) => ({
+    backgroundColor: v("--c-bg"),
     padding: "1.5rem",
     borderRadius: "8px",
-    border: "1px solid #e5e7eb",
-    boxShadow: "0 1px 3px 0 rgb(0 0 0 / 0.1)",
+    border: `1px solid ${v("--c-border")}`,
+    boxShadow: v("--shadow"),
     cursor: "pointer",
     transition: "all 0.2s",
     "&:hover": {
       boxShadow: "0 4px 6px -1px rgb(0 0 0 / 0.1)",
     },
-  }),
+  })),
   environmentActionButton: css({
     padding: "0.5rem 1rem",
     borderRadius: "4px",
@@ -339,5 +371,6 @@ const Styles = {
     cursor: "pointer",
     fontSize: "0.75rem",
     fontWeight: "500",
+    transition: "all 0.2s",
   }),
 };

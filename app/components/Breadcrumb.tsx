@@ -16,11 +16,11 @@ export function Breadcrumb({ items }: BreadcrumbProps) {
 
   return (
     <div
-      className={css({
-        backgroundColor: "#f9fafb",
-        borderBottom: "1px solid #e5e7eb",
+      className={css(({ v }) => ({
+        backgroundColor: v("--c-bg-light"),
+        borderBottom: `1px solid ${v("--c-border")}`,
         padding: "0.75rem 1rem",
-      })}
+      }))}
     >
       <div
         className={css({
@@ -34,26 +34,32 @@ export function Breadcrumb({ items }: BreadcrumbProps) {
       >
         {items.map((item, index) => (
           <span key={index}>
-            {index > 0 && <span className={css({ color: "#9ca3af" })}>•</span>}
+            {index > 0 && (
+              <span
+                className={css(({ v }) => ({ color: v("--c-text-muted") }))}
+              >
+                •
+              </span>
+            )}
             {item.path ? (
               <Link
                 to={item.path}
-                className={css({
-                  color: "#3b82f6",
+                className={css(({ v }) => ({
+                  color: v("--c-primary"),
                   textDecoration: "none",
                   "&:hover": {
                     textDecoration: "underline",
                   },
-                })}
+                }))}
               >
                 {item.label}
               </Link>
             ) : (
               <span
-                className={css({
-                  color: "#6b7280",
+                className={css(({ v }) => ({
+                  color: v("--c-text-muted"),
                   fontWeight: "500",
-                })}
+                }))}
               >
                 {item.label}
               </span>

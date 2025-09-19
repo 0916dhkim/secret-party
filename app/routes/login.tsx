@@ -3,7 +3,6 @@ import { loginSchema } from "../auth/validation";
 import { css } from "@flow-css/core/css";
 import { useForm } from "@tanstack/react-form";
 import { clsx } from "clsx";
-// Removed shared imports - styles inlined
 import { hasFirstUser } from "../auth/session";
 import { createFileRoute, redirect } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
@@ -57,11 +56,14 @@ export default function Login() {
       <h1>Login</h1>
 
       <form
-        className={css({
+        className={css(({ v }) => ({
           display: "flex",
           flexDirection: "column",
           gap: "1rem",
-        })}
+          input: {
+            background: v("--c-bg-light"),
+          },
+        }))}
         action={login.url}
         method="POST"
       >
@@ -94,11 +96,11 @@ export default function Login() {
               {field.state.meta.isTouched &&
                 field.state.meta.errors.length > 0 && (
                   <div
-                    className={css({
-                      color: "#dc3545",
+                    className={css(({ v }) => ({
+                      color: v("--c-danger"),
                       fontSize: "0.875rem",
                       marginTop: "0.25rem",
-                    })}
+                    }))}
                   >
                     {typeof field.state.meta.errors[0] === "string"
                       ? field.state.meta.errors[0]
@@ -139,11 +141,11 @@ export default function Login() {
               {field.state.meta.isTouched &&
                 field.state.meta.errors.length > 0 && (
                   <div
-                    className={css({
-                      color: "#dc3545",
+                    className={css(({ v }) => ({
+                      color: v("--c-danger"),
                       fontSize: "0.875rem",
                       marginTop: "0.25rem",
-                    })}
+                    }))}
                   >
                     {typeof field.state.meta.errors[0] === "string"
                       ? field.state.meta.errors[0]
@@ -157,14 +159,14 @@ export default function Login() {
 
         {generalError && (
           <div
-            className={css({
-              color: "#dc3545",
+            className={css(({ v }) => ({
+              color: v("--c-danger"),
               fontSize: "0.875rem",
               padding: "0.75rem",
-              backgroundColor: "#f8d7da",
-              border: "1px solid #f5c6cb",
+              backgroundColor: v("--c-bg-light"),
+              border: `1px solid ${v("--c-border")}`,
               borderRadius: "4px",
-            })}
+            }))}
           >
             {generalError}
           </div>
@@ -196,31 +198,31 @@ const Styles = {
     borderRadius: "4px",
   }),
 
-  inputValid: css({
-    border: "1px solid #ccc",
-  }),
+  inputValid: css(({ v }) => ({
+    border: `1px solid ${v("--c-border")}`,
+  })),
 
-  inputInvalid: css({
-    border: "1px solid #dc3545",
-  }),
+  inputInvalid: css(({ v }) => ({
+    border: `1px solid ${v("--c-danger")}`,
+  })),
 
-  button: css({
+  button: css(({ v }) => ({
     padding: "0.75rem",
-    color: "white",
+    color: v("--c-text-alt"),
     border: "none",
     borderRadius: "4px",
-  }),
+  })),
 
-  buttonEnabled: css({
-    backgroundColor: "#007bff",
+  buttonEnabled: css(({ v }) => ({
+    backgroundColor: v("--c-success"),
     cursor: "pointer",
     "&:hover": {
-      backgroundColor: "#0056b3",
+      backgroundColor: `oklch(from ${v("--c-success")} calc(l - 0.05) c h)`,
     },
-  }),
+  })),
 
-  buttonDisabled: css({
-    backgroundColor: "#6c757d",
+  buttonDisabled: css(({ v }) => ({
+    backgroundColor: `oklch(from ${v("--c-success")} l 0 h)`,
     cursor: "not-allowed",
-  }),
+  })),
 };

@@ -6,6 +6,8 @@ import {
   Scripts,
 } from "@tanstack/react-router";
 import appCssUrl from "../app.css?url";
+import { CSS_VARIABLES } from "../theme";
+import { css } from "@flow-css/core/css";
 
 export const Route = createRootRoute({
   head: () => ({
@@ -40,7 +42,13 @@ function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
       <head>
         <HeadContent />
       </head>
-      <body>
+      <body
+        style={CSS_VARIABLES as React.CSSProperties}
+        className={css(({ v }) => ({
+          background: v("--c-bg-dark"),
+          color: v("--c-text"),
+        }))}
+      >
         {children}
         <Scripts />
       </body>

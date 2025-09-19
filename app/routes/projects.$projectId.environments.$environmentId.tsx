@@ -117,7 +117,12 @@ function EnvironmentDetail() {
             >
               {environment.name} Environment
             </h1>
-            <p className={css({ color: "#6b7280", fontSize: "1rem" })}>
+            <p
+              className={css(({ v }) => ({
+                color: v("--c-text-muted"),
+                fontSize: "1rem",
+              }))}
+            >
               Manage secrets for the {environment.name.toLowerCase()}{" "}
               environment
             </p>
@@ -126,10 +131,15 @@ function EnvironmentDetail() {
             <button
               className={clsx(
                 Styles.actionButton,
-                css({
-                  backgroundColor: "#f59e0b",
-                  color: "white",
-                })
+                css(({ v }) => ({
+                  backgroundColor: v("--c-warning"),
+                  color: v("--c-text-alt"),
+                  "&:hover": {
+                    backgroundColor: `oklch(from ${v(
+                      "--c-warning"
+                    )} calc(l - 0.05) c h)`,
+                  },
+                }))
               )}
             >
               Import Secrets
@@ -137,10 +147,15 @@ function EnvironmentDetail() {
             <button
               className={clsx(
                 Styles.actionButton,
-                css({
-                  backgroundColor: "#3b82f6",
-                  color: "white",
-                })
+                css(({ v }) => ({
+                  backgroundColor: v("--c-primary"),
+                  color: v("--c-text-alt"),
+                  "&:hover": {
+                    backgroundColor: `oklch(from ${v(
+                      "--c-primary"
+                    )} calc(l - 0.05) c h)`,
+                  },
+                }))
               )}
             >
               + Add Secret
@@ -151,7 +166,12 @@ function EnvironmentDetail() {
         {/* Environment Info */}
         <div className={Styles.infoCard}>
           <div>
-            <span className={css({ fontSize: "0.875rem", color: "#6b7280" })}>
+            <span
+              className={css(({ v }) => ({
+                fontSize: "0.875rem",
+                color: v("--c-text-muted"),
+              }))}
+            >
               <strong>{environment.secrets.length}</strong> secrets total
             </span>
           </div>
@@ -165,22 +185,27 @@ function EnvironmentDetail() {
             <input
               type="text"
               placeholder="Search secrets..."
-              className={css({
+              className={css(({ v }) => ({
                 padding: "0.5rem 0.75rem",
-                border: "1px solid #d1d5db",
+                border: `1px solid ${v("--c-border")}`,
                 borderRadius: "6px",
                 fontSize: "0.875rem",
                 minWidth: "200px",
-              })}
+                backgroundColor: v("--c-bg-light"),
+                color: v("--c-text"),
+              }))}
             />
             <button
               className={clsx(
                 Styles.smallButton,
-                css({
-                  backgroundColor: "#6b7280",
-                  color: "white",
+                css(({ v }) => ({
+                  backgroundColor: `oklch(from ${v("--c-text")} l 0.3 h)`,
+                  color: v("--c-text-alt"),
                   fontWeight: "500",
-                })
+                  "&:hover": {
+                    backgroundColor: `oklch(from ${v("--c-text")} l 0.25 h)`,
+                  },
+                }))
               )}
             >
               Export
@@ -204,48 +229,64 @@ function EnvironmentDetail() {
               className={clsx(
                 Styles.tableRow,
                 index < environment.secrets.length - 1 &&
-                  css({
-                    borderBottom: "1px solid #f3f4f6",
-                  })
+                  css(({ v }) => ({
+                    borderBottom: `1px solid ${v("--c-border")}`,
+                  }))
               )}
             >
               <div>
                 <code
-                  className={css({
-                    backgroundColor: "#f3f4f6",
+                  className={css(({ v }) => ({
+                    backgroundColor: v("--c-bg-light"),
                     padding: "0.25rem 0.5rem",
                     borderRadius: "4px",
                     fontSize: "0.75rem",
                     fontFamily: "monospace",
                     fontWeight: "500",
-                  })}
+                    border: `1px solid ${v("--c-border")}`,
+                  }))}
                 >
                   {secret.key}
                 </code>
               </div>
               <div
-                className={css({
+                className={css(({ v }) => ({
                   fontFamily: "monospace",
-                  color: "#6b7280",
+                  color: v("--c-text-muted"),
                   fontSize: "0.75rem",
-                })}
+                }))}
               >
                 {secret.value}
               </div>
-              <div className={css({ color: "#6b7280", fontSize: "0.75rem" })}>
+              <div
+                className={css(({ v }) => ({
+                  color: v("--c-text-muted"),
+                  fontSize: "0.75rem",
+                }))}
+              >
                 {secret.lastUpdated}
               </div>
-              <div className={css({ color: "#6b7280", fontSize: "0.75rem" })}>
+              <div
+                className={css(({ v }) => ({
+                  color: v("--c-text-muted"),
+                  fontSize: "0.75rem",
+                }))}
+              >
                 {secret.updatedBy}
               </div>
               <div className={css({ display: "flex", gap: "0.5rem" })}>
                 <button
                   className={clsx(
                     Styles.smallButton,
-                    css({
-                      backgroundColor: "#f3f4f6",
-                      color: "#374151",
-                    })
+                    css(({ v }) => ({
+                      backgroundColor: v("--c-bg-light"),
+                      color: v("--c-text"),
+                      "&:hover": {
+                        backgroundColor: `oklch(from ${v(
+                          "--c-bg-light"
+                        )} calc(l - 0.05) c h)`,
+                      },
+                    }))
                   )}
                 >
                   View
@@ -253,10 +294,15 @@ function EnvironmentDetail() {
                 <button
                   className={clsx(
                     Styles.smallButton,
-                    css({
-                      backgroundColor: "#3b82f6",
-                      color: "white",
-                    })
+                    css(({ v }) => ({
+                      backgroundColor: v("--c-primary"),
+                      color: v("--c-text-alt"),
+                      "&:hover": {
+                        backgroundColor: `oklch(from ${v(
+                          "--c-primary"
+                        )} calc(l - 0.05) c h)`,
+                      },
+                    }))
                   )}
                 >
                   Edit
@@ -264,10 +310,17 @@ function EnvironmentDetail() {
                 <button
                   className={clsx(
                     Styles.smallButton,
-                    css({
-                      backgroundColor: "#fef2f2",
-                      color: "#dc2626",
-                    })
+                    css(({ v }) => ({
+                      backgroundColor: `oklch(from ${v(
+                        "--c-danger"
+                      )} 0.95 0.05 h)`,
+                      color: v("--c-danger"),
+                      "&:hover": {
+                        backgroundColor: `oklch(from ${v(
+                          "--c-danger"
+                        )} 0.9 0.1 h)`,
+                      },
+                    }))
                   )}
                 >
                   Delete
@@ -278,14 +331,19 @@ function EnvironmentDetail() {
         </div>
 
         <div
-          className={css({
-            backgroundColor: "#f0f9ff",
+          className={css(({ v }) => ({
+            backgroundColor: `oklch(from ${v("--c-info")} 0.85 0.1 h)`,
             padding: "1rem",
             borderRadius: "6px",
-            border: "1px solid #0ea5e9",
-          })}
+            border: `1px solid ${v("--c-info")}`,
+          }))}
         >
-          <p className={css({ color: "#0c4a6e", fontSize: "0.875rem" })}>
+          <p
+            className={css(({ v }) => ({
+              color: `oklch(from ${v("--c-info")} 0.3 c h)`,
+              fontSize: "0.875rem",
+            }))}
+          >
             This is a placeholder environment detail page. The actual
             implementation will show real secrets, allow secret management
             (create, read, update, delete), and provide search/filtering
@@ -305,6 +363,7 @@ const Styles = {
     cursor: "pointer",
     fontSize: "0.875rem",
     fontWeight: "500",
+    transition: "all 0.2s",
   }),
   smallButton: css({
     padding: "0.25rem 0.5rem",
@@ -312,37 +371,38 @@ const Styles = {
     border: "none",
     cursor: "pointer",
     fontSize: "0.75rem",
+    transition: "all 0.2s",
   }),
-  infoCard: css({
-    backgroundColor: "#f8f9fa",
+  infoCard: css(({ v }) => ({
+    backgroundColor: v("--c-bg"),
     padding: "1rem",
     borderRadius: "6px",
-    border: "1px solid #e9ecef",
+    border: `1px solid ${v("--c-border")}`,
     marginBottom: "2rem",
     display: "flex",
     justifyContent: "space-between",
     alignItems: "center",
-  }),
-  tableContainer: css({
-    backgroundColor: "white",
+  })),
+  tableContainer: css(({ v }) => ({
+    backgroundColor: v("--c-bg"),
     borderRadius: "8px",
-    border: "1px solid #e5e7eb",
+    border: `1px solid ${v("--c-border")}`,
     overflow: "hidden",
     marginBottom: "2rem",
-  }),
-  tableHeader: css({
-    backgroundColor: "#f9fafb",
+  })),
+  tableHeader: css(({ v }) => ({
+    backgroundColor: v("--c-bg-light"),
     padding: "0.75rem 1.5rem",
-    borderBottom: "1px solid #e5e7eb",
+    borderBottom: `1px solid ${v("--c-border")}`,
     display: "grid",
     gridTemplateColumns: "2fr 1fr 1fr 1fr 1fr",
     gap: "1rem",
     fontSize: "0.75rem",
     fontWeight: "600",
-    color: "#374151",
+    color: v("--c-text"),
     textTransform: "uppercase",
     letterSpacing: "0.05em",
-  }),
+  })),
   tableRow: css({
     padding: "1rem 1.5rem",
     display: "grid",

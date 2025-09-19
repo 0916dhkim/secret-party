@@ -43,9 +43,9 @@ function Projects() {
             Projects
           </h1>
           <button
-            className={css({
-              backgroundColor: "#3b82f6",
-              color: "white",
+            className={css(({ v }) => ({
+              backgroundColor: v("--c-primary"),
+              color: v("--c-text-alt"),
               padding: "0.75rem 1.5rem",
               borderRadius: "6px",
               border: "none",
@@ -53,9 +53,11 @@ function Projects() {
               fontSize: "0.875rem",
               fontWeight: "500",
               "&:hover": {
-                backgroundColor: "#2563eb",
+                backgroundColor: `oklch(from ${v(
+                  "--c-primary"
+                )} calc(l - 0.05) c h)`,
               },
-            })}
+            }))}
           >
             + New Project
           </button>
@@ -93,12 +95,12 @@ function Projects() {
           ].map((project, index) => (
             <div key={index} className={Styles.projectCard}>
               <h3
-                className={css({
+                className={css(({ v }) => ({
                   fontSize: "1.25rem",
                   fontWeight: "600",
                   marginBottom: "1rem",
-                  color: "#111827",
-                })}
+                  color: v("--c-text"),
+                }))}
               >
                 {project.name}
               </h3>
@@ -111,17 +113,26 @@ function Projects() {
                 })}
               >
                 <div
-                  className={css({ fontSize: "0.875rem", color: "#6b7280" })}
+                  className={css(({ v }) => ({
+                    fontSize: "0.875rem",
+                    color: v("--c-text-muted"),
+                  }))}
                 >
                   <strong>{project.environments}</strong> environments
                 </div>
                 <div
-                  className={css({ fontSize: "0.875rem", color: "#6b7280" })}
+                  className={css(({ v }) => ({
+                    fontSize: "0.875rem",
+                    color: v("--c-text-muted"),
+                  }))}
                 >
                   <strong>{project.secrets}</strong> secrets total
                 </div>
                 <div
-                  className={css({ fontSize: "0.875rem", color: "#6b7280" })}
+                  className={css(({ v }) => ({
+                    fontSize: "0.875rem",
+                    color: v("--c-text-muted"),
+                  }))}
                 >
                   Last updated: {project.lastUpdated}
                 </div>
@@ -136,10 +147,15 @@ function Projects() {
                 <button
                   className={clsx(
                     Styles.cardButton,
-                    css({
-                      backgroundColor: "#f3f4f6",
-                      color: "#374151",
-                    })
+                    css(({ v }) => ({
+                      backgroundColor: v("--c-bg-light"),
+                      color: v("--c-text"),
+                      "&:hover": {
+                        backgroundColor: `oklch(from ${v(
+                          "--c-bg-light"
+                        )} calc(l - 0.05) c h)`,
+                      },
+                    }))
                   )}
                 >
                   Edit
@@ -147,10 +163,15 @@ function Projects() {
                 <button
                   className={clsx(
                     Styles.cardButton,
-                    css({
-                      backgroundColor: "#3b82f6",
-                      color: "white",
-                    })
+                    css(({ v }) => ({
+                      backgroundColor: v("--c-primary"),
+                      color: v("--c-text-alt"),
+                      "&:hover": {
+                        backgroundColor: `oklch(from ${v(
+                          "--c-primary"
+                        )} calc(l - 0.05) c h)`,
+                      },
+                    }))
                   )}
                 >
                   View
@@ -161,14 +182,19 @@ function Projects() {
         </div>
 
         <div
-          className={css({
-            backgroundColor: "#f0f9ff",
+          className={css(({ v }) => ({
+            backgroundColor: `oklch(from ${v("--c-info")} 0.85 0.1 h)`,
             padding: "1rem",
             borderRadius: "6px",
-            border: "1px solid #0ea5e9",
-          })}
+            border: `1px solid ${v("--c-info")}`,
+          }))}
         >
-          <p className={css({ color: "#0c4a6e", fontSize: "0.875rem" })}>
+          <p
+            className={css(({ v }) => ({
+              color: `oklch(from ${v("--c-info")} 0.3 c h)`,
+              fontSize: "0.875rem",
+            }))}
+          >
             This is a placeholder projects page. The actual implementation will
             show your real projects, allow creating new projects, and provide
             navigation to project details and environments.
@@ -180,18 +206,18 @@ function Projects() {
 }
 
 const Styles = {
-  projectCard: css({
-    backgroundColor: "white",
+  projectCard: css(({ v }) => ({
+    backgroundColor: v("--c-bg"),
     padding: "1.5rem",
     borderRadius: "8px",
-    border: "1px solid #e5e7eb",
-    boxShadow: "0 1px 3px 0 rgb(0 0 0 / 0.1)",
+    border: `1px solid ${v("--c-border")}`,
+    boxShadow: v("--shadow"),
     cursor: "pointer",
     transition: "all 0.2s",
     "&:hover": {
       boxShadow: "0 4px 6px -1px rgb(0 0 0 / 0.1)",
     },
-  }),
+  })),
   cardButton: css({
     padding: "0.5rem 1rem",
     borderRadius: "4px",
@@ -199,5 +225,6 @@ const Styles = {
     cursor: "pointer",
     fontSize: "0.75rem",
     fontWeight: "500",
+    transition: "all 0.2s",
   }),
 };

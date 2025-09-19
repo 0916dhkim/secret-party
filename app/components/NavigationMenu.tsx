@@ -28,14 +28,14 @@ export function NavigationMenu({ userEmail }: NavigationMenuProps) {
 
   return (
     <nav
-      className={css({
-        backgroundColor: "#ffffff",
-        borderBottom: "1px solid #e5e7eb",
+      className={css(({ v }) => ({
+        backgroundColor: v("--c-bg"),
+        borderBottom: `1px solid ${v("--c-border")}`,
         padding: "0 1rem",
         position: "sticky",
         top: 0,
         zIndex: 50,
-      })}
+      }))}
     >
       <div
         className={css({
@@ -50,12 +50,12 @@ export function NavigationMenu({ userEmail }: NavigationMenuProps) {
         {/* Logo */}
         <Link
           to="/dashboard"
-          className={css({
+          className={css(({ v }) => ({
             fontSize: "1.5rem",
             fontWeight: "bold",
-            color: "#111827",
+            color: v("--c-text"),
             textDecoration: "none",
-          })}
+          }))}
         >
           Secret Party
         </Link>
@@ -75,9 +75,10 @@ export function NavigationMenu({ userEmail }: NavigationMenuProps) {
             <Link
               key={item.path}
               to={item.path}
+              data-active={isActive(item.path)}
               className={clsx(
-                css({
-                  color: "#6b7280",
+                css(({ v }) => ({
+                  color: v("--c-text"),
                   textDecoration: "none",
                   fontSize: "0.875rem",
                   fontWeight: "500",
@@ -85,15 +86,20 @@ export function NavigationMenu({ userEmail }: NavigationMenuProps) {
                   borderRadius: "6px",
                   transition: "all 0.2s",
                   "&:hover": {
-                    backgroundColor: "#f3f4f6",
-                    color: "#111827",
+                    backgroundColor: `oklch(from ${v(
+                      "--c-bg"
+                    )} calc(l - 0.05) c h)`,
                   },
-                }),
-                isActive(item.path) &&
-                  css({
-                    backgroundColor: "#3b82f6",
-                    color: "#ffffff",
-                  })
+                  '&[data-active="true"]': {
+                    backgroundColor: v("--c-primary"),
+                    color: v("--c-text-alt"),
+                    "&:hover": {
+                      backgroundColor: `oklch(from ${v(
+                        "--c-primary"
+                      )} calc(l - 0.05) c h)`,
+                    },
+                  },
+                }))
               )}
             >
               {item.label}
@@ -110,13 +116,13 @@ export function NavigationMenu({ userEmail }: NavigationMenuProps) {
           })}
         >
           <span
-            className={css({
+            className={css(({ v }) => ({
               fontSize: "0.875rem",
-              color: "#6b7280",
+              color: v("--c-text"),
               "@media (max-width: 768px)": {
                 display: "none",
               },
-            })}
+            }))}
           >
             {userEmail}
           </span>
@@ -127,27 +133,22 @@ export function NavigationMenu({ userEmail }: NavigationMenuProps) {
           >
             <button
               type="submit"
-              className={clsx(
-                css({
-                  color: "#6b7280",
-                  textDecoration: "none",
-                  fontSize: "0.875rem",
-                  fontWeight: "500",
-                  padding: "0.5rem 1rem",
-                  borderRadius: "6px",
-                  transition: "all 0.2s",
-                  "&:hover": {
-                    backgroundColor: "#f3f4f6",
-                    color: "#111827",
-                  },
-                }),
-                css({
-                  backgroundColor: "#dc3545",
-                  color: "white",
-                  border: "none",
-                  cursor: "pointer",
-                })
-              )}
+              className={css(({ v }) => ({
+                backgroundColor: v("--c-danger"),
+                color: v("--c-text-alt"),
+                border: "none",
+                cursor: "pointer",
+                fontSize: "0.875rem",
+                fontWeight: "500",
+                padding: "0.5rem 1rem",
+                borderRadius: "6px",
+                transition: "all 0.2s",
+                "&:hover": {
+                  backgroundColor: `oklch(from ${v(
+                    "--c-danger"
+                  )} calc(l - 0.05) c h)`,
+                },
+              }))}
             >
               Logout
             </button>
@@ -156,7 +157,7 @@ export function NavigationMenu({ userEmail }: NavigationMenuProps) {
 
         {/* Mobile menu button */}
         <button
-          className={css({
+          className={css(({ v }) => ({
             display: "none",
             backgroundColor: "transparent",
             border: "none",
@@ -164,12 +165,12 @@ export function NavigationMenu({ userEmail }: NavigationMenuProps) {
             borderRadius: "6px",
             cursor: "pointer",
             "&:hover": {
-              backgroundColor: "#f3f4f6",
+              backgroundColor: `oklch(from ${v("--c-bg")} calc(l - 0.05) c h)`,
             },
             "@media (max-width: 768px)": {
               display: "block",
             },
-          })}
+          }))}
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
           aria-label="Toggle mobile menu"
         >
@@ -192,19 +193,19 @@ export function NavigationMenu({ userEmail }: NavigationMenuProps) {
 
       {/* Mobile Navigation Menu */}
       <div
-        className={css({
+        className={css(({ v }) => ({
           position: "absolute",
           top: "100%",
           left: 0,
           right: 0,
-          backgroundColor: "#ffffff",
-          borderBottom: "1px solid #e5e7eb",
+          backgroundColor: v("--c-bg"),
+          borderBottom: `1px solid ${v("--c-border")}`,
           padding: "1rem",
           display: "none",
           '&[data-open="true"]': {
             display: "block",
           },
-        })}
+        }))}
         data-open={isMobileMenuOpen}
       >
         {navigationItems.map((item) => (
@@ -212,9 +213,9 @@ export function NavigationMenu({ userEmail }: NavigationMenuProps) {
             key={item.path}
             to={item.path}
             className={clsx(
-              css({
+              css(({ v }) => ({
                 display: "block",
-                color: "#6b7280",
+                color: v("--c-text"),
                 textDecoration: "none",
                 fontSize: "0.875rem",
                 fontWeight: "500",
@@ -222,15 +223,17 @@ export function NavigationMenu({ userEmail }: NavigationMenuProps) {
                 borderRadius: "6px",
                 transition: "all 0.2s",
                 "&:hover": {
-                  backgroundColor: "#f3f4f6",
-                  color: "#111827",
+                  backgroundColor: `oklch(from ${v(
+                    "--c-bg"
+                  )} calc(l - 0.05) c h)`,
+                  color: v("--c-text"),
                 },
-              }),
+              })),
               isActive(item.path) &&
-                css({
-                  backgroundColor: "#3b82f6",
-                  color: "#ffffff",
-                })
+                css(({ v }) => ({
+                  backgroundColor: v("--c-primary"),
+                  color: v("--c-text-alt"),
+                }))
             )}
             onClick={() => setIsMobileMenuOpen(false)}
           >
@@ -238,48 +241,43 @@ export function NavigationMenu({ userEmail }: NavigationMenuProps) {
           </Link>
         ))}
         <div
-          className={css({
-            borderTop: "1px solid #e5e7eb",
+          className={css(({ v }) => ({
+            borderTop: `1px solid ${v("--c-border")}`,
             marginTop: "1rem",
             paddingTop: "1rem",
-          })}
+          }))}
         >
           <span
-            className={css({
+            className={css(({ v }) => ({
               fontSize: "0.875rem",
-              color: "#6b7280",
+              color: v("--c-text"),
               padding: "0.75rem 1rem",
-            })}
+            }))}
           >
             {userEmail}
           </span>
           <form action={logout.url} method="POST">
             <button
               type="submit"
-              className={clsx(
-                css({
-                  display: "block",
-                  color: "#6b7280",
-                  textDecoration: "none",
-                  fontSize: "0.875rem",
-                  fontWeight: "500",
-                  padding: "0.75rem 1rem",
-                  borderRadius: "6px",
-                  transition: "all 0.2s",
-                  "&:hover": {
-                    backgroundColor: "#f3f4f6",
-                    color: "#111827",
-                  },
-                }),
-                css({
-                  backgroundColor: "#dc3545",
-                  color: "white",
-                  border: "none",
-                  cursor: "pointer",
-                  width: "100%",
-                  textAlign: "left",
-                })
-              )}
+              className={css(({ v }) => ({
+                display: "block",
+                backgroundColor: v("--c-danger"),
+                color: v("--c-text-alt"),
+                border: "none",
+                cursor: "pointer",
+                fontSize: "0.875rem",
+                fontWeight: "500",
+                padding: "0.75rem 1rem",
+                borderRadius: "6px",
+                transition: "all 0.2s",
+                width: "100%",
+                textAlign: "left",
+                "&:hover": {
+                  backgroundColor: `oklch(from ${v(
+                    "--c-danger"
+                  )} calc(l - 0.05) c h)`,
+                },
+              }))}
             >
               Logout
             </button>

@@ -109,10 +109,10 @@ export default function Signup() {
                 )}
               {field.state.meta.errors.length === 0 && (
                 <small
-                  className={css({
+                  className={css(({ v }) => ({
                     fontSize: "0.75rem",
-                    color: "#666",
-                  })}
+                    color: v("--c-text-muted"),
+                  }))}
                 >
                   Must be at least 8 characters long with uppercase, lowercase,
                   and number
@@ -183,36 +183,39 @@ const Styles = {
     padding: "2rem",
   }),
 
-  description: css({
+  description: css(({ v }) => ({
     marginBottom: "1.5rem",
-    color: "#666",
-  }),
+    color: v("--c-text-muted"),
+  })),
 
-  form: css({
+  form: css(({ v }) => ({
     display: "flex",
     flexDirection: "column",
     gap: "1rem",
-  }),
+    input: {
+      background: v("--c-bg-light"),
+    },
+  })),
 
   label: css({
     display: "block",
     marginBottom: "0.5rem",
   }),
 
-  errorMessage: css({
-    color: "#dc3545",
+  errorMessage: css(({ v }) => ({
+    color: v("--c-danger"),
     fontSize: "0.875rem",
     marginTop: "0.25rem",
-  }),
+  })),
 
-  generalError: css({
-    color: "#dc3545",
+  generalError: css(({ v }) => ({
+    color: v("--c-danger"),
     fontSize: "0.875rem",
     padding: "0.75rem",
-    backgroundColor: "#f8d7da",
-    border: "1px solid #f5c6cb",
+    backgroundColor: v("--c-bg-light"),
+    border: `1px solid ${v("--c-border")}`,
     borderRadius: "4px",
-  }),
+  })),
 
   input: css({
     width: "100%",
@@ -224,27 +227,27 @@ const Styles = {
     border: "1px solid #ccc",
   }),
 
-  inputInvalid: css({
-    border: "1px solid #dc3545",
-  }),
+  inputInvalid: css(({ v }) => ({
+    border: `1px solid ${v("--c-danger")}`,
+  })),
 
-  button: css({
+  button: css(({ v }) => ({
     padding: "0.75rem",
-    color: "white",
+    color: v("--c-text-alt"),
     border: "none",
     borderRadius: "4px",
-  }),
+  })),
 
-  buttonEnabled: css({
-    backgroundColor: "#28a745",
+  buttonEnabled: css(({ v }) => ({
+    backgroundColor: v("--c-success"),
     cursor: "pointer",
     "&:hover": {
-      backgroundColor: "#218838",
+      backgroundColor: `oklch(from ${v("--c-success")} calc(l - 0.05) c h)`,
     },
-  }),
+  })),
 
-  buttonDisabled: css({
-    backgroundColor: "#6c757d",
+  buttonDisabled: css(({ v }) => ({
+    backgroundColor: `oklch(from ${v("--c-success")} l 0 h)`,
     cursor: "not-allowed",
-  }),
+  })),
 };

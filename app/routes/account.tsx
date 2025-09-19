@@ -54,13 +54,13 @@ function Account() {
           >
             <div>
               <label
-                className={css({
+                className={css(({ v }) => ({
                   display: "block",
                   fontSize: "0.875rem",
                   fontWeight: "500",
-                  color: "#374151",
+                  color: v("--c-text"),
                   marginBottom: "0.5rem",
-                })}
+                }))}
               >
                 Email Address
               </label>
@@ -68,15 +68,15 @@ function Account() {
                 type="email"
                 value={loaderData.user.email}
                 disabled
-                className={css({
+                className={css(({ v }) => ({
                   width: "100%",
                   maxWidth: "400px",
                   padding: "0.75rem",
-                  border: "1px solid #d1d5db",
+                  border: `1px solid ${v("--c-border")}`,
                   borderRadius: "6px",
-                  backgroundColor: "#f9fafb",
-                  color: "#6b7280",
-                })}
+                  backgroundColor: v("--c-bg-light"),
+                  color: v("--c-text-muted"),
+                }))}
               />
             </div>
 
@@ -84,10 +84,15 @@ function Account() {
               <button
                 className={clsx(
                   Styles.actionButton,
-                  css({
-                    backgroundColor: "#3b82f6",
-                    color: "white",
-                  })
+                  css(({ v }) => ({
+                    backgroundColor: v("--c-primary"),
+                    color: v("--c-text-alt"),
+                    "&:hover": {
+                      backgroundColor: `oklch(from ${v(
+                        "--c-primary"
+                      )} calc(l - 0.05) c h)`,
+                    },
+                  }))
                 )}
               >
                 Update Profile
@@ -109,31 +114,36 @@ function Account() {
           >
             <div>
               <h3
-                className={css({
+                className={css(({ v }) => ({
                   fontSize: "1rem",
                   fontWeight: "500",
-                  color: "#374151",
+                  color: v("--c-text"),
                   marginBottom: "0.5rem",
-                })}
+                }))}
               >
                 Change Password
               </h3>
               <p
-                className={css({
+                className={css(({ v }) => ({
                   fontSize: "0.875rem",
-                  color: "#6b7280",
+                  color: v("--c-text-muted"),
                   marginBottom: "1rem",
-                })}
+                }))}
               >
                 Update your password to keep your account secure.
               </p>
               <button
                 className={clsx(
                   Styles.actionButton,
-                  css({
-                    backgroundColor: "#f59e0b",
-                    color: "white",
-                  })
+                  css(({ v }) => ({
+                    backgroundColor: v("--c-warning"),
+                    color: v("--c-text-alt"),
+                    "&:hover": {
+                      backgroundColor: `oklch(from ${v(
+                        "--c-warning"
+                      )} calc(l - 0.05) c h)`,
+                    },
+                  }))
                 )}
               >
                 Change Password
@@ -141,37 +151,42 @@ function Account() {
             </div>
 
             <div
-              className={css({
-                borderTop: "1px solid #f3f4f6",
+              className={css(({ v }) => ({
+                borderTop: `1px solid ${v("--c-border")}`,
                 paddingTop: "1.5rem",
-              })}
+              }))}
             >
               <h3
-                className={css({
+                className={css(({ v }) => ({
                   fontSize: "1rem",
                   fontWeight: "500",
-                  color: "#374151",
+                  color: v("--c-text"),
                   marginBottom: "0.5rem",
-                })}
+                }))}
               >
                 Account Recovery
               </h3>
               <p
-                className={css({
+                className={css(({ v }) => ({
                   fontSize: "0.875rem",
-                  color: "#6b7280",
+                  color: v("--c-text-muted"),
                   marginBottom: "1rem",
-                })}
+                }))}
               >
                 Set up recovery options for your account.
               </p>
               <button
                 className={clsx(
                   Styles.actionButton,
-                  css({
-                    backgroundColor: "#10b981",
-                    color: "white",
-                  })
+                  css(({ v }) => ({
+                    backgroundColor: v("--c-success"),
+                    color: v("--c-text-alt"),
+                    "&:hover": {
+                      backgroundColor: `oklch(from ${v(
+                        "--c-success"
+                      )} calc(l - 0.05) c h)`,
+                    },
+                  }))
                 )}
               >
                 Setup Recovery
@@ -182,41 +197,41 @@ function Account() {
 
         {/* Danger Zone */}
         <div
-          className={css({
-            backgroundColor: "#fef2f2",
+          className={css(({ v }) => ({
+            backgroundColor: `oklch(from ${v("--c-danger")} 0.95 0.05 h)`,
             padding: "2rem",
             borderRadius: "8px",
-            border: "1px solid #fecaca",
-          })}
+            border: `1px solid oklch(from ${v("--c-danger")} 0.85 0.1 h)`,
+          }))}
         >
           <h2
-            className={css({
+            className={css(({ v }) => ({
               fontSize: "1.5rem",
               fontWeight: "600",
               marginBottom: "1.5rem",
-              color: "#dc2626",
-            })}
+              color: v("--c-danger"),
+            }))}
           >
             Danger Zone
           </h2>
 
           <div>
             <h3
-              className={css({
+              className={css(({ v }) => ({
                 fontSize: "1rem",
                 fontWeight: "500",
-                color: "#dc2626",
+                color: v("--c-danger"),
                 marginBottom: "0.5rem",
-              })}
+              }))}
             >
               Delete Account
             </h3>
             <p
-              className={css({
+              className={css(({ v }) => ({
                 fontSize: "0.875rem",
-                color: "#7f1d1d",
+                color: `oklch(from ${v("--c-danger")} 0.3 c h)`,
                 marginBottom: "1rem",
-              })}
+              }))}
             >
               Permanently delete your account and all associated data. This
               action cannot be undone.
@@ -224,10 +239,15 @@ function Account() {
             <button
               className={clsx(
                 Styles.actionButton,
-                css({
-                  backgroundColor: "#dc2626",
-                  color: "white",
-                })
+                css(({ v }) => ({
+                  backgroundColor: v("--c-danger"),
+                  color: v("--c-text-alt"),
+                  "&:hover": {
+                    backgroundColor: `oklch(from ${v(
+                      "--c-danger"
+                    )} calc(l - 0.05) c h)`,
+                  },
+                }))
               )}
             >
               Delete Account
@@ -236,15 +256,20 @@ function Account() {
         </div>
 
         <div
-          className={css({
-            backgroundColor: "#f0f9ff",
+          className={css(({ v }) => ({
+            backgroundColor: `oklch(from ${v("--c-info")} 0.85 0.1 h)`,
             padding: "1rem",
             borderRadius: "6px",
-            border: "1px solid #0ea5e9",
+            border: `1px solid ${v("--c-info")}`,
             marginTop: "2rem",
-          })}
+          }))}
         >
-          <p className={css({ color: "#0c4a6e", fontSize: "0.875rem" })}>
+          <p
+            className={css(({ v }) => ({
+              color: `oklch(from ${v("--c-info")} 0.3 c h)`,
+              fontSize: "0.875rem",
+            }))}
+          >
             This is a placeholder account settings page. The actual
             implementation will include profile management, password changes,
             security settings, and account recovery options.
@@ -256,19 +281,19 @@ function Account() {
 }
 
 const Styles = {
-  sectionCard: css({
-    backgroundColor: "white",
+  sectionCard: css(({ v }) => ({
+    backgroundColor: v("--c-bg"),
     padding: "2rem",
     borderRadius: "8px",
-    border: "1px solid #e5e7eb",
+    border: `1px solid ${v("--c-border")}`,
     marginBottom: "2rem",
-  }),
-  sectionTitle: css({
+  })),
+  sectionTitle: css(({ v }) => ({
     fontSize: "1.5rem",
     fontWeight: "600",
     marginBottom: "1.5rem",
-    color: "#111827",
-  }),
+    color: v("--c-text"),
+  })),
   actionButton: css({
     padding: "0.75rem 1.5rem",
     borderRadius: "6px",
@@ -276,5 +301,6 @@ const Styles = {
     cursor: "pointer",
     fontSize: "0.875rem",
     fontWeight: "500",
+    transition: "all 0.2s",
   }),
 };
