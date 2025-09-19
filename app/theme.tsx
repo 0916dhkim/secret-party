@@ -1,8 +1,8 @@
 export const CSS_VARIABLES = {
-  "--c-bg-dark": "oklch(0.90 0.015 17)",
-  "--c-bg": "oklch(0.95 0.015 17)",
-  "--c-bg-light": "oklch(1 0.015 17)",
-  "--c-border": "oklch(0.6 0.03 17)",
+  "--c-bg-dark": "oklch(0.92 0.005 339.7)",
+  "--c-bg": "oklch(0.96 0.005 339.7)",
+  "--c-bg-light": "oklch(1 0.005 339.7)",
+  "--c-border": "oklch(0.6 0.03 339.7)",
   "--c-text": "oklch(0.15 0.015 339.7)",
   "--c-text-alt": "oklch(1 0.015 339.7)",
   "--c-text-muted": "oklch(0.6 0.015 339.7)",
