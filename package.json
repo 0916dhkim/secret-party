@@ -20,6 +20,7 @@
     "@noble/ciphers": "^2.0.0",
     "@noble/hashes": "^2.0.0",
     "@tanstack/react-form": "^1.19.5",
+    "@tanstack/react-query": "^5.89.0",
     "@tanstack/react-router": "^1.131.41",
     "@tanstack/react-start": "^1.131.43",
     "clsx": "^2.1.1",
