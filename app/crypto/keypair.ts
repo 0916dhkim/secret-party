@@ -65,14 +65,14 @@ export async function deserializeKeyPair(
 }
 
 export async function encryptWithPublicKey(
-  data: ArrayBuffer | Uint8Array,
+  data: BufferSource,
   publicKey: CryptoKey
 ): Promise<ArrayBuffer> {
   return await crypto.subtle.encrypt({ name: "RSA-OAEP" }, publicKey, data);
 }
 
 export async function decryptWithPrivateKey(
-  encryptedData: ArrayBuffer | Uint8Array,
+  encryptedData: BufferSource,
   privateKey: CryptoKey
 ): Promise<ArrayBuffer> {
   return await crypto.subtle.decrypt(

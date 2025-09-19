@@ -3,13 +3,7 @@ import { loginSchema } from "../auth/validation";
 import { css } from "@flow-css/core/css";
 import { useForm } from "@tanstack/react-form";
 import { clsx } from "clsx";
-import {
-  formContainer,
-  form,
-  label,
-  errorMessage,
-  generalError as generalErrorStyle,
-} from "../styles/shared";
+// Removed shared imports - styles inlined
 import { hasFirstUser } from "../auth/session";
 import { createFileRoute, redirect } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
@@ -53,14 +47,34 @@ export default function Login() {
   });
 
   return (
-    <div className={formContainer}>
+    <div
+      className={css({
+        maxWidth: "400px",
+        margin: "0 auto",
+        padding: "2rem",
+      })}
+    >
       <h1>Login</h1>
 
-      <form className={form} action={login.url} method="POST">
+      <form
+        className={css({
+          display: "flex",
+          flexDirection: "column",
+          gap: "1rem",
+        })}
+        action={login.url}
+        method="POST"
+      >
         <loginForm.Field name="email">
           {(field) => (
             <div>
-              <label htmlFor="email" className={label}>
+              <label
+                htmlFor="email"
+                className={css({
+                  display: "block",
+                  marginBottom: "0.5rem",
+                })}
+              >
                 Email
               </label>
               <input
@@ -79,7 +93,13 @@ export default function Login() {
               />
               {field.state.meta.isTouched &&
                 field.state.meta.errors.length > 0 && (
-                  <div className={errorMessage}>
+                  <div
+                    className={css({
+                      color: "#dc3545",
+                      fontSize: "0.875rem",
+                      marginTop: "0.25rem",
+                    })}
+                  >
                     {typeof field.state.meta.errors[0] === "string"
                       ? field.state.meta.errors[0]
                       : (field.state.meta.errors[0] as any)?.message ||
@@ -93,7 +113,13 @@ export default function Login() {
         <loginForm.Field name="password">
           {(field) => (
             <div>
-              <label htmlFor="password" className={label}>
+              <label
+                htmlFor="password"
+                className={css({
+                  display: "block",
+                  marginBottom: "0.5rem",
+                })}
+              >
                 Password
               </label>
               <input
@@ -112,7 +138,13 @@ export default function Login() {
               />
               {field.state.meta.isTouched &&
                 field.state.meta.errors.length > 0 && (
-                  <div className={errorMessage}>
+                  <div
+                    className={css({
+                      color: "#dc3545",
+                      fontSize: "0.875rem",
+                      marginTop: "0.25rem",
+                    })}
+                  >
                     {typeof field.state.meta.errors[0] === "string"
                       ? field.state.meta.errors[0]
                       : (field.state.meta.errors[0] as any)?.message ||
@@ -124,7 +156,18 @@ export default function Login() {
         </loginForm.Field>
 
         {generalError && (
-          <div className={generalErrorStyle}>{generalError}</div>
+          <div
+            className={css({
+              color: "#dc3545",
+              fontSize: "0.875rem",
+              padding: "0.75rem",
+              backgroundColor: "#f8d7da",
+              border: "1px solid #f5c6cb",
+              borderRadius: "4px",
+            })}
+          >
+            {generalError}
+          </div>
         )}
 
         <loginForm.Subscribe selector={(state) => [state.canSubmit]}>

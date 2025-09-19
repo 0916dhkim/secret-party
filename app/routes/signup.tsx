@@ -38,42 +38,17 @@ export default function Signup() {
   });
 
   return (
-    <div
-      className={css({
-        maxWidth: "400px",
-        margin: "0 auto",
-        padding: "2rem",
-      })}
-    >
+    <div className={Styles.container}>
       <h1>Create Account</h1>
-      <p
-        className={css({
-          marginBottom: "1.5rem",
-          color: "#666",
-        })}
-      >
+      <p className={Styles.description}>
         Create the first and only account for this system.
       </p>
 
-      <form
-        className={css({
-          display: "flex",
-          flexDirection: "column",
-          gap: "1rem",
-        })}
-        action={signUp.url}
-        method="POST"
-      >
+      <form className={Styles.form} action={signUp.url} method="POST">
         <form.Field name="email">
           {(field) => (
             <div>
-              <label
-                htmlFor="email"
-                className={css({
-                  display: "block",
-                  marginBottom: "0.5rem",
-                })}
-              >
+              <label htmlFor="email" className={Styles.label}>
                 Email
               </label>
               <input
@@ -92,13 +67,7 @@ export default function Signup() {
               />
               {field.state.meta.isTouched &&
                 field.state.meta.errors.length > 0 && (
-                  <div
-                    className={css({
-                      color: "#dc3545",
-                      fontSize: "0.875rem",
-                      marginTop: "0.25rem",
-                    })}
-                  >
+                  <div className={Styles.errorMessage}>
                     {typeof field.state.meta.errors[0] === "string"
                       ? field.state.meta.errors[0]
                       : (field.state.meta.errors[0] as any)?.message ||
@@ -112,13 +81,7 @@ export default function Signup() {
         <form.Field name="password">
           {(field) => (
             <div>
-              <label
-                htmlFor="password"
-                className={css({
-                  display: "block",
-                  marginBottom: "0.5rem",
-                })}
-              >
+              <label htmlFor="password" className={Styles.label}>
                 Password
               </label>
               <input
@@ -137,13 +100,7 @@ export default function Signup() {
               />
               {field.state.meta.isTouched &&
                 field.state.meta.errors.length > 0 && (
-                  <div
-                    className={css({
-                      color: "#dc3545",
-                      fontSize: "0.875rem",
-                      marginTop: "0.25rem",
-                    })}
-                  >
+                  <div className={Styles.errorMessage}>
                     {typeof field.state.meta.errors[0] === "string"
                       ? field.state.meta.errors[0]
                       : (field.state.meta.errors[0] as any)?.message ||
@@ -168,13 +125,7 @@ export default function Signup() {
         <form.Field name="confirmPassword">
           {(field) => (
             <div>
-              <label
-                htmlFor="confirmPassword"
-                className={css({
-                  display: "block",
-                  marginBottom: "0.5rem",
-                })}
-              >
+              <label htmlFor="confirmPassword" className={Styles.label}>
                 Confirm Password
               </label>
               <input
@@ -193,13 +144,7 @@ export default function Signup() {
               />
               {field.state.meta.isTouched &&
                 field.state.meta.errors.length > 0 && (
-                  <div
-                    className={css({
-                      color: "#dc3545",
-                      fontSize: "0.875rem",
-                      marginTop: "0.25rem",
-                    })}
-                  >
+                  <div className={Styles.errorMessage}>
                     {typeof field.state.meta.errors[0] === "string"
                       ? field.state.meta.errors[0]
                       : (field.state.meta.errors[0] as any)?.message ||
@@ -210,20 +155,7 @@ export default function Signup() {
           )}
         </form.Field>
 
-        {error && (
-          <div
-            className={css({
-              color: "#dc3545",
-              fontSize: "0.875rem",
-              padding: "0.75rem",
-              backgroundColor: "#f8d7da",
-              border: "1px solid #f5c6cb",
-              borderRadius: "4px",
-            })}
-          >
-            {error}
-          </div>
-        )}
+        {error && <div className={Styles.generalError}>{error}</div>}
 
         <form.Subscribe selector={(state) => [state.canSubmit]}>
           {([canSubmit]) => (
@@ -245,6 +177,43 @@ export default function Signup() {
 }
 
 const Styles = {
+  container: css({
+    maxWidth: "400px",
+    margin: "0 auto",
+    padding: "2rem",
+  }),
+
+  description: css({
+    marginBottom: "1.5rem",
+    color: "#666",
+  }),
+
+  form: css({
+    display: "flex",
+    flexDirection: "column",
+    gap: "1rem",
+  }),
+
+  label: css({
+    display: "block",
+    marginBottom: "0.5rem",
+  }),
+
+  errorMessage: css({
+    color: "#dc3545",
+    fontSize: "0.875rem",
+    marginTop: "0.25rem",
+  }),
+
+  generalError: css({
+    color: "#dc3545",
+    fontSize: "0.875rem",
+    padding: "0.75rem",
+    backgroundColor: "#f8d7da",
+    border: "1px solid #f5c6cb",
+    borderRadius: "4px",
+  }),
+
   input: css({
     width: "100%",
     padding: "0.5rem",
