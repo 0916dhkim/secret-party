@@ -214,9 +214,6 @@ const Styles = {
     boxShadow: v("--shadow"),
     cursor: "pointer",
     transition: "all 0.2s",
-    "&:hover": {
-      boxShadow: "0 4px 6px -1px rgb(0 0 0 / 0.1)",
-    },
   })),
   cardButton: css({
     padding: "0.5rem 1rem",

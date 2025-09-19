@@ -1,6 +1,5 @@
 import { Link } from "@tanstack/react-router";
 import { css } from "@flow-css/core/css";
-// Removed shared imports - styles inlined
 
 interface BreadcrumbItem {
   label: string;
@@ -16,11 +15,9 @@ export function Breadcrumb({ items }: BreadcrumbProps) {
 
   return (
     <div
-      className={css(({ v }) => ({
-        backgroundColor: v("--c-bg-light"),
-        borderBottom: `1px solid ${v("--c-border")}`,
+      className={css({
         padding: "0.75rem 1rem",
-      }))}
+      })}
     >
       <div
         className={css({

@@ -30,11 +30,11 @@ export function NavigationMenu({ userEmail }: NavigationMenuProps) {
     <nav
       className={css(({ v }) => ({
         backgroundColor: v("--c-bg"),
-        borderBottom: `1px solid ${v("--c-border")}`,
         padding: "0 1rem",
         position: "sticky",
         top: 0,
         zIndex: 50,
+        boxShadow: v("--shadow"),
       }))}
     >
       <div

@@ -153,6 +153,7 @@ function Dashboard() {
 const Styles = {
   card: css(({ v }) => ({
     backgroundColor: v("--c-bg"),
+    boxShadow: v("--shadow"),
     padding: "1.5rem",
     borderRadius: "8px",
     border: `1px solid ${v("--c-border")}`,

@@ -45,6 +45,7 @@ function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
       <body
         style={CSS_VARIABLES as React.CSSProperties}
         className={css(({ v }) => ({
+          colorScheme: "light dark",
           background: v("--c-bg-dark"),
           color: v("--c-text"),
         }))}

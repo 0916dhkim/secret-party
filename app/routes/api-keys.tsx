@@ -250,6 +250,7 @@ function ApiKeys() {
 const Styles = {
   tableContainer: css(({ v }) => ({
     backgroundColor: v("--c-bg"),
+    boxShadow: v("--shadow"),
     borderRadius: "8px",
     border: `1px solid ${v("--c-border")}`,
     overflow: "hidden",
@@ -286,6 +287,7 @@ const Styles = {
   }),
   instructionsCard: css(({ v }) => ({
     backgroundColor: v("--c-bg"),
+    boxShadow: v("--shadow"),
     padding: "1.5rem",
     borderRadius: "8px",
     border: `1px solid ${v("--c-border")}`,

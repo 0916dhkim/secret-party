@@ -1,11 +1,12 @@
 export const CSS_VARIABLES = {
-  "--c-bg-dark": "oklch(0.92 0.005 339.7)",
-  "--c-bg": "oklch(0.96 0.005 339.7)",
-  "--c-bg-light": "oklch(1 0.005 339.7)",
-  "--c-border": "oklch(0.6 0.03 339.7)",
-  "--c-text": "oklch(0.15 0.015 339.7)",
+  "--c-bg-dark": "light-dark(oklch(0.92 0.005 339.7), oklch(0 0.005 339.7))",
+  "--c-bg": "light-dark(oklch(0.96 0.005 339.7), oklch(0.2 0.005 339.7))",
+  "--c-bg-light": "light-dark(oklch(1 0.005 339.7), oklch(0.3 0.005 339.7))",
+  "--c-border": "light-dark(oklch(0.88 0.005 339.7), oklch(0.4 0.005 339.7))",
+  "--c-text": "light-dark(oklch(0.15 0.015 339.7), oklch(0.85 0.015 339.7))",
   "--c-text-alt": "oklch(1 0.015 339.7)",
-  "--c-text-muted": "oklch(0.6 0.015 339.7)",
+  "--c-text-muted":
+    "light-dark(oklch(0.6 0.015 339.7), oklch(0.5 0.015 339.7))",
   "--c-primary": "oklch(0.52 0.18 339.7)",
   "--c-secondary": "oklch(0.52 0.18 279.88)",
   "--c-success": "oklch(0.48 0.18 142)",
