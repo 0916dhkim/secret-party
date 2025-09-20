@@ -7,6 +7,7 @@ Simple self-hostable secrets manager
 - Organize your secrets by projects and environments (e.g. prod & staging)
   - Secrets are stored as key-value pairs.
   - No versioning.
+- Easy backup & restore.
 - Public API for managing secrets.
   - Authentication: Bearer token using public key in Authorization header
   - Endpoints:
