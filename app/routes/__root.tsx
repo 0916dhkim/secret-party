@@ -10,6 +10,19 @@ import appCssUrl from "../app.css?url";
 import { CSS_VARIABLES } from "../theme";
 import { css } from "@flow-css/core/css";
 
+// Have this until React resolve the missing type.
+// https://github.com/DefinitelyTyped/DefinitelyTyped/pull/73651
+// https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/dialog#closedby
+declare module "react" {
+  interface DialogHTMLAttributes<T> {
+    closedby?: "any" | "closerequest" | "none";
+  }
+}
+
+if (typeof window !== "undefined") {
+  await import("dialog-closedby-polyfill");
+}
+
 const queryClient = new QueryClient();
 
 export const Route = createRootRoute({

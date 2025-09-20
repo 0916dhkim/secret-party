@@ -1,15 +1,18 @@
+import { css } from "@flow-css/core/css";
+import { useMutation } from "@tanstack/react-query";
 import { createFileRoute, useRouter } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
-import { css } from "@flow-css/core/css";
+import { useForm } from "@tanstack/react-form";
 import { clsx } from "clsx";
-import { useMutation } from "@tanstack/react-query";
+import { eq } from "drizzle-orm";
+import { useRef } from "react";
+import { z } from "zod";
 import { requireAuth } from "../auth/session";
-import { Layout } from "../components/Layout";
 import { Breadcrumb } from "../components/Breadcrumb";
-import { mainContent } from "../styles/shared";
+import { Layout } from "../components/Layout";
 import { db } from "../db/db";
-import { projectTable, environmentTable, secretTable } from "../db/schema";
-import { eq, count } from "drizzle-orm";
+import { projectTable } from "../db/schema";
+import { mainContent } from "../styles/shared";
 
 export const Route = createFileRoute("/projects/")({
   component: Projects,
@@ -21,72 +24,74 @@ const loader = createServerFn({
 }).handler(async () => {
   const session = await requireAuth();
 
-  // Fetch projects for the current user
-  const projects = await db
-    .select()
-    .from(projectTable)
-    .where(eq(projectTable.ownerId, session.user.id));
+  const projects = await db.query.projectTable.findMany({
+    where: eq(projectTable.ownerId, session.user.id),
+    with: {
+      environments: {
+        columns: {
+          id: true,
+          name: true,
+        },
+        with: {
+          secrets: {
+            columns: {
+              key: true,
+            },
+          },
+        },
+      },
+    },
+  });
 
-  // For each project, fetch its stats
-  const projectsWithStats = await Promise.all(
-    projects.map(async (project) => {
-      // Get environment count
-      const environmentCount = await db
-        .select({ count: count() })
-        .from(environmentTable)
-        .where(eq(environmentTable.projectId, project.id));
-
-      // Get total secret count across all environments in this project
-      const secretCount = await db
-        .select({ count: count() })
-        .from(secretTable)
-        .innerJoin(
-          environmentTable,
-          eq(secretTable.environmentId, environmentTable.id)
-        )
-        .where(eq(environmentTable.projectId, project.id));
-
-      return {
-        ...project,
-        environments: environmentCount[0]?.count || 0,
-        secrets: secretCount[0]?.count || 0,
-      };
-    })
-  );
+  const projectCardProps = projects.map((project) => ({
+    id: project.id,
+    name: project.name,
+    environmentCount: project.environments.length,
+    secretCount: project.environments.reduce((a, b) => a + b.secrets.length, 0),
+  }));
 
   return {
     user: session.user,
-    projects: projectsWithStats,
+    projectCardProps,
   };
+});
+
+const projectCreationSchema = z.object({
+  name: z.string().min(1, "Project name is required"),
 });
 
 const createProject = createServerFn({
   method: "POST",
-}).handler(async () => {
-  const session = await requireAuth();
+})
+  .validator(projectCreationSchema)
+  .handler(async ({ data }) => {
+    const session = await requireAuth();
 
-  // Create a new project for the current user
-  await db.insert(projectTable).values({
-    ownerId: session.user.id,
+    const [newProject] = await db
+      .insert(projectTable)
+      .values({
+        name: data.name,
+        ownerId: session.user.id,
+      })
+      .returning();
+
+    return { project: newProject };
   });
 
-  return { success: true };
-});
-
-interface Project {
+interface ProjectCardProps {
   id: number;
-  ownerId: number;
-  environments: number;
-  secrets: number;
+  name: string;
+  environmentCount: number;
+  secretCount: number;
 }
 
-function ProjectCard({ project }: { project: Project }) {
+function ProjectCard(props: ProjectCardProps) {
   const router = useRouter();
 
   const handleViewClick = () => {
     router.navigate({
       to: "/projects/$projectId",
-      params: { projectId: project.id.toString() },
+      params: { projectId: props.id.toString() },
     });
   };
 
@@ -100,7 +105,7 @@ function ProjectCard({ project }: { project: Project }) {
           color: v("--c-text"),
         }))}
       >
-        Project Name
+        {props.name}
       </h3>
       <div
         className={css({
@@ -116,7 +121,7 @@ function ProjectCard({ project }: { project: Project }) {
             color: v("--c-text-muted"),
           }))}
         >
-          <strong>{project.environments}</strong> environments
+          <strong>{props.environmentCount}</strong> environments
         </div>
         <div
           className={css(({ v }) => ({
@@ -124,15 +129,7 @@ function ProjectCard({ project }: { project: Project }) {
             color: v("--c-text-muted"),
           }))}
         >
-          <strong>{project.secrets}</strong> secrets total
-        </div>
-        <div
-          className={css(({ v }) => ({
-            fontSize: "0.875rem",
-            color: v("--c-text-muted"),
-          }))}
-        >
-          Last updated: Project #{project.id}
+          <strong>{props.secretCount}</strong> secrets total
         </div>
       </div>
       <div
@@ -166,18 +163,49 @@ function ProjectCard({ project }: { project: Project }) {
 function Projects() {
   const loaderData = Route.useLoaderData();
   const router = useRouter();
+  const dialogRef = useRef<HTMLDialogElement>(null);
+
+  const createProjectForm = useForm({
+    defaultValues: {
+      name: "",
+    },
+    validators: {
+      onChange: projectCreationSchema,
+    },
+    async onSubmit({ value }) {
+      createProjectMutation.mutate(value.name);
+    },
+  });
 
   const createProjectMutation = useMutation({
-    mutationFn: createProject,
-    onSuccess: async () => {
-      // Invalidate the current route's loader data to refetch projects
-      await router.invalidate();
+    mutationFn: (name: string) => createProject({ data: { name } }),
+    onSuccess: async (result) => {
+      // Navigate to the newly created project
+      if (result.project) {
+        await router.navigate({
+          to: "/projects/$projectId",
+          params: { projectId: result.project.id.toString() },
+        });
+      }
+
+      dialogRef.current?.close();
+      createProjectForm.reset();
     },
     onError: (error) => {
       console.error("Failed to create project:", error);
       alert("Failed to create project. Please try again.");
     },
   });
+
+  const openModal = () => {
+    dialogRef.current?.showModal();
+  };
+
+  const closeModal = () => {
+    dialogRef.current?.close();
+    createProjectMutation.reset();
+    createProjectForm.reset();
+  };
 
   return (
     <Layout userEmail={loaderData.user.email}>
@@ -200,8 +228,7 @@ function Projects() {
             Projects
           </h1>
           <button
-            onClick={() => createProjectMutation.mutate(undefined)}
-            disabled={createProjectMutation.isPending}
+            onClick={openModal}
             className={css(({ v }) => ({
               backgroundColor: v("--c-success"),
               color: v("--c-text-alt"),
@@ -215,13 +242,9 @@ function Projects() {
                   "--c-success"
                 )} calc(l - 0.05) c h)`,
               },
-              "&:disabled": {
-                backgroundColor: `oklch(from ${v("--c-text-muted")} l 0 h)`,
-                cursor: "not-allowed",
-              },
             }))}
           >
-            {createProjectMutation.isPending ? "Creating..." : "+ New Project"}
+            + New Project
           </button>
         </div>
 
@@ -234,9 +257,9 @@ function Projects() {
             marginBottom: "2rem",
           })}
         >
-          {loaderData.projects.length > 0 ? (
-            loaderData.projects.map((project) => (
-              <ProjectCard key={project.id} project={project} />
+          {loaderData.projectCardProps.length > 0 ? (
+            loaderData.projectCardProps.map((project) => (
+              <ProjectCard key={project.id} {...project} />
             ))
           ) : (
             <div
@@ -272,6 +295,159 @@ function Projects() {
             project details.
           </p>
         </div>
+
+        {/* Create Project Modal */}
+        <dialog
+          ref={dialogRef}
+          closedby={createProjectMutation.isPending ? "none" : "any"}
+          className={css(({ v }) => ({
+            padding: 0,
+            border: "none",
+            borderRadius: "8px",
+            boxShadow: v("--shadow"),
+            backgroundColor: v("--c-bg"),
+            color: v("--c-text"),
+            minWidth: "400px",
+            position: "fixed",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            margin: 0,
+            "&::backdrop": {
+              backgroundColor: "rgba(0, 0, 0, 0.5)",
+            },
+          }))}
+        >
+          <div
+            className={css({
+              padding: "2rem",
+            })}
+          >
+            <h2
+              className={css({
+                fontSize: "1.5rem",
+                fontWeight: "600",
+                marginBottom: "1.5rem",
+                margin: 0,
+              })}
+            >
+              Create New Project
+            </h2>
+
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                createProjectForm.handleSubmit();
+              }}
+            >
+              <createProjectForm.Field name="name">
+                {(field) => (
+                  <div
+                    className={css({
+                      marginBottom: "1.5rem",
+                    })}
+                  >
+                    <label
+                      htmlFor="projectName"
+                      className={css(({ v }) => ({
+                        display: "block",
+                        fontSize: "0.875rem",
+                        fontWeight: "500",
+                        marginBottom: "0.5rem",
+                        color: v("--c-text"),
+                      }))}
+                    >
+                      Project Name
+                    </label>
+                    <input
+                      id="projectName"
+                      name="name"
+                      type="text"
+                      placeholder="Enter project name"
+                      value={field.state.value}
+                      onBlur={field.handleBlur}
+                      onChange={(e) => field.handleChange(e.target.value)}
+                      className={clsx(
+                        Styles.input,
+                        field.state.meta.isValid
+                          ? Styles.inputValid
+                          : Styles.inputInvalid
+                      )}
+                      autoFocus
+                    />
+                    {!field.state.meta.isValid && (
+                      <div
+                        className={css(({ v }) => ({
+                          color: v("--c-danger"),
+                          fontSize: "0.875rem",
+                          marginTop: "0.25rem",
+                        }))}
+                      >
+                        {field.state.meta.errors
+                          .map((x) => x?.message)
+                          .join(", ")}
+                      </div>
+                    )}
+                  </div>
+                )}
+              </createProjectForm.Field>
+
+              <div
+                className={css({
+                  display: "flex",
+                  gap: "0.5rem",
+                  justifyContent: "flex-end",
+                })}
+              >
+                <button
+                  type="button"
+                  onClick={closeModal}
+                  disabled={createProjectMutation.isPending}
+                  className={css(({ v }) => ({
+                    padding: "0.75rem 1.5rem",
+                    borderRadius: "6px",
+                    fontSize: "0.875rem",
+                    fontWeight: "500",
+                    backgroundColor: v("--c-bg-light"),
+                    color: v("--c-text-alt"),
+                    "&:hover": {
+                      backgroundColor: `oklch(from ${v(
+                        "--c-bg-light"
+                      )} calc(l - 0.05) c h)`,
+                    },
+                    "&:disabled": {
+                      opacity: 0.5,
+                      cursor: "not-allowed",
+                    },
+                  }))}
+                >
+                  Cancel
+                </button>
+                <createProjectForm.Subscribe
+                  selector={(state) => [state.canSubmit]}
+                >
+                  {([canSubmit]) => (
+                    <button
+                      type="submit"
+                      disabled={!canSubmit || createProjectMutation.isPending}
+                      className={clsx(
+                        Styles.button,
+                        canSubmit && !createProjectMutation.isPending
+                          ? Styles.buttonEnabled
+                          : Styles.buttonDisabled
+                      )}
+                    >
+                      {createProjectMutation.isPending
+                        ? "Creating..."
+                        : "Create Project"}
+                    </button>
+                  )}
+                </createProjectForm.Subscribe>
+              </div>
+            </form>
+          </div>
+        </dialog>
       </div>
     </Layout>
   );
@@ -284,16 +460,56 @@ const Styles = {
     borderRadius: "8px",
     border: `1px solid ${v("--c-border")}`,
     boxShadow: v("--shadow"),
-    cursor: "pointer",
-    transition: "all 0.2s",
   })),
   cardButton: css({
     padding: "0.5rem 1rem",
     borderRadius: "4px",
     border: "none",
-    cursor: "pointer",
     fontSize: "0.75rem",
     fontWeight: "500",
-    transition: "all 0.2s",
   }),
+
+  input: css({
+    width: "100%",
+    padding: "0.75rem",
+    borderRadius: "6px",
+    fontSize: "0.875rem",
+    backgroundColor: "var(--c-bg-light)",
+    color: "var(--c-text)",
+    "&:focus": {
+      outline: "none",
+      borderColor: "var(--c-primary)",
+      boxShadow: "0 0 0 2px oklch(from var(--c-primary) l c h / 0.2)",
+    },
+  }),
+
+  inputValid: css(({ v }) => ({
+    border: `1px solid ${v("--c-border")}`,
+  })),
+
+  inputInvalid: css(({ v }) => ({
+    border: `1px solid ${v("--c-danger")}`,
+  })),
+
+  button: css(({ v }) => ({
+    padding: "0.75rem 1.5rem",
+    borderRadius: "6px",
+    fontSize: "0.875rem",
+    fontWeight: "500",
+    color: v("--c-text-alt"),
+    border: "none",
+  })),
+
+  buttonEnabled: css(({ v }) => ({
+    backgroundColor: v("--c-success"),
+    cursor: "pointer",
+    "&:hover": {
+      backgroundColor: `oklch(from ${v("--c-success")} calc(l - 0.05) c h)`,
+    },
+  })),
+
+  buttonDisabled: css(({ v }) => ({
+    backgroundColor: `oklch(from ${v("--c-text-muted")} l 0 h)`,
+    cursor: "not-allowed",
+  })),
 };

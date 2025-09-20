@@ -37,6 +37,7 @@ export const sessionRelations = relations(sessionTable, ({ one }) => ({
 
 export const projectTable = pgTable("project", {
   id: integer().primaryKey().generatedAlwaysAsIdentity(),
+  name: text().notNull(),
   ownerId: integer()
     .notNull()
     .references(() => userTable.id, { onDelete: "cascade" }),

@@ -22,6 +22,13 @@
       "when": 1757993208829,
       "tag": "0002_spooky_marten_broadcloak",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1758335687929,
+      "tag": "0003_chilly_nemesis",
+      "breakpoints": true
     }
   ]
 }
