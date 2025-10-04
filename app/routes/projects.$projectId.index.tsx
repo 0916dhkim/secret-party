@@ -7,6 +7,9 @@ import { Breadcrumb } from "../components/Breadcrumb";
 import { mainContent } from "../styles/shared";
 import { createServerFn } from "@tanstack/react-start";
 import z from "zod";
+import { db } from "../db/db";
+import { projectTable } from "../db/schema";
+import { eq } from "drizzle-orm";
 
 export const Route = createFileRoute("/projects/$projectId/")({
   component: ProjectDetail,
@@ -23,27 +26,29 @@ const loader = createServerFn({ method: "GET" })
   .handler(async ({ data: { projectId } }) => {
     const session = await requireAuth();
 
-    // Mock project data - replace with actual database query
-    const project = {
-      id: projectId,
-      name: `Project ${projectId}`,
-      description: "This is a sample project description",
-      environments: [
-        {
-          id: "1",
-          name: "Production",
-          secretCount: 24,
-          lastUpdated: "2 hours ago",
+    const project = await db.query.projectTable.findFirst({
+      where: eq(projectTable.id, projectId),
+      with: {
+        environments: {
+          columns: {
+            id: true,
+            name: true,
+            projectId: true,
+          },
+          with: {
+            secrets: {
+              columns: {
+                key: true,
+              },
+            },
+          },
         },
-        { id: "2", name: "Staging", secretCount: 18, lastUpdated: "1 day ago" },
-        {
-          id: "3",
-          name: "Development",
-          secretCount: 12,
-          lastUpdated: "3 days ago",
-        },
-      ],
-    };
+      },
+    });
+
+    if (project == null) {
+      throw new Error("Project not found", { cause: { status: 404 } });
+    }
 
     return { user: session.user, project };
   });
@@ -69,25 +74,15 @@ function ProjectDetail() {
             marginBottom: "2rem",
           })}
         >
-          <div>
-            <h1
-              className={css({
-                fontSize: "2rem",
-                fontWeight: "bold",
-                marginBottom: "0.5rem",
-              })}
-            >
-              {project.name}
-            </h1>
-            <p
-              className={css(({ v }) => ({
-                color: v("--c-text-muted"),
-                fontSize: "1rem",
-              }))}
-            >
-              {project.description}
-            </p>
-          </div>
+          <h1
+            className={css({
+              fontSize: "2rem",
+              fontWeight: "bold",
+              marginBottom: "0.5rem",
+            })}
+          >
+            {project.name}
+          </h1>
           <div className={css({ display: "flex", gap: "1rem" })}>
             <button className={Styles.secondaryButton}>Edit Project</button>
             <button className={Styles.primaryButton}>+ New Environment</button>

@@ -143,11 +143,11 @@ function ProjectCard(props: ProjectCardProps) {
           className={clsx(
             Styles.cardButton,
             css(({ v }) => ({
-              backgroundColor: v("--c-primary"),
-              color: v("--c-text-alt"),
+              backgroundColor: v("--c-bg-light"),
+              border: `1px solid ${v("--c-border")}`,
               "&:hover": {
                 backgroundColor: `oklch(from ${v(
-                  "--c-primary"
+                  "--c-bg-light"
                 )} calc(l - 0.05) c h)`,
               },
             }))
@@ -230,7 +230,7 @@ function Projects() {
           <button
             onClick={openModal}
             className={css(({ v }) => ({
-              backgroundColor: v("--c-success"),
+              backgroundColor: v("--c-primary"),
               color: v("--c-text-alt"),
               padding: "0.75rem 1.5rem",
               borderRadius: "6px",
@@ -239,7 +239,7 @@ function Projects() {
               fontWeight: "500",
               "&:hover": {
                 backgroundColor: `oklch(from ${v(
-                  "--c-success"
+                  "--c-primary"
                 )} calc(l - 0.05) c h)`,
               },
             }))}
@@ -276,26 +276,6 @@ function Projects() {
           )}
         </div>
 
-        <div
-          className={css(({ v }) => ({
-            backgroundColor: `oklch(from ${v("--c-info")} 0.85 0.1 h)`,
-            padding: "1rem",
-            borderRadius: "6px",
-            border: `1px solid ${v("--c-info")}`,
-          }))}
-        >
-          <p
-            className={css(({ v }) => ({
-              color: `oklch(from ${v("--c-info")} 0.3 c h)`,
-              fontSize: "0.875rem",
-            }))}
-          >
-            This page now shows your real projects from the database. Click "New
-            Project" to create an empty project, and "View" to navigate to
-            project details.
-          </p>
-        </div>
-
         {/* Create Project Modal */}
         <dialog
           ref={dialogRef}
@@ -320,7 +300,10 @@ function Projects() {
         >
           <div
             className={css({
+              display: "flex",
+              flexDirection: "column",
               padding: "2rem",
+              gap: "1rem",
             })}
           >
             <h2
@@ -340,26 +323,20 @@ function Projects() {
                 e.stopPropagation();
                 createProjectForm.handleSubmit();
               }}
+              className={css({
+                display: "flex",
+                flexDirection: "column",
+                gap: "1rem",
+              })}
             >
               <createProjectForm.Field name="name">
                 {(field) => (
                   <div
                     className={css({
-                      marginBottom: "1.5rem",
+                      display: "flex",
+                      flexDirection: "column",
                     })}
                   >
-                    <label
-                      htmlFor="projectName"
-                      className={css(({ v }) => ({
-                        display: "block",
-                        fontSize: "0.875rem",
-                        fontWeight: "500",
-                        marginBottom: "0.5rem",
-                        color: v("--c-text"),
-                      }))}
-                    >
-                      Project Name
-                    </label>
                     <input
                       id="projectName"
                       name="name"
@@ -369,7 +346,19 @@ function Projects() {
                       onBlur={field.handleBlur}
                       onChange={(e) => field.handleChange(e.target.value)}
                       className={clsx(
-                        Styles.input,
+                        css({
+                          padding: "0.75rem",
+                          borderRadius: "6px",
+                          fontSize: "0.875rem",
+                          backgroundColor: "var(--c-bg-light)",
+                          color: "var(--c-text)",
+                          "&:focus": {
+                            outline: "none",
+                            borderColor: "var(--c-primary)",
+                            boxShadow:
+                              "0 0 0 2px oklch(from var(--c-primary) l c h / 0.2)",
+                          },
+                        }),
                         field.state.meta.isValid
                           ? Styles.inputValid
                           : Styles.inputInvalid
@@ -410,7 +399,7 @@ function Projects() {
                     fontSize: "0.875rem",
                     fontWeight: "500",
                     backgroundColor: v("--c-bg-light"),
-                    color: v("--c-text-alt"),
+                    border: `1px solid ${v("--c-border")}`,
                     "&:hover": {
                       backgroundColor: `oklch(from ${v(
                         "--c-bg-light"
@@ -467,20 +456,6 @@ const Styles = {
     border: "none",
     fontSize: "0.75rem",
     fontWeight: "500",
-  }),
-
-  input: css({
-    width: "100%",
-    padding: "0.75rem",
-    borderRadius: "6px",
-    fontSize: "0.875rem",
-    backgroundColor: "var(--c-bg-light)",
-    color: "var(--c-text)",
-    "&:focus": {
-      outline: "none",
-      borderColor: "var(--c-primary)",
-      boxShadow: "0 0 0 2px oklch(from var(--c-primary) l c h / 0.2)",
-    },
   }),
 
   inputValid: css(({ v }) => ({

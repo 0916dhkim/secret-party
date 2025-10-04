@@ -118,7 +118,7 @@ export function NavigationMenu({ userEmail }: NavigationMenuProps) {
           <span
             className={css(({ v }) => ({
               fontSize: "0.875rem",
-              color: v("--c-text"),
+              color: v("--c-text-muted"),
               "@media (max-width: 768px)": {
                 display: "none",
               },
@@ -134,9 +134,8 @@ export function NavigationMenu({ userEmail }: NavigationMenuProps) {
             <button
               type="submit"
               className={css(({ v }) => ({
-                backgroundColor: v("--c-danger"),
-                color: v("--c-text-alt"),
-                border: "none",
+                backgroundColor: v("--c-bg-light"),
+                border: `1px solid ${v("--c-border")}`,
                 cursor: "pointer",
                 fontSize: "0.875rem",
                 fontWeight: "500",
@@ -145,8 +144,11 @@ export function NavigationMenu({ userEmail }: NavigationMenuProps) {
                 transition: "all 0.2s",
                 "&:hover": {
                   backgroundColor: `oklch(from ${v(
-                    "--c-danger"
+                    "--c-bg-light"
                   )} calc(l - 0.05) c h)`,
+                },
+                "@media (max-width: 768px)": {
+                  display: "none",
                 },
               }))}
             >
@@ -171,7 +173,7 @@ export function NavigationMenu({ userEmail }: NavigationMenuProps) {
               display: "block",
             },
           }))}
-          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+          onClick={() => setIsMobileMenuOpen((original) => !original)}
           aria-label="Toggle mobile menu"
         >
           <svg
@@ -245,13 +247,15 @@ export function NavigationMenu({ userEmail }: NavigationMenuProps) {
             borderTop: `1px solid ${v("--c-border")}`,
             marginTop: "1rem",
             paddingTop: "1rem",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
           }))}
         >
           <span
             className={css(({ v }) => ({
               fontSize: "0.875rem",
-              color: v("--c-text"),
-              padding: "0.75rem 1rem",
+              color: v("--c-text-muted"),
             }))}
           >
             {userEmail}
@@ -261,9 +265,8 @@ export function NavigationMenu({ userEmail }: NavigationMenuProps) {
               type="submit"
               className={css(({ v }) => ({
                 display: "block",
-                backgroundColor: v("--c-danger"),
-                color: v("--c-text-alt"),
-                border: "none",
+                backgroundColor: v("--c-bg-light"),
+                border: `1px solid ${v("--c-border")}`,
                 cursor: "pointer",
                 fontSize: "0.875rem",
                 fontWeight: "500",
@@ -274,7 +277,7 @@ export function NavigationMenu({ userEmail }: NavigationMenuProps) {
                 textAlign: "left",
                 "&:hover": {
                   backgroundColor: `oklch(from ${v(
-                    "--c-danger"
+                    "--c-bg-light"
                   )} calc(l - 0.05) c h)`,
                 },
               }))}
