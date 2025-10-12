@@ -65,6 +65,7 @@ export function NavigationMenu({ userEmail }: NavigationMenuProps) {
         <div
           className={css({
             display: "flex",
+            alignSelf: "stretch",
             alignItems: "center",
             gap: "2rem",
             "@media (max-width: 768px)": {
@@ -79,26 +80,22 @@ export function NavigationMenu({ userEmail }: NavigationMenuProps) {
               data-active={isActive(item.path)}
               className={clsx(
                 css(({ v }) => ({
+                  display: "flex",
+                  alignSelf: "stretch",
+                  alignItems: "center",
+                  justifyContent: "center",
                   color: v("--c-text"),
                   textDecoration: "none",
                   fontSize: "0.875rem",
                   fontWeight: "500",
                   padding: "0.5rem 1rem",
-                  borderRadius: "6px",
                   transition: "all 0.2s",
                   "&:hover": {
-                    backgroundColor: `oklch(from ${v(
-                      "--c-bg"
-                    )} calc(l - 0.05) c h)`,
+                    backgroundColor: v("--c-bg"),
                   },
                   '&[data-active="true"]': {
-                    backgroundColor: v("--c-primary"),
-                    color: v("--c-text-alt"),
-                    "&:hover": {
-                      backgroundColor: `oklch(from ${v(
-                        "--c-primary"
-                      )} calc(l - 0.05) c h)`,
-                    },
+                    textDecoration: "underline",
+                    fontWeight: "bold",
                   },
                 }))
               )}
