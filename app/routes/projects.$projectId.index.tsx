@@ -329,14 +329,6 @@ function ProjectDetail() {
                 >
                   <strong>{environment.secrets.length}</strong> secrets
                 </div>
-                <div
-                  className={css(({ v }) => ({
-                    fontSize: "0.875rem",
-                    color: v("--c-text-muted"),
-                  }))}
-                >
-                  Environment ID: {environment.id}
-                </div>
               </div>
 
               <div
