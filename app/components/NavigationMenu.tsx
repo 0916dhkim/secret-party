@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Link, useLocation } from "@tanstack/react-router";
 import { clsx } from "clsx";
 import { css } from "@flow-css/core/css";
