@@ -5,7 +5,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { useForm } from "@tanstack/react-form";
 import { clsx } from "clsx";
 import { eq } from "drizzle-orm";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { z } from "zod";
 import { requireAuth } from "../auth/session";
 import { Breadcrumb } from "../components/Breadcrumb";
@@ -13,6 +13,7 @@ import { Layout } from "../components/Layout";
 import { db } from "../db/db";
 import { projectTable } from "../db/schema";
 import { mainContent } from "../styles/shared";
+import { Modal } from "../components/Modal";
 
 export const Route = createFileRoute("/projects/")({
   component: Projects,
@@ -163,7 +164,7 @@ function ProjectCard(props: ProjectCardProps) {
 function Projects() {
   const loaderData = Route.useLoaderData();
   const router = useRouter();
-  const dialogRef = useRef<HTMLDialogElement>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const createProjectForm = useForm({
     defaultValues: {
@@ -188,7 +189,7 @@ function Projects() {
         });
       }
 
-      dialogRef.current?.close();
+      setIsModalOpen(false);
       createProjectForm.reset();
     },
     onError: (error) => {
@@ -197,12 +198,8 @@ function Projects() {
     },
   });
 
-  const openModal = () => {
-    dialogRef.current?.showModal();
-  };
-
   const closeModal = () => {
-    dialogRef.current?.close();
+    setIsModalOpen(false);
     createProjectMutation.reset();
     createProjectForm.reset();
   };
@@ -228,7 +225,7 @@ function Projects() {
             Projects
           </h1>
           <button
-            onClick={openModal}
+            onClick={() => setIsModalOpen(true)}
             className={css(({ v }) => ({
               backgroundColor: v("--c-primary"),
               color: v("--c-text-alt"),
@@ -277,27 +274,7 @@ function Projects() {
         </div>
 
         {/* Create Project Modal */}
-        <dialog
-          ref={dialogRef}
-          closedby={createProjectMutation.isPending ? "none" : "any"}
-          className={css(({ v }) => ({
-            padding: 0,
-            border: "none",
-            borderRadius: "8px",
-            boxShadow: v("--shadow"),
-            backgroundColor: v("--c-bg"),
-            color: v("--c-text"),
-            minWidth: "400px",
-            position: "fixed",
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
-            margin: 0,
-            "&::backdrop": {
-              backgroundColor: "rgba(0, 0, 0, 0.5)",
-            },
-          }))}
-        >
+        <Modal open={isModalOpen} onClose={closeModal}>
           <div
             className={css({
               display: "flex",
@@ -436,7 +413,7 @@ function Projects() {
               </div>
             </form>
           </div>
-        </dialog>
+        </Modal>
       </div>
     </Layout>
   );
