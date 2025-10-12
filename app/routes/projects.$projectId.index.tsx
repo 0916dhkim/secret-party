@@ -384,25 +384,6 @@ function ProjectDetail() {
           ))}
         </div>
 
-        <div
-          className={css(({ v }) => ({
-            backgroundColor: `oklch(from ${v("--c-info")} 0.85 0.1 h)`,
-            padding: "1rem",
-            borderRadius: "6px",
-            border: `1px solid ${v("--c-info")}`,
-          }))}
-        >
-          <p
-            className={css(({ v }) => ({
-              color: `oklch(from ${v("--c-info")} 0.3 c h)`,
-              fontSize: "0.875rem",
-            }))}
-          >
-            This is a placeholder project detail page. The actual implementation
-            will show real project data, allow project management, and provide
-            navigation to environment-specific secret management.
-          </p>
-        </div>
         <Modal open={isModalOpen} onClose={closeModal}>
           <div
             className={css({
