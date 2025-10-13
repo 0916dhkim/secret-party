@@ -29,7 +29,8 @@ export function NavigationMenu({ userEmail }: NavigationMenuProps) {
   return (
     <nav
       className={css(({ v }) => ({
-        backgroundColor: `oklch(from ${v("--c-bg-dark")} l c h / 0.8)`,
+        backgroundColor: `oklch(from ${v("--c-bg")} l c h / 0.8)`,
+        borderBottom: `1px solid ${v("--c-border")}`,
         backdropFilter: "blur(10px)",
         padding: "0 1rem",
         position: "sticky",
