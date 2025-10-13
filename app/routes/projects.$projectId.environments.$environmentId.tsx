@@ -7,6 +7,9 @@ import { Breadcrumb } from "../components/Breadcrumb";
 import { mainContent } from "../styles/shared";
 import { createServerFn } from "@tanstack/react-start";
 import z from "zod";
+import { db } from "../db/db";
+import { and, eq } from "drizzle-orm";
+import { environmentTable, projectTable } from "../db/schema";
 
 export const Route = createFileRoute(
   "/projects/$projectId/environments/$environmentId"
@@ -33,60 +36,38 @@ const loader = createServerFn({
   .handler(async ({ data: { projectId, environmentId } }) => {
     const session = await requireAuth();
 
-    // Mock data - replace with actual database queries
-    const project = {
-      id: projectId,
-      name: `Project ${projectId}`,
-    };
+    const environment = await db.query.environmentTable.findFirst({
+      where: and(
+        eq(environmentTable.id, environmentId),
+        eq(environmentTable.projectId, projectId)
+      ),
+      with: {
+        project: {
+          columns: {
+            id: true,
+            name: true,
+          },
+        },
+        secrets: {
+          columns: {
+            key: true,
+            valueEncrypted: true,
+          },
+        },
+      },
+    });
+    console.log(projectId, environmentId);
+    console.log(environment);
 
-    const environment = {
-      id: environmentId,
-      name:
-        environmentId === 1
-          ? "Production"
-          : environmentId === 2
-          ? "Staging"
-          : "Development",
-      projectId,
-      secrets: [
-        {
-          key: "DATABASE_URL",
-          value: "••••••••",
-          lastUpdated: "2 hours ago",
-          updatedBy: "john@example.com",
-        },
-        {
-          key: "API_SECRET_KEY",
-          value: "••••••••",
-          lastUpdated: "1 day ago",
-          updatedBy: "jane@example.com",
-        },
-        {
-          key: "REDIS_URL",
-          value: "••••••••",
-          lastUpdated: "3 days ago",
-          updatedBy: "john@example.com",
-        },
-        {
-          key: "STRIPE_SECRET_KEY",
-          value: "••••••••",
-          lastUpdated: "1 week ago",
-          updatedBy: "admin@example.com",
-        },
-        {
-          key: "JWT_SECRET",
-          value: "••••••••",
-          lastUpdated: "2 weeks ago",
-          updatedBy: "jane@example.com",
-        },
-      ],
-    };
+    if (environment == null) {
+      throw new Error("Environment not found", { cause: { status: 404 } });
+    }
 
-    return { user: session.user, project, environment };
+    return { user: session.user, environment };
   });
 
 function EnvironmentDetail() {
-  const { user, project, environment } = Route.useLoaderData();
+  const { user, environment } = Route.useLoaderData();
 
   return (
     <Layout userEmail={user.email}>
@@ -94,7 +75,10 @@ function EnvironmentDetail() {
         items={[
           { label: "Dashboard", path: "/dashboard" },
           { label: "Projects", path: "/projects" },
-          { label: project.name, path: `/projects/${project.id}` },
+          {
+            label: environment.project.name,
+            path: `/projects/${environment.project.id}`,
+          },
           { label: environment.name },
         ]}
       />
@@ -218,8 +202,6 @@ function EnvironmentDetail() {
           <div className={Styles.tableHeader}>
             <div>Secret Key</div>
             <div>Value</div>
-            <div>Last Updated</div>
-            <div>Updated By</div>
             <div>Actions</div>
           </div>
 
@@ -256,23 +238,7 @@ function EnvironmentDetail() {
                   fontSize: "0.75rem",
                 }))}
               >
-                {secret.value}
-              </div>
-              <div
-                className={css(({ v }) => ({
-                  color: v("--c-text-muted"),
-                  fontSize: "0.75rem",
-                }))}
-              >
-                {secret.lastUpdated}
-              </div>
-              <div
-                className={css(({ v }) => ({
-                  color: v("--c-text-muted"),
-                  fontSize: "0.75rem",
-                }))}
-              >
-                {secret.updatedBy}
+                {secret.valueEncrypted}
               </div>
               <div className={css({ display: "flex", gap: "0.5rem" })}>
                 <button
