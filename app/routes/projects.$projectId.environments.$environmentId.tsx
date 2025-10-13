@@ -9,7 +9,7 @@ import { createServerFn } from "@tanstack/react-start";
 import z from "zod";
 import { db } from "../db/db";
 import { and, eq } from "drizzle-orm";
-import { environmentTable, projectTable } from "../db/schema";
+import { environmentTable } from "../db/schema";
 
 export const Route = createFileRoute(
   "/projects/$projectId/environments/$environmentId"
@@ -56,8 +56,6 @@ const loader = createServerFn({
         },
       },
     });
-    console.log(projectId, environmentId);
-    console.log(environment);
 
     if (environment == null) {
       throw new Error("Environment not found", { cause: { status: 404 } });

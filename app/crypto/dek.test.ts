@@ -26,7 +26,6 @@ test("DEK password wrapping/unwrapping roundtrip", () => {
 
   // Wrap DEK with password
   const wrapped = wrapDekWithPassword(dek, password);
-  console.log(wrapped);
 
   // Should be a string with IV and encrypted data
   assert.strictEqual(typeof wrapped, "string");
