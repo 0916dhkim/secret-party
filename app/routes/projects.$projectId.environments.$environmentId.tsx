@@ -114,22 +114,6 @@ function EnvironmentDetail() {
               className={clsx(
                 Styles.actionButton,
                 css(({ v }) => ({
-                  backgroundColor: v("--c-warning"),
-                  color: v("--c-text-alt"),
-                  "&:hover": {
-                    backgroundColor: `oklch(from ${v(
-                      "--c-warning"
-                    )} calc(l - 0.05) c h)`,
-                  },
-                }))
-              )}
-            >
-              Import Secrets
-            </button>
-            <button
-              className={clsx(
-                Styles.actionButton,
-                css(({ v }) => ({
                   backgroundColor: v("--c-primary"),
                   color: v("--c-text-alt"),
                   "&:hover": {
