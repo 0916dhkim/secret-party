@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useRouter } from "@tanstack/react-router";
 import { css } from "@flow-css/core/css";
 import { clsx } from "clsx";
 import { requireAuth } from "../auth/session";
@@ -9,7 +9,11 @@ import { createServerFn } from "@tanstack/react-start";
 import z from "zod";
 import { db } from "../db/db";
 import { and, eq } from "drizzle-orm";
-import { environmentTable } from "../db/schema";
+import { environmentTable, secretTable } from "../db/schema";
+import { useState } from "react";
+import { Modal } from "../components/Modal";
+import { unwrapDekWithPassword } from "../crypto/dek";
+import { unwrapSecret, wrapSecret } from "../crypto/secrets";
 
 export const Route = createFileRoute(
   "/projects/$projectId/environments/$environmentId"
@@ -64,8 +68,133 @@ const loader = createServerFn({
     return { user: session.user, environment };
   });
 
+const createSecret = createServerFn({
+  method: "POST",
+})
+  .validator(
+    z.object({
+      environmentId: z.number(),
+      secretKey: z.string(),
+      secretValue: z.string(),
+      password: z.string(),
+    })
+  )
+  .handler(async ({ data }) => {
+    const environment = await db.query.environmentTable.findFirst({
+      where: eq(environmentTable.id, data.environmentId),
+    });
+
+    if (environment == null) {
+      throw new Error("Missing environment");
+    }
+
+    const { dekWrappedByPassword } = environment;
+    const dek = unwrapDekWithPassword(dekWrappedByPassword, data.password);
+
+    const valueEncrypted = wrapSecret(data.secretValue, dek);
+
+    const inserted = await db
+      .insert(secretTable)
+      .values({
+        key: data.secretKey,
+        environmentId: data.environmentId,
+        valueEncrypted,
+      })
+      .returning();
+
+    return inserted;
+  });
+
+const decryptSecret = createServerFn({
+  method: "POST",
+})
+  .validator(
+    z.object({
+      environmentId: z.number(),
+      key: z.string(),
+      password: z.string(),
+    })
+  )
+  .handler(async ({ data }) => {
+    const environment = await db.query.environmentTable.findFirst({
+      where: eq(environmentTable.id, data.environmentId),
+    });
+    if (environment == null) {
+      throw new Error("Missing environment");
+    }
+    const dek = unwrapDekWithPassword(
+      environment.dekWrappedByPassword,
+      data.password
+    );
+    const secret = await db.query.secretTable.findFirst({
+      where: and(
+        eq(secretTable.environmentId, data.environmentId),
+        eq(secretTable.key, data.key)
+      ),
+    });
+    if (secret == null) {
+      throw new Error("Missing secret");
+    }
+
+    const value = unwrapSecret(secret.valueEncrypted, dek);
+    return { value };
+  });
+
 function EnvironmentDetail() {
+  const router = useRouter();
   const { user, environment } = Route.useLoaderData();
+  const [isCreateModalOpen, setIsCraeteModalOpen] = useState(false);
+  const [selectedSecretKey, setSelectedSecretKey] = useState<string | null>(
+    null
+  );
+  const [decryptedValue, setDecryptedValue] = useState<string | null>(null);
+
+  const handleSubmit: React.FormEventHandler = async (e) => {
+    e.preventDefault();
+    const keyInput = document.querySelector<HTMLInputElement>(".secret-key");
+    const valueInput =
+      document.querySelector<HTMLInputElement>(".secret-value");
+    const passwordInput = document.querySelector<HTMLInputElement>(".password");
+
+    if (keyInput == null || valueInput == null || passwordInput == null) {
+      throw new Error("Missing input element");
+    }
+    await createSecret({
+      data: {
+        environmentId: environment.id,
+        secretKey: keyInput.value,
+        secretValue: valueInput.value,
+        password: passwordInput.value,
+      },
+    });
+
+    setIsCraeteModalOpen(false);
+    router.invalidate();
+  };
+
+  const handleViewSubmit: React.FormEventHandler = async (e) => {
+    e.preventDefault();
+    if (selectedSecretKey == null) {
+      throw new Error("No secret selected");
+    }
+    const passwordInput =
+      document.querySelector<HTMLInputElement>(".password2");
+    if (passwordInput == null) {
+      throw new Error("Missing input element");
+    }
+    const password = passwordInput.value;
+    if (!password) {
+      debugger;
+    }
+    const { value } = await decryptSecret({
+      data: {
+        environmentId: environment.id,
+        key: selectedSecretKey,
+        password,
+      },
+    });
+    setDecryptedValue(value);
+  };
 
   return (
     <Layout userEmail={user.email}>
@@ -123,6 +252,7 @@ function EnvironmentDetail() {
                   },
                 }))
               )}
+              onClick={() => setIsCraeteModalOpen(true)}
             >
               + Add Secret
             </button>
@@ -218,9 +348,11 @@ function EnvironmentDetail() {
                   fontFamily: "monospace",
                   color: v("--c-text-muted"),
                   fontSize: "0.75rem",
+                  maxWidth: "30rem",
+                  overflow: "hidden",
                 }))}
               >
-                {secret.valueEncrypted}
+                {`${secret.valueEncrypted.substring(0, 6)}*****`}
               </div>
               <div className={css({ display: "flex", gap: "0.5rem" })}>
                 <button
@@ -236,6 +368,7 @@ function EnvironmentDetail() {
                       },
                     }))
                   )}
+                  onClick={() => setSelectedSecretKey(secret.key)}
                 >
                   View
                 </button>
@@ -299,6 +432,37 @@ function EnvironmentDetail() {
           </p>
         </div>
       </div>
+      <Modal
+        open={isCreateModalOpen}
+        onClose={() => setIsCraeteModalOpen(false)}
+      >
+        <form onSubmit={handleSubmit}>
+          <p>Secret key</p>
+          <input className="secret-key" />
+          <p>Secret value</p>
+          <input className="secret-value" />
+          <p>User password</p>
+          <input className="password" type="password" />
+          <button>Cancel</button>
+          <button>Add</button>
+        </form>
+      </Modal>
+      <Modal
+        open={selectedSecretKey != null}
+        onClose={() => {
+          setSelectedSecretKey(null);
+          setDecryptedValue(null);
+        }}
+      >
+        {decryptedValue ? (
+          decryptedValue
+        ) : (
+          <form onSubmit={handleViewSubmit}>
+            <p>User password</p>
+            <input className="password2" type="password" />
+          </form>
+        )}
+      </Modal>
     </Layout>
   );
 }
