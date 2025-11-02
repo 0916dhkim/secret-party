@@ -307,56 +307,6 @@ function EnvironmentDetail() {
           </div>
         </div>
 
-        {/* Environment Info */}
-        <div className={Styles.infoCard}>
-          <div>
-            <span
-              className={css(({ v }) => ({
-                fontSize: "0.875rem",
-                color: v("--c-text-muted"),
-              }))}
-            >
-              <strong>{environment.secrets.length}</strong> secrets total
-            </span>
-          </div>
-          <div
-            className={css({
-              display: "flex",
-              gap: "1rem",
-              alignItems: "center",
-            })}
-          >
-            <input
-              type="text"
-              placeholder="Search secrets..."
-              className={css(({ v }) => ({
-                padding: "0.5rem 0.75rem",
-                border: `1px solid ${v("--c-border")}`,
-                borderRadius: "6px",
-                fontSize: "0.875rem",
-                minWidth: "200px",
-                backgroundColor: v("--c-bg-light"),
-                color: v("--c-text"),
-              }))}
-            />
-            <button
-              className={clsx(
-                Styles.smallButton,
-                css(({ v }) => ({
-                  backgroundColor: `oklch(from ${v("--c-text")} l 0.3 h)`,
-                  color: v("--c-text-alt"),
-                  fontWeight: "500",
-                  "&:hover": {
-                    backgroundColor: `oklch(from ${v("--c-text")} l 0.25 h)`,
-                  },
-                }))
-              )}
-            >
-              Export
-            </button>
-          </div>
-        </div>
-
         {/* Secrets Table */}
         <div className={Styles.tableContainer}>
           <div className={Styles.tableHeader}>
@@ -595,16 +545,6 @@ const Styles = {
     fontSize: "0.75rem",
     transition: "all 0.2s",
   }),
-  infoCard: css(({ v }) => ({
-    backgroundColor: v("--c-bg"),
-    padding: "1rem",
-    borderRadius: "6px",
-    border: `1px solid ${v("--c-border")}`,
-    marginBottom: "2rem",
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "center",
-  })),
   tableContainer: css(({ v }) => ({
     backgroundColor: v("--c-bg"),
     borderRadius: "8px",
