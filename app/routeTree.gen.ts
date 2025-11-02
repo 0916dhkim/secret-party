@@ -13,6 +13,7 @@ import { createServerRootRoute } from '@tanstack/react-start/server'
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SignupRouteImport } from './routes/signup'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as DesignRouteImport } from './routes/design'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as ApiKeysRouteImport } from './routes/api-keys'
 import { Route as AccountRouteImport } from './routes/account'
@@ -32,6 +33,11 @@ const SignupRoute = SignupRouteImport.update({
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DesignRoute = DesignRouteImport.update({
+  id: '/design',
+  path: '/design',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DashboardRoute = DashboardRouteImport.update({
@@ -81,6 +87,7 @@ export interface FileRoutesByFullPath {
   '/account': typeof AccountRoute
   '/api-keys': typeof ApiKeysRoute
   '/dashboard': typeof DashboardRoute
+  '/design': typeof DesignRoute
   '/login': typeof LoginRoute
   '/signup': typeof SignupRoute
   '/projects': typeof ProjectsIndexRoute
@@ -92,6 +99,7 @@ export interface FileRoutesByTo {
   '/account': typeof AccountRoute
   '/api-keys': typeof ApiKeysRoute
   '/dashboard': typeof DashboardRoute
+  '/design': typeof DesignRoute
   '/login': typeof LoginRoute
   '/signup': typeof SignupRoute
   '/projects': typeof ProjectsIndexRoute
@@ -104,6 +112,7 @@ export interface FileRoutesById {
   '/account': typeof AccountRoute
   '/api-keys': typeof ApiKeysRoute
   '/dashboard': typeof DashboardRoute
+  '/design': typeof DesignRoute
   '/login': typeof LoginRoute
   '/signup': typeof SignupRoute
   '/projects/': typeof ProjectsIndexRoute
@@ -117,6 +126,7 @@ export interface FileRouteTypes {
     | '/account'
     | '/api-keys'
     | '/dashboard'
+    | '/design'
     | '/login'
     | '/signup'
     | '/projects'
@@ -128,6 +138,7 @@ export interface FileRouteTypes {
     | '/account'
     | '/api-keys'
     | '/dashboard'
+    | '/design'
     | '/login'
     | '/signup'
     | '/projects'
@@ -139,6 +150,7 @@ export interface FileRouteTypes {
     | '/account'
     | '/api-keys'
     | '/dashboard'
+    | '/design'
     | '/login'
     | '/signup'
     | '/projects/'
@@ -151,6 +163,7 @@ export interface RootRouteChildren {
   AccountRoute: typeof AccountRoute
   ApiKeysRoute: typeof ApiKeysRoute
   DashboardRoute: typeof DashboardRoute
+  DesignRoute: typeof DesignRoute
   LoginRoute: typeof LoginRoute
   SignupRoute: typeof SignupRoute
   ProjectsIndexRoute: typeof ProjectsIndexRoute
@@ -193,6 +206,13 @@ declare module '@tanstack/react-router' {
       path: '/login'
       fullPath: '/login'
       preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/design': {
+      id: '/design'
+      path: '/design'
+      fullPath: '/design'
+      preLoaderRoute: typeof DesignRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/dashboard': {
@@ -263,6 +283,7 @@ const rootRouteChildren: RootRouteChildren = {
   AccountRoute: AccountRoute,
   ApiKeysRoute: ApiKeysRoute,
   DashboardRoute: DashboardRoute,
+  DesignRoute: DesignRoute,
   LoginRoute: LoginRoute,
   SignupRoute: SignupRoute,
   ProjectsIndexRoute: ProjectsIndexRoute,
