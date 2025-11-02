@@ -14,6 +14,8 @@ import { useState } from "react";
 import { Modal } from "../components/Modal";
 import { unwrapDekWithPassword } from "../crypto/dek";
 import { unwrapSecret, wrapSecret } from "../crypto/secrets";
+import { useForm } from "@tanstack/react-form";
+import { useMutation } from "@tanstack/react-query";
 
 export const Route = createFileRoute(
   "/projects/$projectId/environments/$environmentId"
@@ -68,17 +70,17 @@ const loader = createServerFn({
     return { user: session.user, environment };
   });
 
+const secretCreationSchema = z.object({
+  environmentId: z.number(),
+  secretKey: z.string(),
+  secretValue: z.string(),
+  password: z.string(),
+});
+
 const createSecret = createServerFn({
   method: "POST",
 })
-  .validator(
-    z.object({
-      environmentId: z.number(),
-      secretKey: z.string(),
-      secretValue: z.string(),
-      password: z.string(),
-    })
-  )
+  .validator(secretCreationSchema)
   .handler(async ({ data }) => {
     const environment = await db.query.environmentTable.findFirst({
       where: eq(environmentTable.id, data.environmentId),
@@ -103,6 +105,28 @@ const createSecret = createServerFn({
       .returning();
 
     return inserted;
+  });
+
+const secretDeletionSchema = z.object({
+  environmentId: z.number(),
+  secretKey: z.string(),
+});
+
+const deleteSecret = createServerFn({
+  method: "POST",
+})
+  .validator(secretDeletionSchema)
+  .handler(async ({ data }) => {
+    const deleted = await db
+      .delete(secretTable)
+      .where(
+        and(
+          eq(secretTable.environmentId, data.environmentId),
+          eq(secretTable.key, data.secretKey)
+        )
+      )
+      .returning();
+    console.log(`Deleted ${deleted.length} secrets.`, deleted);
   });
 
 const decryptSecret = createServerFn({
@@ -149,28 +173,46 @@ function EnvironmentDetail() {
   );
   const [decryptedValue, setDecryptedValue] = useState<string | null>(null);
 
-  const handleSubmit: React.FormEventHandler = async (e) => {
-    e.preventDefault();
-    const keyInput = document.querySelector<HTMLInputElement>(".secret-key");
-    const valueInput =
-      document.querySelector<HTMLInputElement>(".secret-value");
-    const passwordInput = document.querySelector<HTMLInputElement>(".password");
-
-    if (keyInput == null || valueInput == null || passwordInput == null) {
-      throw new Error("Missing input element");
-    }
-    await createSecret({
-      data: {
+  const createSecretForm = useForm({
+    defaultValues: {
+      secretKey: "",
+      secretValue: "",
+      password: "",
+    },
+    validators: {
+      onChange: secretCreationSchema.omit({ environmentId: true }),
+    },
+    async onSubmit({ value }) {
+      createSecretMutation.mutate({
+        ...value,
         environmentId: environment.id,
-        secretKey: keyInput.value,
-        secretValue: valueInput.value,
-        password: passwordInput.value,
-      },
-    });
+      });
+    },
+  });
 
-    setIsCraeteModalOpen(false);
-    router.invalidate();
-  };
+  const createSecretMutation = useMutation({
+    mutationFn: (data: z.infer<typeof secretCreationSchema>) =>
+      createSecret({ data }),
+    onSuccess: async (result) => {
+      // Reload the page to show the new secret
+      router.invalidate();
+      setIsCraeteModalOpen(false);
+      createSecretForm.reset();
+    },
+    onError: (error) => {
+      console.error("Failed to create secret:", error);
+      alert("Failed to create secret. Please try again.");
+    },
+  });
+
+  const deleteSecretMutation = useMutation({
+    mutationFn: (data: z.infer<typeof secretDeletionSchema>) =>
+      deleteSecret({ data }),
+    onSuccess: async (result) => {
+      // Reload the page
+      router.invalidate();
+    },
+  });
 
   const handleViewSubmit: React.FormEventHandler = async (e) => {
     e.preventDefault();
@@ -194,6 +236,12 @@ function EnvironmentDetail() {
       },
     });
     setDecryptedValue(value);
+  };
+
+  const closeModal = () => {
+    setIsCraeteModalOpen(false);
+    createSecretMutation.reset();
+    createSecretForm.reset();
   };
 
   return (
@@ -313,7 +361,7 @@ function EnvironmentDetail() {
         <div className={Styles.tableContainer}>
           <div className={Styles.tableHeader}>
             <div>Secret Key</div>
-            <div>Value</div>
+            <div>Encrypted Value</div>
             <div>Actions</div>
           </div>
 
@@ -373,22 +421,12 @@ function EnvironmentDetail() {
                   View
                 </button>
                 <button
-                  className={clsx(
-                    Styles.smallButton,
-                    css(({ v }) => ({
-                      backgroundColor: v("--c-primary"),
-                      color: v("--c-text-alt"),
-                      "&:hover": {
-                        backgroundColor: `oklch(from ${v(
-                          "--c-primary"
-                        )} calc(l - 0.05) c h)`,
-                      },
-                    }))
-                  )}
-                >
-                  Edit
-                </button>
-                <button
+                  onClick={() =>
+                    deleteSecretMutation.mutate({
+                      environmentId: environment.id,
+                      secretKey: secret.key,
+                    })
+                  }
                   className={clsx(
                     Styles.smallButton,
                     css(({ v }) => ({
@@ -410,41 +448,113 @@ function EnvironmentDetail() {
             </div>
           ))}
         </div>
-
-        <div
-          className={css(({ v }) => ({
-            backgroundColor: `oklch(from ${v("--c-info")} 0.85 0.1 h)`,
-            padding: "1rem",
-            borderRadius: "6px",
-            border: `1px solid ${v("--c-info")}`,
-          }))}
-        >
-          <p
-            className={css(({ v }) => ({
-              color: `oklch(from ${v("--c-info")} 0.3 c h)`,
-              fontSize: "0.875rem",
-            }))}
-          >
-            This is a placeholder environment detail page. The actual
-            implementation will show real secrets, allow secret management
-            (create, read, update, delete), and provide search/filtering
-            capabilities.
-          </p>
-        </div>
       </div>
       <Modal
         open={isCreateModalOpen}
         onClose={() => setIsCraeteModalOpen(false)}
       >
-        <form onSubmit={handleSubmit}>
-          <p>Secret key</p>
-          <input className="secret-key" />
-          <p>Secret value</p>
-          <input className="secret-value" />
-          <p>User password</p>
-          <input className="password" type="password" />
-          <button>Cancel</button>
-          <button>Add</button>
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            createSecretForm.handleSubmit();
+          }}
+        >
+          <createSecretForm.Field name="secretKey">
+            {(field) => (
+              <div>
+                <label>Secret key</label>
+                <input
+                  name={field.name}
+                  type="text"
+                  placeholder="Enter secret key"
+                  value={field.state.value}
+                  onBlur={field.handleBlur}
+                  onChange={(e) => field.handleChange(e.target.value)}
+                />
+                {!field.state.meta.isValid && (
+                  <div
+                    className={css(({ v }) => ({
+                      color: v("--c-danger"),
+                      fontSize: "0.875rem",
+                      marginTop: "0.25rem",
+                    }))}
+                  >
+                    {field.state.meta.errors.map((x) => x?.message).join(", ")}
+                  </div>
+                )}
+              </div>
+            )}
+          </createSecretForm.Field>
+          <createSecretForm.Field name="secretValue">
+            {(field) => (
+              <div>
+                <label>Secret value</label>
+                <input
+                  name={field.name}
+                  type="text"
+                  placeholder="Enter secret value"
+                  value={field.state.value}
+                  onBlur={field.handleBlur}
+                  onChange={(e) => field.handleChange(e.target.value)}
+                />
+                {!field.state.meta.isValid && (
+                  <div
+                    className={css(({ v }) => ({
+                      color: v("--c-danger"),
+                      fontSize: "0.875rem",
+                      marginTop: "0.25rem",
+                    }))}
+                  >
+                    {field.state.meta.errors.map((x) => x?.message).join(", ")}
+                  </div>
+                )}
+              </div>
+            )}
+          </createSecretForm.Field>
+          <createSecretForm.Field name="password">
+            {(field) => (
+              <div>
+                <label>Password</label>
+                <input
+                  name={field.name}
+                  type="password"
+                  placeholder="Enter password"
+                  value={field.state.value}
+                  onBlur={field.handleBlur}
+                  onChange={(e) => field.handleChange(e.target.value)}
+                />
+                {!field.state.meta.isValid && (
+                  <div
+                    className={css(({ v }) => ({
+                      color: v("--c-danger"),
+                      fontSize: "0.875rem",
+                      marginTop: "0.25rem",
+                    }))}
+                  >
+                    {field.state.meta.errors.map((x) => x?.message).join(", ")}
+                  </div>
+                )}
+              </div>
+            )}
+          </createSecretForm.Field>
+          <button
+            type="button"
+            onClick={closeModal}
+            disabled={createSecretMutation.isPending}
+          >
+            Cancel
+          </button>
+          <createSecretForm.Subscribe selector={(state) => state.canSubmit}>
+            {(canSubmit) => (
+              <button
+                type="submit"
+                disabled={!canSubmit || createSecretMutation.isPending}
+              >
+                {createSecretMutation.isPending ? "Adding..." : "Add"}
+              </button>
+            )}
+          </createSecretForm.Subscribe>
         </form>
       </Modal>
       <Modal
