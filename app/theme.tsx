@@ -111,6 +111,8 @@ export const system = {
 };
 
 export const CSS_VARIABLES = {
+  // Legacy variables
+  // We want more granular tokens in the app layer.
   "--c-bg-dark": lightDark(system.neutral[300], system.neutral[950]),
   "--c-bg": lightDark(system.neutral[200], system.neutral[900]),
   "--c-bg-light": lightDark(system.neutral[100], system.neutral[800]),
@@ -124,6 +126,7 @@ export const CSS_VARIABLES = {
   "--c-warning": system.warning[800],
   "--c-info": system.info[700],
   "--shadow": system.shadow.default,
+  // End of legacy variables
 
   "--c-page-background": lightDark(system.neutral[200], system.neutral[800]),
 
