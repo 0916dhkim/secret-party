@@ -16,6 +16,7 @@ import { generateDek, wrapDekWithPassword } from "../crypto/dek";
 import { verifyPassword } from "../auth/hash";
 import { useMutation } from "@tanstack/react-query";
 import { useForm } from "@tanstack/react-form";
+import { Button } from "../components/Button";
 
 export const Route = createFileRoute("/projects/$projectId/")({
   component: ProjectDetail,
@@ -182,15 +183,15 @@ function ProjectDetail() {
             {project.name}
           </h1>
           <div className={css({ display: "flex", gap: "1rem" })}>
-            <button className={Styles.secondaryButton}>Edit Project</button>
-            <button
-              className={Styles.primaryButton}
+            <Button variant="secondary">Edit Project</Button>
+            <Button
+              variant="primary"
               onClick={() => {
                 setIsModalOpen(true);
               }}
             >
               + New Environment
-            </button>
+            </Button>
           </div>
         </div>
 
@@ -338,35 +339,12 @@ function ProjectDetail() {
                   justifyContent: "flex-end",
                 })}
               >
-                <button
-                  className={clsx(
-                    Styles.environmentActionButton,
-                    css(({ v }) => ({
-                      backgroundColor: v("--c-bg-light"),
-                      color: v("--c-text"),
-                      "&:hover": {
-                        backgroundColor: `oklch(from ${v(
-                          "--c-bg-light"
-                        )} calc(l - 0.05) c h)`,
-                      },
-                    }))
-                  )}
-                >
+                <Button variant="secondary" size="sm">
                   Manage
-                </button>
-                <button
-                  className={clsx(
-                    Styles.environmentActionButton,
-                    css(({ v }) => ({
-                      backgroundColor: v("--c-primary"),
-                      color: v("--c-text-alt"),
-                      "&:hover": {
-                        backgroundColor: `oklch(from ${v(
-                          "--c-primary"
-                        )} calc(l - 0.05) c h)`,
-                      },
-                    }))
-                  )}
+                </Button>
+                <Button
+                  variant="primary"
+                  size="sm"
                   onClick={() => {
                     router.navigate({
                       to: "/projects/$projectId/environments/$environmentId",
@@ -378,7 +356,7 @@ function ProjectDetail() {
                   }}
                 >
                   View Secrets
-                </button>
+                </Button>
               </div>
             </div>
           ))}
@@ -550,50 +528,29 @@ function ProjectDetail() {
                   justifyContent: "flex-end",
                 })}
               >
-                <button
+                <Button
                   type="button"
+                  variant="secondary"
                   onClick={closeModal}
                   disabled={createEnvironmentMutation.isPending}
-                  className={css(({ v }) => ({
-                    padding: "0.75rem 1.5rem",
-                    borderRadius: "6px",
-                    fontSize: "0.875rem",
-                    fontWeight: "500",
-                    backgroundColor: v("--c-bg-light"),
-                    border: `1px solid ${v("--c-border")}`,
-                    "&:hover": {
-                      backgroundColor: `oklch(from ${v(
-                        "--c-bg-light"
-                      )} calc(l - 0.05) c h)`,
-                    },
-                    "&:disabled": {
-                      opacity: 0.5,
-                      cursor: "not-allowed",
-                    },
-                  }))}
                 >
                   Cancel
-                </button>
+                </Button>
                 <createEnvironmentForm.Subscribe
                   selector={(state) => [state.canSubmit]}
                 >
                   {([canSubmit]) => (
-                    <button
+                    <Button
                       type="submit"
+                      variant="success"
                       disabled={
                         !canSubmit || createEnvironmentMutation.isPending
                       }
-                      className={clsx(
-                        Styles.button,
-                        canSubmit && !createEnvironmentMutation.isPending
-                          ? Styles.buttonEnabled
-                          : Styles.buttonDisabled
-                      )}
                     >
                       {createEnvironmentMutation.isPending
                         ? "Creating..."
                         : "Create Environment"}
-                    </button>
+                    </Button>
                   )}
                 </createEnvironmentForm.Subscribe>
               </div>
@@ -616,34 +573,7 @@ const Styles = {
     border: `1px solid ${v("--c-border")}`,
     textAlign: "center",
   })),
-  secondaryButton: css(({ v }) => ({
-    backgroundColor: v("--c-bg-light"),
-    color: v("--c-text"),
-    padding: "0.75rem 1.5rem",
-    borderRadius: "6px",
-    border: "none",
-    cursor: "pointer",
-    fontSize: "0.875rem",
-    fontWeight: "500",
-    transition: "all 0.2s",
-    "&:hover": {
-      backgroundColor: `oklch(from ${v("--c-bg-light")} calc(l - 0.05) c h)`,
-    },
-  })),
-  primaryButton: css(({ v }) => ({
-    backgroundColor: v("--c-success"),
-    color: v("--c-text-alt"),
-    padding: "0.75rem 1.5rem",
-    borderRadius: "6px",
-    border: "none",
-    cursor: "pointer",
-    fontSize: "0.875rem",
-    fontWeight: "500",
-    transition: "all 0.2s",
-    "&:hover": {
-      backgroundColor: `oklch(from ${v("--c-success")} calc(l - 0.05) c h)`,
-    },
-  })),
+
   environmentCard: css(({ v }) => ({
     backgroundColor: v("--c-bg"),
     padding: "1.5rem",
@@ -653,15 +583,6 @@ const Styles = {
     cursor: "pointer",
     transition: "all 0.2s",
   })),
-  environmentActionButton: css({
-    padding: "0.5rem 1rem",
-    borderRadius: "4px",
-    border: "none",
-    cursor: "pointer",
-    fontSize: "0.75rem",
-    fontWeight: "500",
-    transition: "all 0.2s",
-  }),
 
   inputValid: css(({ v }) => ({
     border: `1px solid ${v("--c-border")}`,
@@ -669,27 +590,5 @@ const Styles = {
 
   inputInvalid: css(({ v }) => ({
     border: `1px solid ${v("--c-danger")}`,
-  })),
-
-  button: css(({ v }) => ({
-    padding: "0.75rem 1.5rem",
-    borderRadius: "6px",
-    fontSize: "0.875rem",
-    fontWeight: "500",
-    color: v("--c-text-alt"),
-    border: "none",
-  })),
-
-  buttonEnabled: css(({ v }) => ({
-    backgroundColor: v("--c-success"),
-    cursor: "pointer",
-    "&:hover": {
-      backgroundColor: `oklch(from ${v("--c-success")} calc(l - 0.05) c h)`,
-    },
-  })),
-
-  buttonDisabled: css(({ v }) => ({
-    backgroundColor: `oklch(from ${v("--c-text-muted")} l 0 h)`,
-    cursor: "not-allowed",
   })),
 };

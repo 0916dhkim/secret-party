@@ -3,7 +3,7 @@ import { Link, useLocation } from "@tanstack/react-router";
 import { clsx } from "clsx";
 import { css } from "@flow-css/core/css";
 import { logout } from "../auth/actions";
-// Removed shared imports - styles inlined
+import { Button } from "./Button";
 
 interface NavigationMenuProps {
   userEmail: string;
@@ -130,44 +130,25 @@ export function NavigationMenu({ userEmail }: NavigationMenuProps) {
             method="POST"
             className={css({ display: "inline" })}
           >
-            <button
+            <Button
               type="submit"
+              variant="secondary"
               className={css(({ v }) => ({
-                backgroundColor: v("--c-bg-light"),
-                border: `1px solid ${v("--c-border")}`,
-                cursor: "pointer",
-                fontSize: "0.875rem",
-                fontWeight: "500",
-                padding: "0.5rem 1rem",
-                borderRadius: "6px",
-                transition: "all 0.2s",
-                "&:hover": {
-                  backgroundColor: `oklch(from ${v(
-                    "--c-bg-light"
-                  )} calc(l - 0.05) c h)`,
-                },
                 "@media (max-width: 768px)": {
                   display: "none",
                 },
               }))}
             >
               Logout
-            </button>
+            </Button>
           </form>
         </div>
 
         {/* Mobile menu button */}
-        <button
+        <Button
+          variant="ghost"
           className={css(({ v }) => ({
             display: "none",
-            backgroundColor: "transparent",
-            border: "none",
-            padding: "0.5rem",
-            borderRadius: "6px",
-            cursor: "pointer",
-            "&:hover": {
-              backgroundColor: `oklch(from ${v("--c-bg")} calc(l - 0.05) c h)`,
-            },
             "@media (max-width: 768px)": {
               display: "block",
             },
@@ -189,7 +170,7 @@ export function NavigationMenu({ userEmail }: NavigationMenuProps) {
             <line x1="3" y1="12" x2="21" y2="12"></line>
             <line x1="3" y1="18" x2="21" y2="18"></line>
           </svg>
-        </button>
+        </Button>
       </div>
 
       {/* Mobile Navigation Menu */}
@@ -260,29 +241,9 @@ export function NavigationMenu({ userEmail }: NavigationMenuProps) {
             {userEmail}
           </span>
           <form action={logout.url} method="POST">
-            <button
-              type="submit"
-              className={css(({ v }) => ({
-                display: "block",
-                backgroundColor: v("--c-bg-light"),
-                border: `1px solid ${v("--c-border")}`,
-                cursor: "pointer",
-                fontSize: "0.875rem",
-                fontWeight: "500",
-                padding: "0.75rem 1rem",
-                borderRadius: "6px",
-                transition: "all 0.2s",
-                width: "100%",
-                textAlign: "left",
-                "&:hover": {
-                  backgroundColor: `oklch(from ${v(
-                    "--c-bg-light"
-                  )} calc(l - 0.05) c h)`,
-                },
-              }))}
-            >
+            <Button type="submit" variant="secondary">
               Logout
-            </button>
+            </Button>
           </form>
         </div>
       </div>

@@ -14,6 +14,7 @@ import { db } from "../db/db";
 import { projectTable } from "../db/schema";
 import { mainContent } from "../styles/shared";
 import { Modal } from "../components/Modal";
+import { Button } from "../components/Button";
 
 export const Route = createFileRoute("/projects/")({
   component: Projects,
@@ -139,23 +140,9 @@ function ProjectCard(props: ProjectCardProps) {
           justifyContent: "flex-end",
         })}
       >
-        <button
-          onClick={handleViewClick}
-          className={clsx(
-            Styles.cardButton,
-            css(({ v }) => ({
-              backgroundColor: v("--c-bg-light"),
-              border: `1px solid ${v("--c-border")}`,
-              "&:hover": {
-                backgroundColor: `oklch(from ${v(
-                  "--c-bg-light"
-                )} calc(l - 0.05) c h)`,
-              },
-            }))
-          )}
-        >
+        <Button onClick={handleViewClick} variant="secondary" size="sm">
           View
-        </button>
+        </Button>
       </div>
     </div>
   );
@@ -224,7 +211,8 @@ function Projects() {
           <h1 className={css({ fontSize: "2rem", fontWeight: "bold" })}>
             Projects
           </h1>
-          <button
+          <Button
+            variant="primary"
             onClick={() => setIsModalOpen(true)}
             className={css(({ v }) => ({
               backgroundColor: v("--c-primary"),
@@ -242,7 +230,7 @@ function Projects() {
             }))}
           >
             + New Project
-          </button>
+          </Button>
         </div>
 
         {/* Projects Grid */}
@@ -366,48 +354,27 @@ function Projects() {
                   justifyContent: "flex-end",
                 })}
               >
-                <button
+                <Button
                   type="button"
+                  variant="secondary"
                   onClick={closeModal}
                   disabled={createProjectMutation.isPending}
-                  className={css(({ v }) => ({
-                    padding: "0.75rem 1.5rem",
-                    borderRadius: "6px",
-                    fontSize: "0.875rem",
-                    fontWeight: "500",
-                    backgroundColor: v("--c-bg-light"),
-                    border: `1px solid ${v("--c-border")}`,
-                    "&:hover": {
-                      backgroundColor: `oklch(from ${v(
-                        "--c-bg-light"
-                      )} calc(l - 0.05) c h)`,
-                    },
-                    "&:disabled": {
-                      opacity: 0.5,
-                      cursor: "not-allowed",
-                    },
-                  }))}
                 >
                   Cancel
-                </button>
+                </Button>
                 <createProjectForm.Subscribe
                   selector={(state) => [state.canSubmit]}
                 >
                   {([canSubmit]) => (
-                    <button
+                    <Button
                       type="submit"
+                      variant="success"
                       disabled={!canSubmit || createProjectMutation.isPending}
-                      className={clsx(
-                        Styles.button,
-                        canSubmit && !createProjectMutation.isPending
-                          ? Styles.buttonEnabled
-                          : Styles.buttonDisabled
-                      )}
                     >
                       {createProjectMutation.isPending
                         ? "Creating..."
                         : "Create Project"}
-                    </button>
+                    </Button>
                   )}
                 </createProjectForm.Subscribe>
               </div>
@@ -427,13 +394,6 @@ const Styles = {
     border: `1px solid ${v("--c-border")}`,
     boxShadow: v("--shadow"),
   })),
-  cardButton: css({
-    padding: "0.5rem 1rem",
-    borderRadius: "4px",
-    border: "none",
-    fontSize: "0.75rem",
-    fontWeight: "500",
-  }),
 
   inputValid: css(({ v }) => ({
     border: `1px solid ${v("--c-border")}`,
@@ -441,27 +401,5 @@ const Styles = {
 
   inputInvalid: css(({ v }) => ({
     border: `1px solid ${v("--c-danger")}`,
-  })),
-
-  button: css(({ v }) => ({
-    padding: "0.75rem 1.5rem",
-    borderRadius: "6px",
-    fontSize: "0.875rem",
-    fontWeight: "500",
-    color: v("--c-text-alt"),
-    border: "none",
-  })),
-
-  buttonEnabled: css(({ v }) => ({
-    backgroundColor: v("--c-success"),
-    cursor: "pointer",
-    "&:hover": {
-      backgroundColor: `oklch(from ${v("--c-success")} calc(l - 0.05) c h)`,
-    },
-  })),
-
-  buttonDisabled: css(({ v }) => ({
-    backgroundColor: `oklch(from ${v("--c-text-muted")} l 0 h)`,
-    cursor: "not-allowed",
   })),
 };

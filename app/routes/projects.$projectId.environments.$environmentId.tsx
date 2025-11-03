@@ -16,6 +16,7 @@ import { unwrapDekWithPassword } from "../crypto/dek";
 import { unwrapSecret, wrapSecret } from "../crypto/secrets";
 import { useForm } from "@tanstack/react-form";
 import { useMutation } from "@tanstack/react-query";
+import { Button } from "../components/Button";
 
 export const Route = createFileRoute(
   "/projects/$projectId/environments/$environmentId"
@@ -287,23 +288,12 @@ function EnvironmentDetail() {
             </p>
           </div>
           <div className={css({ display: "flex", gap: "1rem" })}>
-            <button
-              className={clsx(
-                Styles.actionButton,
-                css(({ v }) => ({
-                  backgroundColor: v("--c-primary"),
-                  color: v("--c-text-alt"),
-                  "&:hover": {
-                    backgroundColor: `oklch(from ${v(
-                      "--c-primary"
-                    )} calc(l - 0.05) c h)`,
-                  },
-                }))
-              )}
+            <Button
+              variant="primary"
               onClick={() => setIsCraeteModalOpen(true)}
             >
               + Add Secret
-            </button>
+            </Button>
           </div>
         </div>
 
@@ -353,47 +343,24 @@ function EnvironmentDetail() {
                 {`${secret.valueEncrypted.substring(0, 6)}*****`}
               </div>
               <div className={css({ display: "flex", gap: "0.5rem" })}>
-                <button
-                  className={clsx(
-                    Styles.smallButton,
-                    css(({ v }) => ({
-                      backgroundColor: v("--c-bg-light"),
-                      color: v("--c-text"),
-                      "&:hover": {
-                        backgroundColor: `oklch(from ${v(
-                          "--c-bg-light"
-                        )} calc(l - 0.05) c h)`,
-                      },
-                    }))
-                  )}
+                <Button
+                  size="sm"
                   onClick={() => setSelectedSecretKey(secret.key)}
                 >
                   View
-                </button>
-                <button
+                </Button>
+                <Button
+                  variant="destructive"
+                  size="sm"
                   onClick={() =>
                     deleteSecretMutation.mutate({
                       environmentId: environment.id,
                       secretKey: secret.key,
                     })
                   }
-                  className={clsx(
-                    Styles.smallButton,
-                    css(({ v }) => ({
-                      backgroundColor: `oklch(from ${v(
-                        "--c-danger"
-                      )} 0.95 0.05 h)`,
-                      color: v("--c-danger"),
-                      "&:hover": {
-                        backgroundColor: `oklch(from ${v(
-                          "--c-danger"
-                        )} 0.9 0.1 h)`,
-                      },
-                    }))
-                  )}
                 >
                   Delete
-                </button>
+                </Button>
               </div>
             </div>
           ))}
@@ -528,23 +495,6 @@ function EnvironmentDetail() {
 }
 
 const Styles = {
-  actionButton: css({
-    padding: "0.75rem 1.5rem",
-    borderRadius: "6px",
-    border: "none",
-    cursor: "pointer",
-    fontSize: "0.875rem",
-    fontWeight: "500",
-    transition: "all 0.2s",
-  }),
-  smallButton: css({
-    padding: "0.25rem 0.5rem",
-    borderRadius: "4px",
-    border: "none",
-    cursor: "pointer",
-    fontSize: "0.75rem",
-    transition: "all 0.2s",
-  }),
   tableContainer: css(({ v }) => ({
     backgroundColor: v("--c-bg"),
     borderRadius: "8px",

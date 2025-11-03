@@ -7,7 +7,8 @@ type ButtonVariant =
   | "primary"
   | "secondary"
   | "success"
-  | "destructive";
+  | "destructive"
+  | "ghost";
 type ButtonSize = "sm" | "md";
 
 interface Props extends React.ComponentProps<"button"> {
@@ -45,7 +46,7 @@ const Styles = {
   base: css(() => ({
     border: "none",
     cursor: "pointer",
-    fontWeight: "500",
+    fontWeight: "600",
     transition: "background-color 0.2s",
     "&[disabled]": {
       cursor: "not-allowed",
@@ -100,6 +101,18 @@ const Styles = {
       },
       "&[disabled]": {
         backgroundColor: `oklch(from ${v("--c-text-muted")} l 0 h)`,
+      },
+    })),
+    ghost: css(({ v }) => ({
+      color: v("--c-text"),
+      "&:hover": {
+        backgroundColor: `oklch(from ${v("--c-bg-light")} calc(l - 0.1) c h)`,
+      },
+      "&[disabled]": {
+        color: v("--c-text-muted"),
+        "&:hover": {
+          backgroundColor: "none",
+        },
       },
     })),
   } satisfies Record<ButtonVariant, unknown>,

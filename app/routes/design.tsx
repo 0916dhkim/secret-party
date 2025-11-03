@@ -46,6 +46,7 @@ function ButtonShowcase() {
     "secondary",
     "success",
     "destructive",
+    "ghost",
   ] as const;
 
   return (

@@ -8,6 +8,7 @@ import { createFileRoute, redirect } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
 import { useState } from "react";
 import z from "zod";
+import { Button } from "../components/Button";
 
 export const Route = createFileRoute("/login")({
   component: Login,
@@ -174,16 +175,9 @@ export default function Login() {
 
         <loginForm.Subscribe selector={(state) => [state.canSubmit]}>
           {([canSubmit]) => (
-            <button
-              type="submit"
-              disabled={!canSubmit}
-              className={clsx(
-                Styles.button,
-                canSubmit ? Styles.buttonEnabled : Styles.buttonDisabled
-              )}
-            >
+            <Button type="submit" variant="success" disabled={!canSubmit}>
               Login
-            </button>
+            </Button>
           )}
         </loginForm.Subscribe>
       </form>
@@ -204,25 +198,5 @@ const Styles = {
 
   inputInvalid: css(({ v }) => ({
     border: `1px solid ${v("--c-danger")}`,
-  })),
-
-  button: css(({ v }) => ({
-    padding: "0.75rem",
-    color: v("--c-text-alt"),
-    border: "none",
-    borderRadius: "4px",
-  })),
-
-  buttonEnabled: css(({ v }) => ({
-    backgroundColor: v("--c-success"),
-    cursor: "pointer",
-    "&:hover": {
-      backgroundColor: `oklch(from ${v("--c-success")} calc(l - 0.05) c h)`,
-    },
-  })),
-
-  buttonDisabled: css(({ v }) => ({
-    backgroundColor: `oklch(from ${v("--c-success")} l 0 h)`,
-    cursor: "not-allowed",
   })),
 };
