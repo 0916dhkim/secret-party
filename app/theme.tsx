@@ -97,7 +97,7 @@ export const system = {
   neutral: primitives.stone,
   primary: primitives.fuchsia,
   success: primitives.emerald,
-  danger: primitives.rose,
+  destructive: primitives.rose,
   warning: primitives.orange,
   info: primitives.sky,
   shadow: {
@@ -115,15 +115,122 @@ export const CSS_VARIABLES = {
   "--c-bg": lightDark(system.neutral[200], system.neutral[900]),
   "--c-bg-light": lightDark(system.neutral[100], system.neutral[800]),
   "--c-border": lightDark(system.neutral[300], system.neutral[700]),
-  "--c-text": lightDark(system.neutral[900], system.neutral[200]),
+  "--c-text": lightDark(system.neutral[950], system.neutral[200]),
   "--c-text-alt": system.neutral[50],
   "--c-text-muted": lightDark(system.neutral[700], system.neutral[400]),
   "--c-primary": system.primary[700],
   "--c-success": system.success[700],
-  "--c-danger": system.danger[800],
+  "--c-danger": system.destructive[800],
   "--c-warning": system.warning[800],
   "--c-info": system.info[700],
   "--shadow": system.shadow.default,
+
+  "--c-page-background": lightDark(system.neutral[200], system.neutral[800]),
+
+  "--c-button-default-background": lightDark(
+    system.neutral[950],
+    system.neutral[50]
+  ),
+  "--c-button-default-hover-background": lightDark(
+    system.neutral[600],
+    system.neutral[400]
+  ),
+  "--c-button-default-disabled-background": lightDark(
+    system.neutral[700],
+    system.neutral[300]
+  ),
+  "--c-button-default-text": lightDark(system.neutral[50], system.neutral[950]),
+  "--c-button-default-disabled-text": lightDark(
+    system.neutral[300],
+    system.neutral[700]
+  ),
+  "--c-button-primary-background": lightDark(
+    system.primary[700],
+    system.primary[700]
+  ),
+  "--c-button-primary-hover-background": lightDark(
+    system.primary[500],
+    system.primary[900]
+  ),
+  "--c-button-primary-disabled-background": lightDark(
+    system.neutral[700],
+    system.neutral[300]
+  ),
+  "--c-button-primary-text": lightDark(system.neutral[50], system.neutral[50]),
+  "--c-button-primary-disabled-text": lightDark(
+    system.neutral[300],
+    system.neutral[700]
+  ),
+  "--c-button-secondary-background": lightDark(
+    system.neutral[300],
+    system.neutral[700]
+  ),
+  "--c-button-secondary-border": lightDark(
+    system.neutral[400],
+    system.neutral[600]
+  ),
+  "--c-button-secondary-hover-background": lightDark(
+    system.neutral[200],
+    system.neutral[800]
+  ),
+  "--c-button-secondary-disabled-background": lightDark(
+    system.neutral[700],
+    system.neutral[300]
+  ),
+  "--c-button-secondary-text": lightDark(
+    system.neutral[900],
+    system.neutral[100]
+  ),
+  "--c-button-secondary-disabled-text": lightDark(
+    system.neutral[300],
+    system.neutral[700]
+  ),
+  "--c-button-success-background": lightDark(
+    system.success[700],
+    system.success[700]
+  ),
+  "--c-button-success-hover-background": lightDark(
+    system.success[500],
+    system.success[900]
+  ),
+  "--c-button-success-disabled-background": lightDark(
+    system.neutral[700],
+    system.neutral[300]
+  ),
+  "--c-button-success-text": lightDark(system.neutral[50], system.neutral[50]),
+  "--c-button-success-disabled-text": lightDark(
+    system.neutral[300],
+    system.neutral[700]
+  ),
+  "--c-button-destructive-background": lightDark(
+    system.destructive[800],
+    system.destructive[800]
+  ),
+  "--c-button-destructive-hover-background": lightDark(
+    system.destructive[700],
+    system.destructive[900]
+  ),
+  "--c-button-destructive-disabled-background": lightDark(
+    system.neutral[700],
+    system.neutral[300]
+  ),
+  "--c-button-destructive-text": lightDark(
+    system.neutral[50],
+    system.neutral[50]
+  ),
+  "--c-button-destructive-disabled-text": lightDark(
+    system.neutral[300],
+    system.neutral[700]
+  ),
+  "--c-button-ghost-hover-background": lightDark(
+    system.neutral[300],
+    system.neutral[700]
+  ),
+  "--c-button-ghost-text": lightDark(system.neutral[950], system.neutral[50]),
+  "--c-button-ghost-disabled-text": lightDark(
+    system.neutral[700],
+    system.neutral[300]
+  ),
 } as const;
 
 const APP_THEME = {

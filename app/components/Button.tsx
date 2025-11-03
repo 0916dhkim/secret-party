@@ -54,64 +54,71 @@ const Styles = {
   })),
   variant: {
     default: css(({ v }) => ({
-      backgroundColor: v("--c-bg-light"),
-      color: v("--c-text"),
+      backgroundColor: v("--c-button-default-background"),
+      color: v("--c-button-default-text"),
       "&:hover": {
-        backgroundColor: `oklch(from ${v("--c-bg-light")} calc(l - 0.05) c h)`,
+        backgroundColor: v("--c-button-default-hover-background"),
       },
       "&[disabled]": {
-        backgroundColor: `oklch(from ${v("--c-text-muted")} l 0 h)`,
+        backgroundColor: v("--c-button-default-disabled-background"),
+        color: v("--c-button-default-disabled-text"),
       },
     })),
     primary: css(({ v }) => ({
-      backgroundColor: v("--c-primary"),
-      color: v("--c-text-alt"),
+      backgroundColor: v("--c-button-primary-background"),
+      color: v("--c-button-primary-text"),
       "&:hover": {
-        backgroundColor: `oklch(from ${v("--c-primary")} calc(l - 0.05) c h)`,
+        backgroundColor: v("--c-button-primary-hover-background"),
       },
       "&[disabled]": {
-        backgroundColor: `oklch(from ${v("--c-text-muted")} l 0 h)`,
+        backgroundColor: v("--c-button-primary-disabled-background"),
+        color: v("--c-button-primary-disabled-text"),
       },
     })),
     secondary: css(({ v }) => ({
-      backgroundColor: v("--c-bg-light"),
-      color: v("--c-text"),
+      backgroundColor: v("--c-button-secondary-background"),
+      border: `1px solid ${v("--c-button-secondary-border")}`,
+      color: v("--c-button-secondary-text"),
       "&:hover": {
-        backgroundColor: `oklch(from ${v("--c-bg-light")} calc(l - 0.05) c h)`,
+        backgroundColor: v("--c-button-secondary-hover-background"),
       },
       "&[disabled]": {
-        backgroundColor: `oklch(from ${v("--c-text-muted")} l 0 h)`,
+        backgroundColor: v("--c-button-secondary-disabled-background"),
+        border: "none",
+        color: v("--c-button-secondary-disabled-text"),
       },
     })),
     success: css(({ v }) => ({
-      backgroundColor: `oklch(from ${v("--c-success")} 0.95 0.05 h)`,
-      color: v("--c-text"),
+      backgroundColor: v("--c-button-success-background"),
+      color: v("--c-button-success-text"),
       "&:hover": {
-        backgroundColor: `oklch(from ${v("--c-success")} 0.9 0.1 h)`,
+        backgroundColor: v("--c-button-success-hover-background"),
       },
       "&[disabled]": {
-        backgroundColor: `oklch(from ${v("--c-text-muted")} l 0 h)`,
+        backgroundColor: v("--c-button-success-disabled-background"),
+        color: v("--c-button-success-disabled-text"),
       },
     })),
     destructive: css(({ v }) => ({
-      backgroundColor: `oklch(from ${v("--c-danger")} 0.95 0.05 h)`,
-      color: v("--c-danger"),
+      backgroundColor: v("--c-button-destructive-background"),
+      color: v("--c-button-destructive-text"),
       "&:hover": {
-        backgroundColor: `oklch(from ${v("--c-danger")} 0.9 0.1 h)`,
+        backgroundColor: v("--c-button-destructive-hover-background"),
       },
       "&[disabled]": {
-        backgroundColor: `oklch(from ${v("--c-text-muted")} l 0 h)`,
+        backgroundColor: v("--c-button-destructive-disabled-background"),
+        color: v("--c-button-destructive-disabled-text"),
       },
     })),
     ghost: css(({ v }) => ({
-      color: v("--c-text"),
+      color: v("--c-button-ghost-text"),
       "&:hover": {
-        backgroundColor: `oklch(from ${v("--c-bg-light")} calc(l - 0.1) c h)`,
+        backgroundColor: v("--c-button-ghost-hover-background"),
       },
       "&[disabled]": {
-        color: v("--c-text-muted"),
+        color: v("--c-button-ghost-disabled-text"),
         "&:hover": {
-          backgroundColor: "none",
+          backgroundColor: "transparent",
         },
       },
     })),

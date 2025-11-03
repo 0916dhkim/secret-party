@@ -28,7 +28,7 @@ function Showcase(props: { colorScheme: "light" | "dark" }) {
         css(({ v }) => ({
           minHeight: "100dvh",
           color: v("--c-text"),
-          backgroundColor: v("--c-bg-dark"),
+          backgroundColor: v("--c-page-background"),
         })),
         props.colorScheme === "light" && css({ colorScheme: "light" }),
         props.colorScheme === "dark" && css({ colorScheme: "dark" })
