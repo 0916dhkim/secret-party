@@ -183,7 +183,6 @@ function ProjectDetail() {
             {project.name}
           </h1>
           <div className={css({ display: "flex", gap: "1rem" })}>
-            <Button variant="secondary">Edit Project</Button>
             <Button
               variant="primary"
               onClick={() => {
@@ -287,31 +286,6 @@ function ProjectDetail() {
                 >
                   {environment.name}
                 </h3>
-                <span
-                  className={clsx(
-                    css({
-                      padding: "0.25rem 0.75rem",
-                      borderRadius: "9999px",
-                      fontSize: "0.75rem",
-                      fontWeight: "500",
-                    }),
-                    environment.name === "Production"
-                      ? css(({ v }) => ({
-                          backgroundColor: `oklch(from ${v(
-                            "--c-danger"
-                          )} 0.95 0.05 h)`,
-                          color: v("--c-danger"),
-                        }))
-                      : css(({ v }) => ({
-                          backgroundColor: `oklch(from ${v(
-                            "--c-success"
-                          )} 0.95 0.05 h)`,
-                          color: v("--c-success"),
-                        }))
-                  )}
-                >
-                  {environment.name}
-                </span>
               </div>
 
               <div
@@ -339,11 +313,7 @@ function ProjectDetail() {
                   justifyContent: "flex-end",
                 })}
               >
-                <Button variant="secondary" size="sm">
-                  Manage
-                </Button>
                 <Button
-                  variant="primary"
                   size="sm"
                   onClick={() => {
                     router.navigate({
@@ -355,7 +325,7 @@ function ProjectDetail() {
                     });
                   }}
                 >
-                  View Secrets
+                  Open
                 </Button>
               </div>
             </div>

@@ -344,6 +344,7 @@ function EnvironmentDetail() {
               </div>
               <div className={css({ display: "flex", gap: "0.5rem" })}>
                 <Button
+                  variant="secondary"
                   size="sm"
                   onClick={() => setSelectedSecretKey(secret.key)}
                 >

@@ -140,8 +140,8 @@ function ProjectCard(props: ProjectCardProps) {
           justifyContent: "flex-end",
         })}
       >
-        <Button onClick={handleViewClick} variant="secondary" size="sm">
-          View
+        <Button onClick={handleViewClick} size="sm">
+          Open
         </Button>
       </div>
     </div>
@@ -211,24 +211,7 @@ function Projects() {
           <h1 className={css({ fontSize: "2rem", fontWeight: "bold" })}>
             Projects
           </h1>
-          <Button
-            variant="primary"
-            onClick={() => setIsModalOpen(true)}
-            className={css(({ v }) => ({
-              backgroundColor: v("--c-primary"),
-              color: v("--c-text-alt"),
-              padding: "0.75rem 1.5rem",
-              borderRadius: "6px",
-              border: "none",
-              fontSize: "0.875rem",
-              fontWeight: "500",
-              "&:hover": {
-                backgroundColor: `oklch(from ${v(
-                  "--c-primary"
-                )} calc(l - 0.05) c h)`,
-              },
-            }))}
-          >
+          <Button variant="primary" onClick={() => setIsModalOpen(true)}>
             + New Project
           </Button>
         </div>
