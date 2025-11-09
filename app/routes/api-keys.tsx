@@ -6,6 +6,9 @@ import { requireAuth } from "../auth/session";
 import { Layout } from "../components/Layout";
 import { Breadcrumb } from "../components/Breadcrumb";
 import { mainContent } from "../styles/shared";
+import { db } from "../db/db";
+import { eq } from "drizzle-orm";
+import { apiClientTable } from "../db/schema";
 
 export const Route = createFileRoute("/api-keys")({
   component: ApiKeys,
@@ -16,7 +19,19 @@ const loader = createServerFn({
   method: "GET",
 }).handler(async () => {
   const session = await requireAuth();
-  return { user: session.user };
+
+  const apiClients = await db.query.apiClientTable.findMany({
+    where: eq(apiClientTable.userId, session.userId),
+    with: {
+      access: {
+        with: {
+          environment: true,
+        },
+      },
+    },
+  });
+
+  return { user: session.user, apiClients };
 });
 
 function ApiKeys() {
@@ -68,35 +83,11 @@ function ApiKeys() {
           <div className={Styles.tableHeader}>
             <div>Name</div>
             <div>Environment</div>
-            <div>Created</div>
-            <div>Last Used</div>
             <div>Actions</div>
           </div>
 
           {/* Sample API Keys - these would be generated from data */}
-          {[
-            {
-              name: "Production API Key",
-              environment: "Production",
-              created: "2024-01-15",
-              lastUsed: "2 hours ago",
-              keyPrefix: "sp_prod_",
-            },
-            {
-              name: "Staging API Key",
-              environment: "Staging",
-              created: "2024-01-10",
-              lastUsed: "1 day ago",
-              keyPrefix: "sp_stag_",
-            },
-            {
-              name: "Dev Testing Key",
-              environment: "Development",
-              created: "2024-01-05",
-              lastUsed: "1 week ago",
-              keyPrefix: "sp_dev_",
-            },
-          ].map((apiKey, index) => (
+          {loaderData.apiClients.map((apiClient, index) => (
             <div
               key={index}
               className={clsx(
@@ -114,7 +105,7 @@ function ApiKeys() {
                     color: v("--c-text"),
                   }))}
                 >
-                  {apiKey.name}
+                  {apiClient.name}
                 </div>
                 <div
                   className={css(({ v }) => ({
@@ -123,7 +114,7 @@ function ApiKeys() {
                     fontFamily: "monospace",
                   }))}
                 >
-                  {apiKey.keyPrefix}••••••••
+                  {apiClient.publicKey}
                 </div>
               </div>
               <div>
@@ -139,14 +130,8 @@ function ApiKeys() {
                     fontWeight: "500",
                   }))}
                 >
-                  {apiKey.environment}
+                  {apiClient.access[0]?.environment.name}
                 </span>
-              </div>
-              <div className={css(({ v }) => ({ color: v("--c-text-muted") }))}>
-                {apiKey.created}
-              </div>
-              <div className={css(({ v }) => ({ color: v("--c-text-muted") }))}>
-                {apiKey.lastUsed}
               </div>
               <div className={css({ display: "flex", gap: "0.5rem" })}>
                 <button

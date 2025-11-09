@@ -16,6 +16,7 @@ export const userTable = pgTable("user", {
 export const userRelations = relations(userTable, ({ many }) => ({
   projects: many(projectTable),
   sessions: many(sessionTable),
+  apiClients: many(apiClientTable),
 }));
 
 export const sessionTable = pgTable("session", {
@@ -95,11 +96,21 @@ export const apiClientTable = pgTable("api_client", {
   id: integer().primaryKey().generatedAlwaysAsIdentity(),
   name: text().notNull(),
   publicKey: text().notNull().unique(),
+  userId: integer()
+    .notNull()
+    .references(() => userTable.id, { onDelete: "cascade" }),
 });
 
-export const apiClientRelations = relations(apiClientTable, ({ many }) => ({
-  access: many(environmentAccessTable),
-}));
+export const apiClientRelations = relations(
+  apiClientTable,
+  ({ one, many }) => ({
+    user: one(userTable, {
+      fields: [apiClientTable.userId],
+      references: [userTable.id],
+    }),
+    access: many(environmentAccessTable),
+  })
+);
 
 export const environmentAccessTable = pgTable(
   "environment_access",

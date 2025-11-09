@@ -1,0 +1,2 @@
+ALTER TABLE "api_client" ADD COLUMN "user_id" integer NOT NULL;--> statement-breakpoint
+ALTER TABLE "api_client" ADD CONSTRAINT "api_client_user_id_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;
