@@ -7,6 +7,7 @@ import {
 } from "@tanstack/react-router";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import appCssUrl from "../app.css?url";
+import faviconUrl from "../assets/favicon.ico?url";
 import { CSS_VARIABLES } from "../theme";
 import { css } from "@flow-css/core/css";
 
@@ -36,10 +37,13 @@ export const Route = createRootRoute({
         content: "width=device-width, initial-scale=1",
       },
       {
-        title: "TanStack Start Starter",
+        title: "Secret Party",
       },
     ],
-    links: [{ rel: "stylesheet", href: appCssUrl }],
+    links: [
+      { rel: "stylesheet", href: appCssUrl },
+      { rel: "icon", href: faviconUrl },
+    ],
   }),
   component: RootComponent,
 });
