@@ -11,9 +11,9 @@ const loader = createServerFn({
   method: "GET",
 }).handler(async () => {
   const session = await requireAuth();
-  // Redirect authenticated users to dashboard
+  // Redirect authenticated users to projects
   throw redirect({
-    to: "/dashboard",
+    to: "/projects",
   });
 });
 

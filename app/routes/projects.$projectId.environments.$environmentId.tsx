@@ -249,7 +249,6 @@ function EnvironmentDetail() {
     <Layout userEmail={user.email}>
       <Breadcrumb
         items={[
-          { label: "Dashboard", path: "/dashboard" },
           { label: "Projects", path: "/projects" },
           {
             label: environment.project.name,

@@ -26,7 +26,6 @@ function Account() {
     <Layout userEmail={loaderData.user.email}>
       <Breadcrumb
         items={[
-          { label: "Dashboard", path: "/dashboard" },
           { label: "Account" },
         ]}
       />

@@ -15,7 +15,6 @@ export function NavigationMenu({ userEmail }: NavigationMenuProps) {
   const location = useLocation();
 
   const navigationItems = [
-    { path: "/dashboard", label: "Dashboard" },
     { path: "/projects", label: "Projects" },
     { path: "/api-keys", label: "API Keys" },
     { path: "/account", label: "Account" },
@@ -52,7 +51,7 @@ export function NavigationMenu({ userEmail }: NavigationMenuProps) {
       >
         {/* Logo */}
         <Link
-          to="/dashboard"
+          to="/projects"
           className={css({
             display: "inline-flex",
             alignItems: "center",

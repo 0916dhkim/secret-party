@@ -159,7 +159,6 @@ function ProjectDetail() {
     <Layout userEmail={user.email}>
       <Breadcrumb
         items={[
-          { label: "Dashboard", path: "/dashboard" },
           { label: "Projects", path: "/projects" },
           { label: project.name },
         ]}

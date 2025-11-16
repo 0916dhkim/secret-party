@@ -370,7 +370,6 @@ function ApiKeyDetail() {
     <Layout userEmail={loaderData.user.email}>
       <Breadcrumb
         items={[
-          { label: "Dashboard", path: "/dashboard" },
           { label: "API Keys", path: "/api-keys" },
           { label: loaderData.apiClient.name },
         ]}
