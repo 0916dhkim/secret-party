@@ -15,11 +15,12 @@ import { Route as SignupRouteImport } from './routes/signup'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as DesignRouteImport } from './routes/design'
 import { Route as DashboardRouteImport } from './routes/dashboard'
-import { Route as ApiKeysRouteImport } from './routes/api-keys'
 import { Route as AccountRouteImport } from './routes/account'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ProjectsIndexRouteImport } from './routes/projects.index'
+import { Route as ApiKeysIndexRouteImport } from './routes/api-keys.index'
 import { Route as ProjectsProjectIdIndexRouteImport } from './routes/projects.$projectId.index'
+import { Route as ApiKeysApiClientIdIndexRouteImport } from './routes/api-keys.$apiClientId.index'
 import { Route as ProjectsProjectIdEnvironmentsEnvironmentIdRouteImport } from './routes/projects.$projectId.environments.$environmentId'
 import { ServerRoute as ApiServerRouteImport } from './routes/api'
 
@@ -45,11 +46,6 @@ const DashboardRoute = DashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiKeysRoute = ApiKeysRouteImport.update({
-  id: '/api-keys',
-  path: '/api-keys',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const AccountRoute = AccountRouteImport.update({
   id: '/account',
   path: '/account',
@@ -65,9 +61,19 @@ const ProjectsIndexRoute = ProjectsIndexRouteImport.update({
   path: '/projects/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiKeysIndexRoute = ApiKeysIndexRouteImport.update({
+  id: '/api-keys/',
+  path: '/api-keys/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ProjectsProjectIdIndexRoute = ProjectsProjectIdIndexRouteImport.update({
   id: '/projects/$projectId/',
   path: '/projects/$projectId/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiKeysApiClientIdIndexRoute = ApiKeysApiClientIdIndexRouteImport.update({
+  id: '/api-keys/$apiClientId/',
+  path: '/api-keys/$apiClientId/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ProjectsProjectIdEnvironmentsEnvironmentIdRoute =
@@ -85,24 +91,26 @@ const ApiServerRoute = ApiServerRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/account': typeof AccountRoute
-  '/api-keys': typeof ApiKeysRoute
   '/dashboard': typeof DashboardRoute
   '/design': typeof DesignRoute
   '/login': typeof LoginRoute
   '/signup': typeof SignupRoute
+  '/api-keys': typeof ApiKeysIndexRoute
   '/projects': typeof ProjectsIndexRoute
+  '/api-keys/$apiClientId': typeof ApiKeysApiClientIdIndexRoute
   '/projects/$projectId': typeof ProjectsProjectIdIndexRoute
   '/projects/$projectId/environments/$environmentId': typeof ProjectsProjectIdEnvironmentsEnvironmentIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/account': typeof AccountRoute
-  '/api-keys': typeof ApiKeysRoute
   '/dashboard': typeof DashboardRoute
   '/design': typeof DesignRoute
   '/login': typeof LoginRoute
   '/signup': typeof SignupRoute
+  '/api-keys': typeof ApiKeysIndexRoute
   '/projects': typeof ProjectsIndexRoute
+  '/api-keys/$apiClientId': typeof ApiKeysApiClientIdIndexRoute
   '/projects/$projectId': typeof ProjectsProjectIdIndexRoute
   '/projects/$projectId/environments/$environmentId': typeof ProjectsProjectIdEnvironmentsEnvironmentIdRoute
 }
@@ -110,12 +118,13 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/account': typeof AccountRoute
-  '/api-keys': typeof ApiKeysRoute
   '/dashboard': typeof DashboardRoute
   '/design': typeof DesignRoute
   '/login': typeof LoginRoute
   '/signup': typeof SignupRoute
+  '/api-keys/': typeof ApiKeysIndexRoute
   '/projects/': typeof ProjectsIndexRoute
+  '/api-keys/$apiClientId/': typeof ApiKeysApiClientIdIndexRoute
   '/projects/$projectId/': typeof ProjectsProjectIdIndexRoute
   '/projects/$projectId/environments/$environmentId': typeof ProjectsProjectIdEnvironmentsEnvironmentIdRoute
 }
@@ -124,36 +133,39 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/account'
-    | '/api-keys'
     | '/dashboard'
     | '/design'
     | '/login'
     | '/signup'
+    | '/api-keys'
     | '/projects'
+    | '/api-keys/$apiClientId'
     | '/projects/$projectId'
     | '/projects/$projectId/environments/$environmentId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/account'
-    | '/api-keys'
     | '/dashboard'
     | '/design'
     | '/login'
     | '/signup'
+    | '/api-keys'
     | '/projects'
+    | '/api-keys/$apiClientId'
     | '/projects/$projectId'
     | '/projects/$projectId/environments/$environmentId'
   id:
     | '__root__'
     | '/'
     | '/account'
-    | '/api-keys'
     | '/dashboard'
     | '/design'
     | '/login'
     | '/signup'
+    | '/api-keys/'
     | '/projects/'
+    | '/api-keys/$apiClientId/'
     | '/projects/$projectId/'
     | '/projects/$projectId/environments/$environmentId'
   fileRoutesById: FileRoutesById
@@ -161,12 +173,13 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AccountRoute: typeof AccountRoute
-  ApiKeysRoute: typeof ApiKeysRoute
   DashboardRoute: typeof DashboardRoute
   DesignRoute: typeof DesignRoute
   LoginRoute: typeof LoginRoute
   SignupRoute: typeof SignupRoute
+  ApiKeysIndexRoute: typeof ApiKeysIndexRoute
   ProjectsIndexRoute: typeof ProjectsIndexRoute
+  ApiKeysApiClientIdIndexRoute: typeof ApiKeysApiClientIdIndexRoute
   ProjectsProjectIdIndexRoute: typeof ProjectsProjectIdIndexRoute
   ProjectsProjectIdEnvironmentsEnvironmentIdRoute: typeof ProjectsProjectIdEnvironmentsEnvironmentIdRoute
 }
@@ -222,13 +235,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api-keys': {
-      id: '/api-keys'
-      path: '/api-keys'
-      fullPath: '/api-keys'
-      preLoaderRoute: typeof ApiKeysRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/account': {
       id: '/account'
       path: '/account'
@@ -250,11 +256,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProjectsIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api-keys/': {
+      id: '/api-keys/'
+      path: '/api-keys'
+      fullPath: '/api-keys'
+      preLoaderRoute: typeof ApiKeysIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/projects/$projectId/': {
       id: '/projects/$projectId/'
       path: '/projects/$projectId'
       fullPath: '/projects/$projectId'
       preLoaderRoute: typeof ProjectsProjectIdIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api-keys/$apiClientId/': {
+      id: '/api-keys/$apiClientId/'
+      path: '/api-keys/$apiClientId'
+      fullPath: '/api-keys/$apiClientId'
+      preLoaderRoute: typeof ApiKeysApiClientIdIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/projects/$projectId/environments/$environmentId': {
@@ -281,12 +301,13 @@ declare module '@tanstack/react-start/server' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AccountRoute: AccountRoute,
-  ApiKeysRoute: ApiKeysRoute,
   DashboardRoute: DashboardRoute,
   DesignRoute: DesignRoute,
   LoginRoute: LoginRoute,
   SignupRoute: SignupRoute,
+  ApiKeysIndexRoute: ApiKeysIndexRoute,
   ProjectsIndexRoute: ProjectsIndexRoute,
+  ApiKeysApiClientIdIndexRoute: ApiKeysApiClientIdIndexRoute,
   ProjectsProjectIdIndexRoute: ProjectsProjectIdIndexRoute,
   ProjectsProjectIdEnvironmentsEnvironmentIdRoute:
     ProjectsProjectIdEnvironmentsEnvironmentIdRoute,

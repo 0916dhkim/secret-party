@@ -32,12 +32,8 @@ export async function serializeKeyPair(keyPair: CryptoKeyPair) {
   };
 }
 
-export async function deserializeKeyPair(
-  publicKeyPEM: string,
-  privateKeyPEM: string
-) {
+export async function deserializePublicKey(publicKeyPEM: string) {
   const publicKeyBuffer = pemToBuffer(publicKeyPEM, "PUBLIC KEY");
-  const privateKeyBuffer = pemToBuffer(privateKeyPEM, "PRIVATE KEY");
 
   const publicKey = await crypto.subtle.importKey(
     "spki",
@@ -50,6 +46,12 @@ export async function deserializeKeyPair(
     ["encrypt"]
   );
 
+  return publicKey;
+}
+
+export async function deserializePrivateKey(privateKeyPEM: string) {
+  const privateKeyBuffer = pemToBuffer(privateKeyPEM, "PRIVATE KEY");
+
   const privateKey = await crypto.subtle.importKey(
     "pkcs8",
     privateKeyBuffer,
@@ -60,6 +62,16 @@ export async function deserializeKeyPair(
     false,
     ["decrypt"]
   );
+
+  return privateKey;
+}
+
+export async function deserializeKeyPair(
+  publicKeyPEM: string,
+  privateKeyPEM: string
+) {
+  const publicKey = await deserializePublicKey(publicKeyPEM);
+  const privateKey = await deserializePrivateKey(privateKeyPEM);
 
   return { publicKey, privateKey };
 }
