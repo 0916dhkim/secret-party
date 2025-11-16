@@ -4,6 +4,7 @@ import { clsx } from "clsx";
 import { css } from "@flow-css/core/css";
 import { logout } from "../auth/actions";
 import { Button } from "./Button";
+import logoUrl from "../assets/logo-transparent.png?url";
 
 interface NavigationMenuProps {
   userEmail: string;
@@ -52,14 +53,20 @@ export function NavigationMenu({ userEmail }: NavigationMenuProps) {
         {/* Logo */}
         <Link
           to="/dashboard"
-          className={css(({ v }) => ({
-            fontSize: "1.5rem",
-            fontWeight: "bold",
-            color: v("--c-text"),
+          className={css({
+            display: "inline-flex",
+            alignItems: "center",
+            height: "100%",
             textDecoration: "none",
-          }))}
+          })}
         >
-          Secret Party
+          <img
+            src={logoUrl}
+            alt="Secret Party"
+            className={css({
+              height: "100%",
+            })}
+          />
         </Link>
 
         {/* Desktop Navigation */}
