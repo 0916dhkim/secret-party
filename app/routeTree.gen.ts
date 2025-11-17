@@ -11,6 +11,7 @@
 import { createServerRootRoute } from '@tanstack/react-start/server'
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as TestApiKeyRouteImport } from './routes/test-api-key'
 import { Route as SignupRouteImport } from './routes/signup'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as DesignRouteImport } from './routes/design'
@@ -24,6 +25,11 @@ import { ServerRoute as ApiServerRouteImport } from './routes/api'
 
 const rootServerRouteImport = createServerRootRoute()
 
+const TestApiKeyRoute = TestApiKeyRouteImport.update({
+  id: '/test-api-key',
+  path: '/test-api-key',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SignupRoute = SignupRouteImport.update({
   id: '/signup',
   path: '/signup',
@@ -81,6 +87,7 @@ export interface FileRoutesByFullPath {
   '/design': typeof DesignRoute
   '/login': typeof LoginRoute
   '/signup': typeof SignupRoute
+  '/test-api-key': typeof TestApiKeyRoute
   '/api-keys': typeof ApiKeysIndexRoute
   '/projects': typeof ProjectsIndexRoute
   '/api-keys/$apiClientId': typeof ApiKeysApiClientIdIndexRoute
@@ -92,6 +99,7 @@ export interface FileRoutesByTo {
   '/design': typeof DesignRoute
   '/login': typeof LoginRoute
   '/signup': typeof SignupRoute
+  '/test-api-key': typeof TestApiKeyRoute
   '/api-keys': typeof ApiKeysIndexRoute
   '/projects': typeof ProjectsIndexRoute
   '/api-keys/$apiClientId': typeof ApiKeysApiClientIdIndexRoute
@@ -104,6 +112,7 @@ export interface FileRoutesById {
   '/design': typeof DesignRoute
   '/login': typeof LoginRoute
   '/signup': typeof SignupRoute
+  '/test-api-key': typeof TestApiKeyRoute
   '/api-keys/': typeof ApiKeysIndexRoute
   '/projects/': typeof ProjectsIndexRoute
   '/api-keys/$apiClientId/': typeof ApiKeysApiClientIdIndexRoute
@@ -117,6 +126,7 @@ export interface FileRouteTypes {
     | '/design'
     | '/login'
     | '/signup'
+    | '/test-api-key'
     | '/api-keys'
     | '/projects'
     | '/api-keys/$apiClientId'
@@ -128,6 +138,7 @@ export interface FileRouteTypes {
     | '/design'
     | '/login'
     | '/signup'
+    | '/test-api-key'
     | '/api-keys'
     | '/projects'
     | '/api-keys/$apiClientId'
@@ -139,6 +150,7 @@ export interface FileRouteTypes {
     | '/design'
     | '/login'
     | '/signup'
+    | '/test-api-key'
     | '/api-keys/'
     | '/projects/'
     | '/api-keys/$apiClientId/'
@@ -151,6 +163,7 @@ export interface RootRouteChildren {
   DesignRoute: typeof DesignRoute
   LoginRoute: typeof LoginRoute
   SignupRoute: typeof SignupRoute
+  TestApiKeyRoute: typeof TestApiKeyRoute
   ApiKeysIndexRoute: typeof ApiKeysIndexRoute
   ProjectsIndexRoute: typeof ProjectsIndexRoute
   ApiKeysApiClientIdIndexRoute: typeof ApiKeysApiClientIdIndexRoute
@@ -181,6 +194,13 @@ export interface RootServerRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/test-api-key': {
+      id: '/test-api-key'
+      path: '/test-api-key'
+      fullPath: '/test-api-key'
+      preLoaderRoute: typeof TestApiKeyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/signup': {
       id: '/signup'
       path: '/signup'
@@ -263,6 +283,7 @@ const rootRouteChildren: RootRouteChildren = {
   DesignRoute: DesignRoute,
   LoginRoute: LoginRoute,
   SignupRoute: SignupRoute,
+  TestApiKeyRoute: TestApiKeyRoute,
   ApiKeysIndexRoute: ApiKeysIndexRoute,
   ProjectsIndexRoute: ProjectsIndexRoute,
   ApiKeysApiClientIdIndexRoute: ApiKeysApiClientIdIndexRoute,
