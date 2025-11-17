@@ -17,7 +17,6 @@ export function NavigationMenu({ userEmail }: NavigationMenuProps) {
   const navigationItems = [
     { path: "/projects", label: "Projects" },
     { path: "/api-keys", label: "API Keys" },
-    { path: "/account", label: "Account" },
   ];
 
   const isActive = (path: string) => {
