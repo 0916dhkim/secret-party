@@ -95,7 +95,9 @@ export const secretRelations = relations(secretTable, ({ one }) => ({
 export const apiClientTable = pgTable("api_client", {
   id: integer().primaryKey().generatedAlwaysAsIdentity(),
   name: text().notNull(),
+  apiKey: text().notNull().unique(),
   publicKey: text().notNull().unique(),
+  privateKeyWrappedByPassword: text().notNull(),
   userId: integer()
     .notNull()
     .references(() => userTable.id, { onDelete: "cascade" }),
