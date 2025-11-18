@@ -6,6 +6,9 @@ import {
   deserializeKeyPair,
   encryptWithPublicKey,
   decryptWithPrivateKey,
+  generateApiKey,
+  wrapPrivateKeyWithPassword,
+  unwrapPrivateKeyWithPassword,
 } from "./keypair";
 
 test("serializeKeyPair converts keys to PEM format", async () => {
@@ -177,4 +180,86 @@ test("decryption fails with wrong private key", async () => {
   await assert.rejects(async () => {
     await decryptWithPrivateKey(encrypted, keyPair2.privateKey);
   });
+});
+
+test("generateApiKey generates valid API key", () => {
+  const apiKey = generateApiKey();
+
+  // Should return a string
+  assert.strictEqual(typeof apiKey, "string");
+
+  // Should start with sk_ prefix
+  assert.ok(apiKey.startsWith("sk_"));
+
+  // Should have reasonable length (sk_ + base64url encoded 32 bytes)
+  assert.ok(apiKey.length > 40);
+
+  // Should generate unique keys
+  const apiKey2 = generateApiKey();
+  assert.notStrictEqual(apiKey, apiKey2);
+});
+
+test("wrapPrivateKeyWithPassword encrypts private key", async () => {
+  const keyPair = await generateKeyPair();
+  const serialized = await serializeKeyPair(keyPair);
+  const password = "test-password";
+
+  const wrapped = wrapPrivateKeyWithPassword(serialized.privateKey, password);
+
+  // Should return a string
+  assert.strictEqual(typeof wrapped, "string");
+
+  // Should contain IV and encrypted data separated by semicolon
+  assert.ok(wrapped.includes(";"));
+  const [iv, encrypted] = wrapped.split(";");
+  assert.ok(iv.length > 0);
+  assert.ok(encrypted.length > 0);
+
+  // Wrapped data should be different from original
+  assert.notStrictEqual(wrapped, serialized.privateKey);
+});
+
+test("unwrapPrivateKeyWithPassword decrypts private key", async () => {
+  const keyPair = await generateKeyPair();
+  const serialized = await serializeKeyPair(keyPair);
+  const password = "test-password";
+
+  const wrapped = wrapPrivateKeyWithPassword(serialized.privateKey, password);
+  const unwrapped = unwrapPrivateKeyWithPassword(wrapped, password);
+
+  // Should decrypt back to original private key
+  assert.strictEqual(unwrapped, serialized.privateKey);
+});
+
+test("private key wrapping fails with wrong password", async () => {
+  const keyPair = await generateKeyPair();
+  const serialized = await serializeKeyPair(keyPair);
+  const password = "correct-password";
+  const wrongPassword = "wrong-password";
+
+  const wrapped = wrapPrivateKeyWithPassword(serialized.privateKey, password);
+
+  // Should throw when using wrong password
+  assert.throws(() => {
+    unwrapPrivateKeyWithPassword(wrapped, wrongPassword);
+  });
+});
+
+test("private key wrapping produces different results each time", async () => {
+  const keyPair = await generateKeyPair();
+  const serialized = await serializeKeyPair(keyPair);
+  const password = "test-password";
+
+  const wrapped1 = wrapPrivateKeyWithPassword(serialized.privateKey, password);
+  const wrapped2 = wrapPrivateKeyWithPassword(serialized.privateKey, password);
+
+  // Should produce different encrypted results due to random IV
+  assert.notStrictEqual(wrapped1, wrapped2);
+
+  // But both should decrypt to the same private key
+  const unwrapped1 = unwrapPrivateKeyWithPassword(wrapped1, password);
+  const unwrapped2 = unwrapPrivateKeyWithPassword(wrapped2, password);
+
+  assert.strictEqual(unwrapped1, serialized.privateKey);
+  assert.strictEqual(unwrapped2, serialized.privateKey);
 });

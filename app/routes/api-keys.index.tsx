@@ -15,7 +15,12 @@ import { Button } from "../components/Button";
 import { useMutation } from "@tanstack/react-query";
 import { useForm } from "@tanstack/react-form";
 import z from "zod";
-import { generateKeyPair, serializeKeyPair } from "../crypto/keypair";
+import {
+  generateKeyPair,
+  serializeKeyPair,
+  generateApiKey,
+  wrapPrivateKeyWithPassword,
+} from "../crypto/keypair";
 import { verifyPassword } from "../auth/hash";
 import { useRouter } from "@tanstack/react-router";
 
@@ -72,11 +77,19 @@ const createApiKey = createServerFn({
     const { publicKey: publicKeyPEM, privateKey: privateKeyPEM } =
       await serializeKeyPair(keyPair);
 
+    const apiKey = generateApiKey();
+    const privateKeyWrappedByPassword = wrapPrivateKeyWithPassword(
+      privateKeyPEM,
+      password
+    );
+
     const [apiClient] = await db
       .insert(apiClientTable)
       .values({
         name,
+        apiKey,
         publicKey: publicKeyPEM,
+        privateKeyWrappedByPassword,
         userId: session.user.id,
       })
       .returning();
@@ -87,6 +100,7 @@ const createApiKey = createServerFn({
 
     return {
       apiClient,
+      apiKey,
       privateKey: privateKeyPEM,
     };
   });
@@ -96,6 +110,7 @@ function ApiKeys() {
   const router = useRouter();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isPrivateKeyModalOpen, setIsPrivateKeyModalOpen] = useState(false);
+  const [generatedApiKey, setGeneratedApiKey] = useState<string | null>(null);
   const [generatedPrivateKey, setGeneratedPrivateKey] = useState<string | null>(
     null
   );
@@ -120,6 +135,7 @@ function ApiKeys() {
     mutationFn: (data: { name: string; password: string }) =>
       createApiKey({ data }),
     onSuccess: async (result) => {
+      setGeneratedApiKey(result.apiKey);
       setGeneratedPrivateKey(result.privateKey);
       setIsModalOpen(false);
       setIsPrivateKeyModalOpen(true);
@@ -140,7 +156,15 @@ function ApiKeys() {
 
   const closePrivateKeyModal = () => {
     setIsPrivateKeyModalOpen(false);
+    setGeneratedApiKey(null);
     setGeneratedPrivateKey(null);
+  };
+
+  const copyApiKey = async () => {
+    if (generatedApiKey) {
+      await navigator.clipboard.writeText(generatedApiKey);
+      alert("API key copied to clipboard!");
+    }
   };
 
   const copyPrivateKey = async () => {
@@ -250,12 +274,12 @@ function ApiKeys() {
                 border: `1px solid ${v("--c-border")}`,
               }))}
             >
-              Authorization: Bearer sp_prod_your_api_key_here
+              Authorization: Bearer sk_your_api_key_here
             </code>
             <p>
               API keys provide access to the secrets within their assigned
-              environment only. Keep your API keys secure and rotate them
-              regularly.
+              environments. The private key is used to decrypt the environment's
+              encryption key. Keep both your API keys and private keys secure.
             </p>
           </div>
         </div>
@@ -492,8 +516,9 @@ function ApiKeys() {
                   margin: 0,
                 }))}
               >
-                <strong>Important:</strong> Save your private key now. You won't
-                be able to see it again after closing this dialog.
+                <strong>Important:</strong> Save both your API key and private
+                key now. You won't be able to see them again after closing this
+                dialog.
               </p>
             </div>
             <div
@@ -510,7 +535,48 @@ function ApiKeys() {
                   color: v("--c-text"),
                 }))}
               >
-                Private Key
+                API Key (for Authorization header)
+              </label>
+              <div
+                className={css({
+                  display: "flex",
+                  gap: "0.5rem",
+                  alignItems: "flex-start",
+                })}
+              >
+                <textarea
+                  readOnly
+                  value={generatedApiKey || ""}
+                  className={css(({ v }) => ({
+                    flex: 1,
+                    padding: "0.75rem",
+                    borderRadius: "6px",
+                    fontSize: "0.75rem",
+                    fontFamily: "monospace",
+                    backgroundColor: v("--c-bg-light"),
+                    color: v("--c-text"),
+                    border: `1px solid ${v("--c-border")}`,
+                    minHeight: "80px",
+                    resize: "vertical",
+                  }))}
+                />
+              </div>
+            </div>
+            <div
+              className={css({
+                display: "flex",
+                flexDirection: "column",
+                gap: "0.5rem",
+              })}
+            >
+              <label
+                className={css(({ v }) => ({
+                  fontSize: "0.875rem",
+                  fontWeight: "500",
+                  color: v("--c-text"),
+                }))}
+              >
+                Private Key (for decryption)
               </label>
               <textarea
                 readOnly
@@ -535,11 +601,14 @@ function ApiKeys() {
                 justifyContent: "flex-end",
               })}
             >
+              <Button variant="secondary" onClick={copyApiKey}>
+                Copy API Key
+              </Button>
               <Button variant="secondary" onClick={copyPrivateKey}>
                 Copy Private Key
               </Button>
               <Button variant="primary" onClick={closePrivateKeyModal}>
-                I've Saved It
+                I've Saved Them
               </Button>
             </div>
           </div>

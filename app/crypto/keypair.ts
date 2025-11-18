@@ -1,3 +1,7 @@
+import { gcm } from "@noble/ciphers/aes";
+import { randomBytes } from "crypto";
+import { sha3_256 } from "@noble/hashes/sha3";
+
 export async function generateKeyPair() {
   const keyPair = await crypto.subtle.generateKey(
     {
@@ -108,4 +112,51 @@ function pemToBuffer(pem: string, type: string) {
     .replace(/\s/g, "");
 
   return Buffer.from(base64, "base64");
+}
+
+export function generateApiKey(): string {
+  // Generate a 32-byte random key and encode as base64url
+  const bytes = randomBytes(32);
+  return "sk_" + Buffer.from(bytes).toString("base64url");
+}
+
+export function wrapPrivateKeyWithPassword(
+  privateKeyPEM: string,
+  password: string
+): string {
+  const aesKey = passwordToAesKey(password);
+  const aesKeyBytes = Buffer.from(aesKey, "base64");
+  const ivBytes = randomBytes(12); // 96-bit IV for GCM
+  const iv = ivBytes.toString("base64");
+  const privateKeyBytes = new TextEncoder().encode(privateKeyPEM);
+
+  const cipher = gcm(aesKeyBytes, ivBytes);
+  const encryptedBytes = cipher.encrypt(privateKeyBytes);
+  const encrypted = Buffer.from(encryptedBytes).toString("base64");
+
+  return `${iv};${encrypted}`;
+}
+
+export function unwrapPrivateKeyWithPassword(
+  wrappedPrivateKey: string,
+  password: string
+): string {
+  const [iv, encrypted] = wrappedPrivateKey.split(";");
+  if (iv == null || encrypted == null) {
+    throw new Error("Invalid wrapped private key format");
+  }
+  const ivBytes = Buffer.from(iv, "base64");
+  const encryptedBytes = Buffer.from(encrypted, "base64");
+  const aesKey = passwordToAesKey(password);
+  const aesKeyBytes = Buffer.from(aesKey, "base64");
+
+  const cipher = gcm(aesKeyBytes, ivBytes);
+  const privateKeyBytes = cipher.decrypt(encryptedBytes);
+
+  return new TextDecoder().decode(privateKeyBytes);
+}
+
+function passwordToAesKey(password: string): string {
+  const passwordBytes = new TextEncoder().encode(password);
+  return Buffer.from(sha3_256(passwordBytes)).toString("base64");
 }

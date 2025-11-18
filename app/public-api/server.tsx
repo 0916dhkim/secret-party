@@ -28,29 +28,29 @@ async function authorizationMiddleware(
     return c.json({ error: "Authorization header required" }, 401);
   }
 
-  const match = authHeader.match(/^Bearer\s+(?<publicKey>.+)$/);
+  const match = authHeader.match(/^Bearer\s+(?<apiKey>.+)$/);
   if (match == null) {
     return c.json(
       {
         error:
-          "Invalid Authorization header format. Expected: Bearer <public_key>",
+          "Invalid Authorization header format. Expected: Bearer <api_key>",
       },
       401
     );
   }
 
-  const publicKey = match.groups?.publicKey;
+  const apiKey = match.groups?.apiKey;
 
-  if (publicKey == null) {
-    return c.json({ error: "Public key cannot be empty" }, 401);
+  if (apiKey == null) {
+    return c.json({ error: "API key cannot be empty" }, 401);
   }
 
   const apiClient = await db.query.apiClientTable.findFirst({
-    where: eq(apiClientTable.publicKey, publicKey),
+    where: eq(apiClientTable.apiKey, apiKey),
   });
 
   if (apiClient == null) {
-    return c.json({ error: "Invalid public key" }, 401);
+    return c.json({ error: "Invalid API key" }, 401);
   }
 
   c.set("apiClient", apiClient);

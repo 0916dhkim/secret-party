@@ -336,6 +336,11 @@ function ApiKeyDetail() {
     }
   };
 
+  const copyApiKey = async () => {
+    await navigator.clipboard.writeText(loaderData.apiClient.apiKey);
+    alert("API key copied to clipboard!");
+  };
+
   const copyPublicKey = async () => {
     await navigator.clipboard.writeText(loaderData.apiClient.publicKey);
     alert("Public key copied to clipboard!");
@@ -389,6 +394,47 @@ function ApiKeyDetail() {
           <Button variant="destructive" onClick={handleDelete}>
             Delete API Key
           </Button>
+        </div>
+
+        {/* API Key Section */}
+        <div className={Styles.section}>
+          <div
+            className={css({
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              marginBottom: "1.5rem",
+            })}
+          >
+            <h2 className={Styles.sectionTitle}>API Key</h2>
+            <Button size="sm" variant="secondary" onClick={copyApiKey}>
+              Copy
+            </Button>
+          </div>
+          <div
+            className={css(({ v }) => ({
+              backgroundColor: `oklch(from ${v("--c-info")} 0.85 0.1 h)`,
+              padding: "1rem",
+              borderRadius: "6px",
+              border: `1px solid ${v("--c-info")}`,
+              marginBottom: "1rem",
+              fontSize: "0.875rem",
+            }))}
+          >
+            <p
+              className={css(({ v }) => ({
+                color: `oklch(from ${v("--c-info")} 0.3 c h)`,
+                margin: 0,
+              }))}
+            >
+              Use this API key in the Authorization header: <code>Authorization: Bearer {"{"}your_api_key{"}"}</code>
+            </p>
+          </div>
+          <div className={Styles.publicKeyContainer}>
+            <div className={Styles.publicKeyDisplay}>
+              {loaderData.apiClient.apiKey}
+            </div>
+          </div>
         </div>
 
         {/* Public Key Section */}
