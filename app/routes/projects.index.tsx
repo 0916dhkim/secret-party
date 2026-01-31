@@ -15,6 +15,7 @@ import { projectTable } from "../db/schema";
 import { mainContent } from "../styles/shared";
 import { Modal } from "../components/Modal";
 import { Button } from "../components/Button";
+import { logAuditEvent } from "../audit/logger";
 
 export const Route = createFileRoute("/projects/")({
   component: Projects,
@@ -76,6 +77,14 @@ const createProject = createServerFn({
         ownerId: session.user.id,
       })
       .returning();
+
+    if (newProject) {
+      await logAuditEvent({
+        action: "project_create",
+        userId: session.user.id,
+        details: { projectId: newProject.id, projectName: data.name },
+      });
+    }
 
     return { project: newProject };
   });

@@ -9,6 +9,7 @@ import {
   environmentTable,
   secretTable,
 } from "../db/schema";
+import { logAuditEvent } from "../audit/logger";
 
 type ApiVariables = {
   apiClient: typeof apiClientTable.$inferSelect;
@@ -25,11 +26,19 @@ async function authorizationMiddleware(
   const authHeader = c.req.header("Authorization");
 
   if (authHeader == null) {
+    await logAuditEvent({
+      action: "api_auth_failure",
+      details: { reason: "missing_header" },
+    });
     return c.json({ error: "Authorization header required" }, 401);
   }
 
   const match = authHeader.match(/^Bearer\s+(?<publicKey>.+)$/);
   if (match == null) {
+    await logAuditEvent({
+      action: "api_auth_failure",
+      details: { reason: "invalid_header_format" },
+    });
     return c.json(
       {
         error:
@@ -42,6 +51,10 @@ async function authorizationMiddleware(
   const publicKey = match.groups?.publicKey;
 
   if (publicKey == null) {
+    await logAuditEvent({
+      action: "api_auth_failure",
+      details: { reason: "empty_public_key" },
+    });
     return c.json({ error: "Public key cannot be empty" }, 401);
   }
 
@@ -50,6 +63,10 @@ async function authorizationMiddleware(
   });
 
   if (apiClient == null) {
+    await logAuditEvent({
+      action: "api_auth_failure",
+      details: { reason: "invalid_public_key" },
+    });
     return c.json({ error: "Invalid public key" }, 401);
   }
 
@@ -73,6 +90,11 @@ async function environmentAccessMiddleware(
   });
 
   if (access == null) {
+    await logAuditEvent({
+      action: "api_access_denied",
+      apiClientId: apiClient.id,
+      details: { environmentId: Number(environmentId) },
+    });
     return c.json(
       {
         error: "Forbidden",
@@ -120,6 +142,7 @@ function buildPublicApiServer() {
       ),
       async (c) => {
         const { environmentId } = c.req.valid("param");
+        const apiClient = c.get("apiClient");
 
         const environment = await db.query.environmentTable.findFirst({
           where: eq(environmentTable.id, environmentId),
@@ -135,6 +158,12 @@ function buildPublicApiServer() {
         }
 
         const secretKeys = environment.secrets.map((secret) => secret.key);
+
+        await logAuditEvent({
+          action: "api_secret_list",
+          apiClientId: apiClient.id,
+          details: { environmentId },
+        });
 
         return c.json({
           secretKeys,
@@ -154,6 +183,7 @@ function buildPublicApiServer() {
       async (c) => {
         const { environmentId, key } = c.req.valid("param");
         const { dekWrappedByClientPublicKey } = c.get("environmentAccess");
+        const apiClient = c.get("apiClient");
 
         const secret = await db.query.secretTable.findFirst({
           where: and(
@@ -169,6 +199,12 @@ function buildPublicApiServer() {
         if (secret == null) {
           return c.json({ error: "Secret not found" }, 404);
         }
+
+        await logAuditEvent({
+          action: "api_secret_get",
+          apiClientId: apiClient.id,
+          details: { environmentId, secretKey: key },
+        });
 
         return c.json({
           ...secret,
@@ -195,6 +231,7 @@ function buildPublicApiServer() {
       async (c) => {
         const { environmentId, key } = c.req.valid("param");
         const { valueEncrypted } = c.req.valid("json");
+        const apiClient = c.get("apiClient");
 
         const existingSecret = await db.query.secretTable.findFirst({
           where: and(
@@ -214,6 +251,12 @@ function buildPublicApiServer() {
           environmentId,
           key,
           valueEncrypted,
+        });
+
+        await logAuditEvent({
+          action: "secret_create",
+          apiClientId: apiClient.id,
+          details: { environmentId, secretKey: key },
         });
 
         return c.body(null, 201);
@@ -238,6 +281,7 @@ function buildPublicApiServer() {
       async (c) => {
         const { environmentId, key } = c.req.valid("param");
         const { valueEncrypted } = c.req.valid("json");
+        const apiClient = c.get("apiClient");
 
         const existingSecret = await db.query.secretTable.findFirst({
           where: and(
@@ -259,6 +303,12 @@ function buildPublicApiServer() {
               eq(secretTable.key, key)
             )
           );
+
+        await logAuditEvent({
+          action: "secret_update",
+          apiClientId: apiClient.id,
+          details: { environmentId, secretKey: key },
+        });
 
         return c.body(null, 200);
       }

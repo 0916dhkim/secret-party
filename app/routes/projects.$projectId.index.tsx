@@ -17,6 +17,7 @@ import { verifyPassword } from "../auth/hash";
 import { useMutation } from "@tanstack/react-query";
 import { useForm } from "@tanstack/react-form";
 import { Button } from "../components/Button";
+import { logAuditEvent } from "../audit/logger";
 
 export const Route = createFileRoute("/projects/$projectId/")({
   component: ProjectDetail,
@@ -108,6 +109,14 @@ const createEnvironment = createServerFn({
         dekWrappedByPassword,
       })
       .returning();
+
+    if (environment) {
+      await logAuditEvent({
+        action: "environment_create",
+        userId: session.user.id,
+        details: { projectId, environmentId: environment.id, environmentName: name },
+      });
+    }
 
     return { environment };
   });

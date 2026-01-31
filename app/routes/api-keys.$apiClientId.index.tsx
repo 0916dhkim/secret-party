@@ -23,6 +23,7 @@ import z from "zod";
 import { unwrapDekWithPassword, wrapDekWithPublicKey } from "../crypto/dek";
 import { deserializePublicKey } from "../crypto/keypair";
 import { verifyPassword } from "../auth/hash";
+import { logAuditEvent } from "../audit/logger";
 
 export const Route = createFileRoute("/api-keys/$apiClientId/")({
   component: ApiKeyDetail,
@@ -170,6 +171,12 @@ const grantAccess = createServerFn({
       dekWrappedByClientPublicKey,
     });
 
+    await logAuditEvent({
+      action: "environment_access_grant",
+      userId: session.user.id,
+      details: { apiClientId, environmentId },
+    });
+
     return { success: true };
   });
 
@@ -205,6 +212,12 @@ const revokeAccess = createServerFn({
         )
       );
 
+    await logAuditEvent({
+      action: "environment_access_revoke",
+      userId: session.user.id,
+      details: { apiClientId, environmentId },
+    });
+
     return { success: true };
   });
 
@@ -231,6 +244,12 @@ const deleteApiKey = createServerFn({
 
     // Delete API client (cascade will handle access records)
     await db.delete(apiClientTable).where(eq(apiClientTable.id, apiClientId));
+
+    await logAuditEvent({
+      action: "api_client_delete",
+      userId: session.user.id,
+      details: { apiClientId, apiClientName: apiClient.name },
+    });
 
     return { success: true };
   });

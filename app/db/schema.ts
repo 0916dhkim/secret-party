@@ -17,6 +17,7 @@ export const userRelations = relations(userTable, ({ many }) => ({
   projects: many(projectTable),
   sessions: many(sessionTable),
   apiClients: many(apiClientTable),
+  auditLogs: many(auditLogTable),
 }));
 
 export const sessionTable = pgTable("session", {
@@ -109,6 +110,7 @@ export const apiClientRelations = relations(
       references: [userTable.id],
     }),
     access: many(environmentAccessTable),
+    auditLogs: many(auditLogTable),
   })
 );
 
@@ -139,3 +141,25 @@ export const environmentAccessRelations = relations(
     }),
   })
 );
+
+export const auditLogTable = pgTable("audit_log", {
+  id: integer().primaryKey().generatedAlwaysAsIdentity(),
+  timestamp: timestamp().notNull().defaultNow(),
+  action: text().notNull(),
+  userId: integer().references(() => userTable.id, { onDelete: "set null" }),
+  apiClientId: integer().references(() => apiClientTable.id, {
+    onDelete: "set null",
+  }),
+  details: text(),
+});
+
+export const auditLogRelations = relations(auditLogTable, ({ one }) => ({
+  user: one(userTable, {
+    fields: [auditLogTable.userId],
+    references: [userTable.id],
+  }),
+  apiClient: one(apiClientTable, {
+    fields: [auditLogTable.apiClientId],
+    references: [apiClientTable.id],
+  }),
+}));

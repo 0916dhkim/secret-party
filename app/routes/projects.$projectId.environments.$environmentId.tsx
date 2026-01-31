@@ -17,6 +17,7 @@ import { unwrapSecret, wrapSecret } from "../crypto/secrets";
 import { useForm } from "@tanstack/react-form";
 import { useMutation } from "@tanstack/react-query";
 import { Button } from "../components/Button";
+import { logAuditEvent } from "../audit/logger";
 
 export const Route = createFileRoute(
   "/projects/$projectId/environments/$environmentId"
@@ -83,6 +84,8 @@ const createSecret = createServerFn({
 })
   .validator(secretCreationSchema)
   .handler(async ({ data }) => {
+    const session = await requireAuth();
+
     const environment = await db.query.environmentTable.findFirst({
       where: eq(environmentTable.id, data.environmentId),
     });
@@ -105,6 +108,12 @@ const createSecret = createServerFn({
       })
       .returning();
 
+    await logAuditEvent({
+      action: "secret_create",
+      userId: session.user.id,
+      details: { environmentId: data.environmentId, secretKey: data.secretKey },
+    });
+
     return inserted;
   });
 
@@ -118,6 +127,8 @@ const deleteSecret = createServerFn({
 })
   .validator(secretDeletionSchema)
   .handler(async ({ data }) => {
+    const session = await requireAuth();
+
     const deleted = await db
       .delete(secretTable)
       .where(
@@ -127,7 +138,14 @@ const deleteSecret = createServerFn({
         )
       )
       .returning();
-    console.log(`Deleted ${deleted.length} secrets.`, deleted);
+
+    if (deleted.length > 0) {
+      await logAuditEvent({
+        action: "secret_delete",
+        userId: session.user.id,
+        details: { environmentId: data.environmentId, secretKey: data.secretKey },
+      });
+    }
   });
 
 const decryptSecret = createServerFn({
@@ -141,6 +159,8 @@ const decryptSecret = createServerFn({
     })
   )
   .handler(async ({ data }) => {
+    const session = await requireAuth();
+
     const environment = await db.query.environmentTable.findFirst({
       where: eq(environmentTable.id, data.environmentId),
     });
@@ -162,6 +182,13 @@ const decryptSecret = createServerFn({
     }
 
     const value = unwrapSecret(secret.valueEncrypted, dek);
+
+    await logAuditEvent({
+      action: "secret_view",
+      userId: session.user.id,
+      details: { environmentId: data.environmentId, secretKey: data.key },
+    });
+
     return { value };
   });
 

@@ -12,6 +12,7 @@ import { setSessionCookie } from "./cookie";
 import { loginSchema, signupSchema, parseFormData } from "./validation";
 import { createServerFn } from "@tanstack/react-start";
 import { redirect } from "@tanstack/react-router";
+import { logAuditEvent } from "../audit/logger";
 
 export const login = createServerFn({ method: "POST" })
   .validator((formData) => parseFormData(formData, loginSchema))
@@ -24,6 +25,10 @@ export const login = createServerFn({ method: "POST" })
     });
 
     if (!user) {
+      await logAuditEvent({
+        action: "login_failure",
+        details: { email, reason: "user_not_found" },
+      });
       throw redirect({
         to: "/login",
         search: {
@@ -34,6 +39,11 @@ export const login = createServerFn({ method: "POST" })
 
     const isPasswordValid = await verifyPassword(password, user.passwordHash);
     if (!isPasswordValid) {
+      await logAuditEvent({
+        action: "login_failure",
+        userId: user.id,
+        details: { email, reason: "invalid_password" },
+      });
       throw redirect({
         to: "/login",
         search: {
@@ -43,6 +53,12 @@ export const login = createServerFn({ method: "POST" })
     }
 
     const session = await createSession(user.id);
+
+    await logAuditEvent({
+      action: "login_success",
+      userId: user.id,
+      details: { email },
+    });
 
     setSessionCookie(
       session.token,
@@ -88,6 +104,13 @@ export const signUp = createServerFn({ method: "POST" })
     }
 
     const session = await createSession(user.id);
+
+    await logAuditEvent({
+      action: "signup",
+      userId: user.id,
+      details: { email },
+    });
+
     setSessionCookie(
       session.token,
       7 * 24 * 60 * 60 // 7 days
@@ -98,6 +121,10 @@ export const signUp = createServerFn({ method: "POST" })
 export const logout = createServerFn({ method: "POST" }).handler(async () => {
   const session = await getSession();
   if (session) {
+    await logAuditEvent({
+      action: "logout",
+      userId: session.userId,
+    });
     await invalidateSession(session.token);
   }
 

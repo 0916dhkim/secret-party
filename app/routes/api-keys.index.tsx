@@ -18,6 +18,7 @@ import z from "zod";
 import { generateKeyPair, serializeKeyPair } from "../crypto/keypair";
 import { verifyPassword } from "../auth/hash";
 import { useRouter } from "@tanstack/react-router";
+import { logAuditEvent } from "../audit/logger";
 
 export const Route = createFileRoute("/api-keys/")({
   component: ApiKeys,
@@ -84,6 +85,12 @@ const createApiKey = createServerFn({
     if (apiClient == null) {
       throw new Error("Failed to create API client");
     }
+
+    await logAuditEvent({
+      action: "api_client_create",
+      userId: session.user.id,
+      details: { apiClientId: apiClient.id, apiClientName: name },
+    });
 
     return {
       apiClient,
