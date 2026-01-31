@@ -152,8 +152,13 @@ The following items are explicitly **not** included in this implementation:
 1. ✅ Basic auth system (already exists)
 2. ✅ Database schema and migrations (already done)
 3. ✅ Encryption utilities
-4. 🔄 Dashboard UI components and pages (Remix)
+4. ✅ Dashboard UI components and pages (core functionality complete)
 5. ✅ Public REST API implementation (Hono)
+
+### Deferred/Optional UI Features:
+- Dashboard home with stats (currently redirects to /projects)
+- Bulk secret import/export
+- Secret search and filtering
 
 ## Technical Considerations:
 
