@@ -16,7 +16,6 @@ The following items are explicitly **not** included in this implementation:
 - **Internal Management APIs** - Using Tanstack Start server actions instead of REST endpoints
 - **Advanced Security Features** - No 2FA, session management, or security settings page
 - **Database Migrations in Production** - No production migration scripts or backup procedures
-- **Logging Libraries** - Using simple console logging instead of external logging libraries
 - **CORS Configuration** - Single domain architecture, no cross-origin requests
 - **UI Polish** - No focus on making polished UI. Rough UI is ok as long as the functionality is there.
 
@@ -25,14 +24,12 @@ The following items are explicitly **not** included in this implementation:
 ### Components to Build:
 
 1. **DEK Management (`app/crypto/dek.ts`)**
-
    - `generateDEK()` - Generate new 256-bit AES key
    - `encryptDEKWithPassword(dek, password)` - Encrypt DEK with user password
    - `decryptDEKWithPassword(encryptedDEK, password)` - Decrypt DEK with user password
    - `encryptDEKWithPublicKey(dek, publicKey)` - Encrypt DEK with RSA public key
 
 2. **Secret Encryption (`app/crypto/secrets.ts`)**
-
    - `encryptSecret(value, dek)` - Encrypt secret value with AES-256-GCM
    - `decryptSecret(encryptedValue, dek)` - Decrypt secret value
 
@@ -45,7 +42,6 @@ The following items are explicitly **not** included in this implementation:
 ### Enhance Current Auth System:
 
 1. **Password Verification for All Operations**
-
    - Add password confirmation modal component (based on <dialog>)
    - Middleware requiring password verification for all secret operations
    - No session-based elevated permissions - password required every time
@@ -59,27 +55,23 @@ The following items are explicitly **not** included in this implementation:
 ### Pages to Create:
 
 1. **Dashboard Home (`/dashboard`)**
-
    - List all user's projects
    - Quick stats (total secrets, environments, API keys)
    - Create new project button
 
 2. **Project Detail (`/projects/:projectId`)**
-
    - Project overview
    - List environments in project
    - Create/edit/delete environments
    - Environment-specific secret counts
 
 3. **Environment Detail (`/projects/:projectId/environments/:envId`)**
-
    - List all secrets in environment
    - Add/edit/delete secrets
    - Bulk secret import/export
    - Secret search and filtering
 
 4. **API Keys Management (`/api-keys`)**
-
    - List all API keys with creation dates and expiry
    - Create new API key flow with environment selection
    - Revoke/delete API keys
@@ -123,19 +115,16 @@ The following items are explicitly **not** included in this implementation:
 ### API Endpoints:
 
 1. **List Secrets in Environment**
-
    - `GET /api/v1/secrets?project=<project-id>&environment=<environment-id>`
    - Returns: `{ secretKeys: [string] }`
    - Authentication: API public key in Authorization header
 
 2. **Get Specific Secret**
-
    - `GET /api/v1/secret?project=<project-id>&environment=<environment-id>&key=<key>`
    - Returns: `{ key: string, encrypted_dek: string, encrypted_secret: string }`
    - Authentication: API public key in Authorization header
 
 3. **Create New Secret**
-
    - `POST /api/v1/secret`
    - Body: `{ projectId: number, environmentId: number, key: string, value: string }`
    - Returns: status 201 with empty body
@@ -156,9 +145,17 @@ The following items are explicitly **not** included in this implementation:
 5. ✅ Public REST API implementation (Hono)
 
 ### Deferred/Optional UI Features:
+
 - Dashboard home with stats (currently redirects to /projects)
 - Bulk secret import/export
 - Secret search and filtering
+
+### TODO:
+
+- **Audit logging** - Track who accessed which secret and when, API key usage, failed auth attempts
+- **Unique environment name per project** - Add unique constraint on (projectId, name) in environmentTable
+- **Secret key validation** - Restrict keys to alphanumeric + underscores for env var compatibility
+- **Delete endpoint in public API** - Add `DELETE /api/v1/environments/:environmentId/secrets/:key`
 
 ## Technical Considerations:
 
