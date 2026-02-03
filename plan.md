@@ -156,6 +156,13 @@ The following items are explicitly **not** included in this implementation:
 
 ### TODO:
 
+- **JavaScript Client Library for Public API** - Build a reusable JS/TS client for interacting with the public API
+  - Features:
+    - Initialize with private key PEM
+    - Automatically extract public key from private key
+    - Handle HTTP header encoding (newline escaping)
+    - Type-safe API with TypeScript definitions
+  - Package: `@secret-party/client` or similar
 - **Audit log viewer UI** - Page to view audit logs with filtering by action, user, date range
 - **Unique environment name per project** - Add unique constraint on (projectId, name) in environmentTable
 - **Secret key validation** - Restrict keys to alphanumeric + underscores for env var compatibility

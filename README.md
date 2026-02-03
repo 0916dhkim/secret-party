@@ -11,6 +11,7 @@ Simple self-hostable secrets manager
 - Public API for managing secrets.
   - Authentication: Bearer token using public key in Authorization header
   - Endpoints:
+    - GET /api/v1/environments - List all environments the API key has access to
     - GET /api/v1/environments/:environmentId - Get environment info
     - GET /api/v1/environments/:environmentId/secrets - List all secret keys
     - GET /api/v1/environments/:environmentId/secrets/:key - Get specific secret

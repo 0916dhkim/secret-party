@@ -21,7 +21,7 @@ type EnvironmentRouteVariables = {
 
 async function authorizationMiddleware(
   c: Context<{ Variables: ApiVariables }>,
-  next: Next
+  next: Next,
 ) {
   const authHeader = c.req.header("Authorization");
 
@@ -44,7 +44,7 @@ async function authorizationMiddleware(
         error:
           "Invalid Authorization header format. Expected: Bearer <public_key>",
       },
-      401
+      401,
     );
   }
 
@@ -58,8 +58,11 @@ async function authorizationMiddleware(
     return c.json({ error: "Public key cannot be empty" }, 401);
   }
 
+  // Decode escaped newlines from HTTP header
+  const publicKeyDecoded = publicKey.replace(/\\n/g, "\n");
+
   const apiClient = await db.query.apiClientTable.findFirst({
-    where: eq(apiClientTable.publicKey, publicKey),
+    where: eq(apiClientTable.publicKey, publicKeyDecoded),
   });
 
   if (apiClient == null) {
@@ -77,7 +80,7 @@ async function authorizationMiddleware(
 
 async function environmentAccessMiddleware(
   c: Context<{ Variables: ApiVariables & EnvironmentRouteVariables }>,
-  next: Next
+  next: Next,
 ) {
   const environmentId = c.req.param("environmentId");
   const apiClient = c.get("apiClient");
@@ -85,7 +88,7 @@ async function environmentAccessMiddleware(
   const access = await db.query.environmentAccessTable.findFirst({
     where: and(
       eq(environmentAccessTable.clientId, apiClient.id),
-      eq(environmentAccessTable.environmentId, Number(environmentId))
+      eq(environmentAccessTable.environmentId, Number(environmentId)),
     ),
   });
 
@@ -99,7 +102,7 @@ async function environmentAccessMiddleware(
       {
         error: "Forbidden",
       },
-      403
+      403,
     );
   }
 
@@ -119,7 +122,7 @@ function buildPublicApiServer() {
         "param",
         z.object({
           environmentId: z.coerce.number(),
-        })
+        }),
       ),
       async (c) => {
         const { environmentId } = c.req.valid("param");
@@ -129,7 +132,7 @@ function buildPublicApiServer() {
         });
 
         return c.json({ environment });
-      }
+      },
     )
 
     .get(
@@ -138,7 +141,7 @@ function buildPublicApiServer() {
         "param",
         z.object({
           environmentId: z.coerce.number(),
-        })
+        }),
       ),
       async (c) => {
         const { environmentId } = c.req.valid("param");
@@ -168,7 +171,7 @@ function buildPublicApiServer() {
         return c.json({
           secretKeys,
         });
-      }
+      },
     )
 
     .get(
@@ -178,7 +181,7 @@ function buildPublicApiServer() {
         z.object({
           environmentId: z.coerce.number(),
           key: z.string(),
-        })
+        }),
       ),
       async (c) => {
         const { environmentId, key } = c.req.valid("param");
@@ -188,7 +191,7 @@ function buildPublicApiServer() {
         const secret = await db.query.secretTable.findFirst({
           where: and(
             eq(secretTable.environmentId, environmentId),
-            eq(secretTable.key, key)
+            eq(secretTable.key, key),
           ),
           columns: {
             key: true,
@@ -210,7 +213,7 @@ function buildPublicApiServer() {
           ...secret,
           dekWrappedByClientPublicKey,
         });
-      }
+      },
     )
 
     .post(
@@ -220,13 +223,13 @@ function buildPublicApiServer() {
         z.object({
           environmentId: z.coerce.number(),
           key: z.string(),
-        })
+        }),
       ),
       zValidator(
         "json",
         z.object({
           valueEncrypted: z.string(),
-        })
+        }),
       ),
       async (c) => {
         const { environmentId, key } = c.req.valid("param");
@@ -236,14 +239,14 @@ function buildPublicApiServer() {
         const existingSecret = await db.query.secretTable.findFirst({
           where: and(
             eq(secretTable.environmentId, environmentId),
-            eq(secretTable.key, key)
+            eq(secretTable.key, key),
           ),
         });
 
         if (existingSecret) {
           return c.json(
             { error: "Secret key already exists in this environment" },
-            409
+            409,
           );
         }
 
@@ -260,7 +263,7 @@ function buildPublicApiServer() {
         });
 
         return c.body(null, 201);
-      }
+      },
     )
 
     .put(
@@ -270,13 +273,13 @@ function buildPublicApiServer() {
         z.object({
           environmentId: z.coerce.number(),
           key: z.string(),
-        })
+        }),
       ),
       zValidator(
         "json",
         z.object({
           valueEncrypted: z.string(),
-        })
+        }),
       ),
       async (c) => {
         const { environmentId, key } = c.req.valid("param");
@@ -286,7 +289,7 @@ function buildPublicApiServer() {
         const existingSecret = await db.query.secretTable.findFirst({
           where: and(
             eq(secretTable.environmentId, environmentId),
-            eq(secretTable.key, key)
+            eq(secretTable.key, key),
           ),
         });
 
@@ -300,8 +303,8 @@ function buildPublicApiServer() {
           .where(
             and(
               eq(secretTable.environmentId, environmentId),
-              eq(secretTable.key, key)
-            )
+              eq(secretTable.key, key),
+            ),
           );
 
         await logAuditEvent({
@@ -311,10 +314,34 @@ function buildPublicApiServer() {
         });
 
         return c.body(null, 200);
-      }
+      },
     );
   const v1 = new Hono<{ Variables: ApiVariables }>()
     .use(authorizationMiddleware)
+    .get("/environments", async (c) => {
+      const apiClient = c.get("apiClient");
+
+      // Get all environments this API key has access to
+      const accessRecords = await db.query.environmentAccessTable.findMany({
+        where: eq(environmentAccessTable.clientId, apiClient.id),
+        with: {
+          environment: {
+            with: {
+              project: true,
+            },
+          },
+        },
+      });
+
+      const environments = accessRecords.map((access) => ({
+        id: access.environment.id,
+        name: access.environment.name,
+        projectId: access.environment.projectId,
+        projectName: access.environment.project.name,
+      }));
+
+      return c.json({ environments });
+    })
     .route("/environments/:environmentId", environmentRoute);
 
   const app = new Hono().basePath("/api").route("/v1", v1);
