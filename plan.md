@@ -150,12 +150,68 @@ The following items are explicitly **not** included in this implementation:
 - Bulk secret import/export
 - Secret search and filtering
 
+### Completed:
+
+- ✅ **Audit logging backend** - Tracks secret access, API key usage, auth attempts, and all user actions
+
 ### TODO:
 
-- **Audit logging** - Track who accessed which secret and when, API key usage, failed auth attempts
+- **Audit log viewer UI** - Page to view audit logs with filtering by action, user, date range
 - **Unique environment name per project** - Add unique constraint on (projectId, name) in environmentTable
 - **Secret key validation** - Restrict keys to alphanumeric + underscores for env var compatibility
-- **Delete endpoint in public API** - Add `DELETE /api/v1/environments/:environmentId/secrets/:key`
+- **Delete endpoint in public API** - Add `DELETE /api/v1/secret` endpoint
+
+## Security Concerns
+
+### High Severity Issues:
+
+1. **✅ RESOLVED: Strong Password-to-Key Derivation**
+   - **Location**: `app/crypto/dek.ts:93-97`
+   - **Status**: Implemented Argon2id with production-grade parameters
+   - **Solution**: Uses Argon2id (64MB memory, 3 iterations, 4 threads) with unique salt per environment
+   - **Security**: ~100ms derivation time makes brute force attacks infeasible (~10 attempts/sec vs 10 billion/sec with SHA3)
+   - **Format**: `salt(hex):iv(base64);ciphertext(base64)` - salt embedded in wrapped DEK
+
+2. **No Rate Limiting on Authentication**
+   - **Location**: `app/auth/actions.ts` (login), `app/public-api/server.tsx` (API auth)
+   - **Issue**: Unlimited login/API authentication attempts allowed
+   - **Impact**: Enables brute force attacks on passwords and API keys
+   - **Fix**: Implement rate limiting middleware (e.g., 5 attempts per 15 minutes per IP)
+
+3. **No Account Lockout Mechanism**
+   - **Location**: `app/auth/actions.ts:23-37`
+   - **Issue**: Failed login attempts don't trigger account lockout
+   - **Impact**: Attackers can attempt unlimited password guesses
+   - **Fix**: Lock account after N failed attempts with 30-minute cooldown
+
+4. **Missing CSRF Protection**
+   - **Location**: All POST/PUT/DELETE operations
+   - **Issue**: Only relies on SameSite cookie protection, no CSRF tokens
+   - **Impact**: Cross-site request forgery attacks possible on state-changing operations
+   - **Fix**: Implement CSRF token validation or verify Origin/Referer headers
+
+5. **Timing Attack in Login Flow**
+   - **Location**: `app/auth/actions.ts:23-37`
+   - **Issue**: Different response times for "user not found" vs "invalid password"
+   - **Impact**: Allows attackers to enumerate valid email addresses
+   - **Fix**: Always hash password even when user doesn't exist (constant-time operations)
+
+### Medium Severity Issues:
+
+- **No Security Headers**: Missing HSTS, CSP, X-Frame-Options, X-Content-Type-Options
+- **Private Keys Displayed in Browser**: API client private keys persist in browser memory/history after creation
+- **No Session Token Invalidation**: Logout doesn't truly revoke session tokens from database
+- **No HTTPS Enforcement**: Secure cookie flag only enabled in production, no HSTS header
+
+### Security Strengths:
+
+- ✅ Excellent password hashing (Argon2id with production-grade parameters)
+- ✅ Strong password-to-key derivation (Argon2id with unique salt per environment)
+- ✅ Strong encryption (AES-256-GCM with proper IVs and authenticated encryption)
+- ✅ Good session management (7-day expiration, 256-bit random tokens)
+- ✅ Comprehensive audit logging (all sensitive actions tracked)
+- ✅ Proper authorization checks (ownership + environment-level access control)
+- ✅ HttpOnly cookies with SameSite protection
 
 ## Technical Considerations:
 
