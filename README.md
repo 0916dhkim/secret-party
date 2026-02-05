@@ -2,6 +2,8 @@
 
 Simple self-hostable secrets manager
 
+> Uses monorepo structure with TypeScript custom conditions for zero-build development
+
 ## Features
 
 - Organize your secrets by projects and environments (e.g. prod & staging)

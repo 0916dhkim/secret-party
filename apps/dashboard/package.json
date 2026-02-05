@@ -1,0 +1,95 @@
+{
+  "name": "dashboard",
+  "version": "0.0.0",
+  "description": "Secret Party Dashboard",
+  "type": "module",
+  "scripts": {
+    "dev": "vite dev",
+    "build": "vite build",
+    "start": "node .output/server/index.mjs",
+    "test": "tsx --test"
+  },
+  "exports": {
+    ".": {
+      "secret-party": "./app/router.tsx",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "./*": {
+      "secret-party": "./app/*.tsx",
+      "import": "./dist/*.js",
+      "require": "./dist/*.cjs"
+    },
+    "./components/*": {
+      "secret-party": "./app/components/*.tsx",
+      "import": "./dist/components/*.js",
+      "require": "./dist/components/*.cjs"
+    },
+    "./routes/*": {
+      "secret-party": "./app/routes/*.tsx",
+      "import": "./dist/routes/*.js",
+      "require": "./dist/routes/*.cjs"
+    },
+    "./auth/*": {
+      "secret-party": "./app/auth/*.ts",
+      "import": "./dist/auth/*.js",
+      "require": "./dist/auth/*.cjs"
+    },
+    "./db/*": {
+      "secret-party": "./app/db/*.ts",
+      "import": "./dist/db/*.js",
+      "require": "./dist/db/*.cjs"
+    },
+    "./crypto/*": {
+      "secret-party": "./app/crypto/*.ts",
+      "import": "./dist/crypto/*.js",
+      "require": "./dist/crypto/*.cjs"
+    },
+    "./public-api/*": {
+      "secret-party": "./app/public-api/*.ts",
+      "import": "./dist/public-api/*.js",
+      "require": "./dist/public-api/*.cjs"
+    },
+    "./audit/*": {
+      "secret-party": "./app/audit/*.ts",
+      "import": "./dist/audit/*.js",
+      "require": "./dist/audit/*.cjs"
+    }
+  },
+  "dependencies": {
+    "@electric-sql/pglite": "^0.3.8",
+    "@flow-css/core": "^1.4.0",
+    "@hono/node-server": "^1.19.2",
+    "@hono/zod-validator": "^0.7.2",
+    "@noble/ciphers": "^2.0.0",
+    "@noble/hashes": "^2.0.0",
+    "@tanstack/react-form": "^1.19.5",
+    "@tanstack/react-query": "^5.89.0",
+    "@tanstack/react-router": "^1.131.41",
+    "@tanstack/react-start": "^1.131.43",
+    "clsx": "^2.1.1",
+    "dialog-closedby-polyfill": "^1.1.0",
+    "dotenv": "^17.2.2",
+    "drizzle-orm": "^0.44.5",
+    "hono": "^4.9.7",
+    "isbot": "^5",
+    "pg": "^8.16.3",
+    "radix-ui": "^1.4.3",
+    "react": "^19.1.1",
+    "react-dom": "^19.1.1",
+    "vite": "^7.1.5",
+    "zod": "^4.1.8"
+  },
+  "devDependencies": {
+    "@flow-css/vite": "^1.4.0",
+    "@types/node": "^24.3.1",
+    "@types/pg": "^8.15.5",
+    "@types/react": "^19.1.13",
+    "@types/react-dom": "^19.1.9",
+    "@vitejs/plugin-react": "^5.0.2",
+    "drizzle-kit": "^0.31.4",
+    "tsx": "^4.20.5",
+    "typescript": "^5.9.2",
+    "vite-tsconfig-paths": "^5.1.4"
+  }
+}

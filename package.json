@@ -1,13 +1,14 @@
 {
-  "name": "secret-party",
+  "name": "secret-party-monorepo",
   "version": "0.0.0",
-  "description": "",
+  "description": "Secret Party Monorepo",
+  "private": true,
   "type": "module",
   "scripts": {
-    "dev": "vite dev",
-    "build": "vite build",
-    "start": "node .output/server/index.mjs",
-    "test": "tsx --test"
+    "dev": "pnpm --filter dashboard dev",
+    "build": "pnpm --filter dashboard build",
+    "start": "pnpm --filter dashboard start",
+    "test": "pnpm --filter dashboard test"
   },
   "author": "Danny Kim",
   "license": "MIT",

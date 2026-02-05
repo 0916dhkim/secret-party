@@ -1,6 +1,7 @@
 {
   "$schema": "https://json.schemastore.org/tsconfig",
   "compilerOptions": {
+    "customConditions": ["secret-party"],
     "esModuleInterop": true,
     "skipLibCheck": true,
     "target": "es2022",
@@ -19,7 +20,6 @@
 
     "jsx": "react-jsx",
     "lib": ["es2022", "dom", "dom.iterable"],
-    "types": ["node", "vite/client"],
-    "rootDirs": [".", "./.react-router/types"]
+    "types": ["node", "vite/client"]
   }
 }

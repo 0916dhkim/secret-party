@@ -1,0 +1,8 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "rootDirs": [".", "./.react-router/types"]
+  },
+  "include": ["app/**/*", "drizzle.config.ts"],
+  "exclude": ["node_modules", "dist", ".output"]
+}
