@@ -163,6 +163,14 @@ The following items are explicitly **not** included in this implementation:
     - Handle HTTP header encoding (newline escaping)
     - Type-safe API with TypeScript definitions
   - Package: `@secret-party/client` or similar
+- **CLI Client for Public API** - Build a command-line tool for accessing secrets from the terminal
+  - Features:
+    - Accept private key via file path or environment variable
+    - Commands: `get`, `list`, `set`, `update`, `delete`
+    - Output formats: env vars, JSON, dotenv files
+    - Use cases: CI/CD pipelines, local development, scripts
+    - Could leverage the JS client library internally
+  - Package: `@secret-party/cli` or similar
 - **Audit log viewer UI** - Page to view audit logs with filtering by action, user, date range
 - **Unique environment name per project** - Add unique constraint on (projectId, name) in environmentTable
 - **Secret key validation** - Restrict keys to alphanumeric + underscores for env var compatibility
