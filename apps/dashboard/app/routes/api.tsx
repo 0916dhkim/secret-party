@@ -1,5 +1,5 @@
 import { createServerFileRoute } from "@tanstack/react-start/server";
-import { publicApiServer } from "../public-api/server";
+import { publicApiServer } from "@secret-party/api/server";
 
 export const ServerRoute = createServerFileRoute("/api").methods({
   GET: async ({ request }) => publicApiServer.fetch(request),

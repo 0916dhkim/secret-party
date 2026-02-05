@@ -4,6 +4,8 @@ import { migrate } from "drizzle-orm/pglite/migrator";
 import { PGlite } from "@electric-sql/pglite";
 import * as schema from "./schema";
 import { PgliteDatabase } from "drizzle-orm/pglite";
+import { fileURLToPath } from "node:url";
+import { dirname, join } from "node:path";
 
 const DRIZZLE_CONFIG = {
   casing: "snake_case",
@@ -30,8 +32,11 @@ async function buildDrizzle() {
     const { drizzle: pgliteDrizzle } = await import("drizzle-orm/pglite");
     const { schema: _ignore, ...configWithoutSchema } = DRIZZLE_CONFIG;
     const inMemoryDb = new PGlite();
+    const __filename = fileURLToPath(import.meta.url);
+    const __dirname = dirname(__filename);
+    const migrationsPath = join(__dirname, "..", "drizzle");
     await migrate(pgliteDrizzle(inMemoryDb, configWithoutSchema), {
-      migrationsFolder: "../drizzle",
+      migrationsFolder: migrationsPath,
     });
     globalThis.__pglite_db__ = pgliteDrizzle(inMemoryDb, DRIZZLE_CONFIG);
     return globalThis.__pglite_db__;

@@ -1,5 +1,6 @@
 import { eq, lt, sql } from "drizzle-orm";
-import { db, sessionTable, userTable } from "@secret-party/database";
+import { db } from "@secret-party/database/db";
+import { sessionTable, userTable } from "@secret-party/database/schema";
 import { generateSessionToken } from "./hash";
 import { getSessionCookie } from "./cookie";
 import { redirect } from "@tanstack/react-router";

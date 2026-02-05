@@ -1,5 +1,6 @@
 import { eq } from "drizzle-orm";
-import { db, userTable } from "@secret-party/database";
+import { db } from "@secret-party/database/db";
+import { userTable } from "@secret-party/database/schema";
 import { verifyPassword, hashPassword } from "./hash";
 import {
   createSession,
@@ -11,7 +12,7 @@ import { setSessionCookie } from "./cookie";
 import { loginSchema, signupSchema, parseFormData } from "./validation";
 import { createServerFn } from "@tanstack/react-start";
 import { redirect } from "@tanstack/react-router";
-import { logAuditEvent } from "../audit/logger";
+import { logAuditEvent } from "@secret-party/audit/logger";
 
 export const login = createServerFn({ method: "POST" })
   .validator((formData) => parseFormData(formData, loginSchema))

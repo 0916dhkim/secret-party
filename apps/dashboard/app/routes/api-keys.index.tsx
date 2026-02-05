@@ -6,7 +6,8 @@ import { requireAuth } from "../auth/session";
 import { Layout } from "../components/Layout";
 import { Breadcrumb } from "../components/Breadcrumb";
 import { mainContent } from "../styles/shared";
-import { db, apiClientTable } from "@secret-party/database";
+import { db } from "@secret-party/database/db";
+import { apiClientTable } from "@secret-party/database/schema";
 import { eq } from "drizzle-orm";
 import { useState } from "react";
 import { Modal } from "../components/Modal";
@@ -17,7 +18,7 @@ import z from "zod";
 import { generateKeyPair, serializeKeyPair } from "../crypto/keypair";
 import { verifyPassword } from "../auth/hash";
 import { useRouter } from "@tanstack/react-router";
-import { logAuditEvent } from "../audit/logger";
+import { logAuditEvent } from "@secret-party/audit/logger";
 
 export const Route = createFileRoute("/api-keys/")({
   component: ApiKeys,

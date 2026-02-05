@@ -10,11 +10,12 @@ import { z } from "zod";
 import { requireAuth } from "../auth/session";
 import { Breadcrumb } from "../components/Breadcrumb";
 import { Layout } from "../components/Layout";
-import { db, projectTable } from "@secret-party/database";
+import { db } from "@secret-party/database/db";
+import { projectTable } from "@secret-party/database/schema";
 import { mainContent } from "../styles/shared";
 import { Modal } from "../components/Modal";
 import { Button } from "../components/Button";
-import { logAuditEvent } from "../audit/logger";
+import { logAuditEvent } from "@secret-party/audit/logger";
 
 export const Route = createFileRoute("/projects/")({
   component: Projects,

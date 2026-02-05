@@ -6,13 +6,13 @@ import { requireAuth } from "../auth/session";
 import { Layout } from "../components/Layout";
 import { Breadcrumb } from "../components/Breadcrumb";
 import { mainContent } from "../styles/shared";
+import { db } from "@secret-party/database/db";
 import {
-  db,
   apiClientTable,
   environmentTable,
   projectTable,
   environmentAccessTable,
-} from "@secret-party/database";
+} from "@secret-party/database/schema";
 import { eq, and } from "drizzle-orm";
 import { useState } from "react";
 import { Modal } from "../components/Modal";
@@ -23,7 +23,7 @@ import z from "zod";
 import { unwrapDekWithPassword, wrapDekWithPublicKey } from "../crypto/dek";
 import { deserializePublicKey } from "../crypto/keypair";
 import { verifyPassword } from "../auth/hash";
-import { logAuditEvent } from "../audit/logger";
+import { logAuditEvent } from "@secret-party/audit/logger";
 
 export const Route = createFileRoute("/api-keys/$apiClientId/")({
   component: ApiKeyDetail,

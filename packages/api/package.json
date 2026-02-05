@@ -1,7 +1,7 @@
 {
-  "name": "@secret-party/database",
+  "name": "@secret-party/api",
   "version": "0.0.0",
-  "description": "Secret Party Database Package",
+  "description": "Secret Party Public API",
   "type": "module",
   "exports": {
     "./*": {
@@ -10,13 +10,14 @@
     }
   },
   "dependencies": {
+    "@secret-party/database": "workspace:*",
+    "@secret-party/audit": "workspace:*",
+    "hono": "^4.9.7",
+    "@hono/zod-validator": "^0.7.2",
     "drizzle-orm": "^0.44.5",
-    "pg": "^8.16.3",
-    "@electric-sql/pglite": "^0.3.8"
+    "zod": "^4.1.8"
   },
   "devDependencies": {
-    "@types/pg": "^8.15.5",
-    "drizzle-kit": "^0.31.4",
     "typescript": "^5.9.2"
   }
 }

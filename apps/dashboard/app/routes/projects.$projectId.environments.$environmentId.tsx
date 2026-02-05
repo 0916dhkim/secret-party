@@ -7,7 +7,8 @@ import { Breadcrumb } from "../components/Breadcrumb";
 import { mainContent } from "../styles/shared";
 import { createServerFn } from "@tanstack/react-start";
 import z from "zod";
-import { db, environmentTable, secretTable } from "@secret-party/database";
+import { db } from "@secret-party/database/db";
+import { environmentTable, secretTable } from "@secret-party/database/schema";
 import { and, eq } from "drizzle-orm";
 import { useState } from "react";
 import { Modal } from "../components/Modal";
@@ -16,7 +17,7 @@ import { unwrapSecret, wrapSecret } from "../crypto/secrets";
 import { useForm } from "@tanstack/react-form";
 import { useMutation } from "@tanstack/react-query";
 import { Button } from "../components/Button";
-import { logAuditEvent } from "../audit/logger";
+import { logAuditEvent } from "@secret-party/audit/logger";
 
 export const Route = createFileRoute(
   "/projects/$projectId/environments/$environmentId"

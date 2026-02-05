@@ -7,7 +7,7 @@ import { Breadcrumb } from "../components/Breadcrumb";
 import { mainContent } from "../styles/shared";
 import { useState } from "react";
 import { clsx } from "clsx";
-import { createPublicApiClient } from "../public-api/client";
+import { createPublicApiClient } from "@secret-party/api/client";
 
 export const Route = createFileRoute("/test-api-key")({
   component: TestApiKey,

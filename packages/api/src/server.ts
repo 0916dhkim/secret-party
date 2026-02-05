@@ -2,14 +2,14 @@ import { Hono, Context, Next } from "hono";
 import { eq, and } from "drizzle-orm";
 import { z } from "zod";
 import { zValidator } from "@hono/zod-validator";
+import { db } from "@secret-party/database/db";
 import {
-  db,
   apiClientTable,
   environmentAccessTable,
   environmentTable,
   secretTable,
-} from "@secret-party/database";
-import { logAuditEvent } from "../audit/logger";
+} from "@secret-party/database/schema";
+import { logAuditEvent } from "@secret-party/audit/logger";
 
 type ApiVariables = {
   apiClient: typeof apiClientTable.$inferSelect;

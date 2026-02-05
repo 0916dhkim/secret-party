@@ -1,0 +1,18 @@
+{
+  "name": "@secret-party/audit",
+  "version": "0.0.0",
+  "description": "Secret Party Audit Logging",
+  "type": "module",
+  "exports": {
+    "./*": {
+      "secret-party": "./src/*.ts",
+      "default": "./src/*.ts"
+    }
+  },
+  "dependencies": {
+    "@secret-party/database": "workspace:*"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.2"
+  }
+}
