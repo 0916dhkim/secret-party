@@ -10,9 +10,9 @@
     }
   },
   "dependencies": {
-    "drizzle-orm": "^0.44.5",
-    "pg": "^8.16.3",
-    "@electric-sql/pglite": "^0.3.8"
+    "@electric-sql/pglite": "^0.3.8",
+    "dotenv": "^17.2.2",
+    "pg": "^8.16.3"
   },
   "devDependencies": {
     "@types/pg": "^8.15.5",

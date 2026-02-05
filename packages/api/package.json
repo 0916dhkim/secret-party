@@ -12,10 +12,9 @@
   "dependencies": {
     "@secret-party/database": "workspace:*",
     "@secret-party/audit": "workspace:*",
-    "hono": "^4.9.7",
+    "@hono/node-server": "^1.19.2",
     "@hono/zod-validator": "^0.7.2",
-    "drizzle-orm": "^0.44.5",
-    "zod": "^4.1.8"
+    "hono": "^4.9.7"
   },
   "devDependencies": {
     "typescript": "^5.9.2"
