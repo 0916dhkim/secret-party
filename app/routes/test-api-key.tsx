@@ -7,6 +7,7 @@ import { Breadcrumb } from "../components/Breadcrumb";
 import { mainContent } from "../styles/shared";
 import { useState } from "react";
 import { clsx } from "clsx";
+import { createPublicApiClient } from "../public-api/client";
 
 export const Route = createFileRoute("/test-api-key")({
   component: TestApiKey,
@@ -80,18 +81,20 @@ async function extractPublicKeyFromPrivateKey(
   return bufferToPEM(publicKeyBuffer, "PUBLIC KEY");
 }
 
-type Environment = {
-  id: number;
-  name: string;
-  projectName: string;
-  secretKeys: string[];
-};
-
 type TestState =
   | { status: "ready" }
   | { status: "loading" }
   | { status: "error"; message: string; error?: string }
-  | { status: "loaded"; message: string; environments: Environment[] };
+  | {
+      status: "loaded";
+      message: string;
+      environments: Array<{
+        id: number;
+        name: string;
+        projectName: string;
+        secretKeys: string[];
+      }>;
+    };
 
 function TestApiKey() {
   const loaderData = Route.useLoaderData();
@@ -109,20 +112,29 @@ function TestApiKey() {
       // Replace newlines with literal \n for HTTP header
       const publicKeyHeader = publicKeyPEM.replace(/\n/g, "\\n");
 
-      // Fetch all accessible environments
-      const envResponse = await fetch("/api/v1/environments", {
-        method: "GET",
+      // Create API client with authentication
+      const client = createPublicApiClient("", {
         headers: {
           Authorization: `Bearer ${publicKeyHeader}`,
         },
       });
 
+      // Fetch all accessible environments
+      const envResponse = await client.api.v1.environments.$get();
+
       if (!envResponse.ok) {
-        const errorData = await envResponse.json();
+        const errorText = await envResponse.text();
+        let errorMessage = "Unknown error";
+        try {
+          const errorData = JSON.parse(errorText);
+          errorMessage = errorData.error || errorText;
+        } catch {
+          errorMessage = errorText;
+        }
         setTestState({
           status: "error",
           message: `Authentication failed (${envResponse.status})`,
-          error: errorData.error || JSON.stringify(errorData),
+          error: errorMessage,
         });
         return;
       }
@@ -140,23 +152,29 @@ function TestApiKey() {
       }
 
       // Fetch secrets for each environment
-      const environmentsWithSecrets: Environment[] = await Promise.all(
-        environments.map(async (env: Environment) => {
-          const secretsResponse = await fetch(
-            `/api/v1/environments/${env.id}/secrets`,
-            {
-              method: "GET",
-              headers: {
-                Authorization: `Bearer ${publicKeyHeader}`,
-              },
-            },
-          );
+      const environmentsWithSecrets = await Promise.all(
+        environments.map(async (env) => {
+          const secretsResponse = await client.api.v1.environments[
+            ":environmentId"
+          ].secrets.$get({
+            param: { environmentId: String(env.id) },
+          });
 
           if (secretsResponse.ok) {
             const { secretKeys } = await secretsResponse.json();
-            return { ...env, secretKeys };
+            return {
+              id: env.id,
+              name: env.name,
+              projectName: env.projectName,
+              secretKeys,
+            };
           } else {
-            return { ...env, secretKeys: [] };
+            return {
+              id: env.id,
+              name: env.name,
+              projectName: env.projectName,
+              secretKeys: [],
+            };
           }
         }),
       );
