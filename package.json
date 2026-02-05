@@ -5,10 +5,10 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "pnpm --filter dashboard dev",
-    "build": "pnpm --filter dashboard build",
-    "start": "pnpm --filter dashboard start",
-    "test": "pnpm --filter dashboard test"
+    "dev": "pnpm --filter @secret-party/dashboard dev",
+    "build": "pnpm --filter @secret-party/dashboard build",
+    "start": "pnpm --filter @secret-party/dashboard start",
+    "test": "pnpm --filter @secret-party/dashboard test"
   },
   "author": "Danny Kim",
   "license": "MIT",

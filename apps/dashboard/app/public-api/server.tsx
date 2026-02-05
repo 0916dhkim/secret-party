@@ -2,13 +2,13 @@ import { Hono, Context, Next } from "hono";
 import { eq, and } from "drizzle-orm";
 import { z } from "zod";
 import { zValidator } from "@hono/zod-validator";
-import { db } from "../db/db";
 import {
+  db,
   apiClientTable,
   environmentAccessTable,
   environmentTable,
   secretTable,
-} from "../db/schema";
+} from "@secret-party/database";
 import { logAuditEvent } from "../audit/logger";
 
 type ApiVariables = {

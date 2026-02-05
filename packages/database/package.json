@@ -1,0 +1,26 @@
+{
+  "name": "@secret-party/database",
+  "version": "0.0.0",
+  "description": "Secret Party Database Package",
+  "type": "module",
+  "exports": {
+    ".": {
+      "secret-party": "./src/index.ts",
+      "default": "./src/index.ts"
+    },
+    "./*": {
+      "secret-party": "./src/*.ts",
+      "default": "./src/*.ts"
+    }
+  },
+  "dependencies": {
+    "drizzle-orm": "^0.44.5",
+    "pg": "^8.16.3",
+    "@electric-sql/pglite": "^0.3.8"
+  },
+  "devDependencies": {
+    "@types/pg": "^8.15.5",
+    "drizzle-kit": "^0.31.4",
+    "typescript": "^5.9.2"
+  }
+}

@@ -1,5 +1,4 @@
-import { db } from "../db/db";
-import { auditLogTable } from "../db/schema";
+import { db, auditLogTable } from "@secret-party/database";
 
 export type AuditAction =
   | "login_success"

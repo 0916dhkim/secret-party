@@ -6,14 +6,14 @@ import { requireAuth } from "../auth/session";
 import { Layout } from "../components/Layout";
 import { Breadcrumb } from "../components/Breadcrumb";
 import { mainContent } from "../styles/shared";
-import { db } from "../db/db";
-import { eq, and } from "drizzle-orm";
 import {
+  db,
   apiClientTable,
   environmentTable,
   projectTable,
   environmentAccessTable,
-} from "../db/schema";
+} from "@secret-party/database";
+import { eq, and } from "drizzle-orm";
 import { useState } from "react";
 import { Modal } from "../components/Modal";
 import { Button } from "../components/Button";

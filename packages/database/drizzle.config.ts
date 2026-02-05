@@ -3,7 +3,7 @@ import { defineConfig } from "drizzle-kit";
 
 const common = {
   out: "./drizzle",
-  schema: "./app/db/schema.ts",
+  schema: "./src/schema.ts",
   casing: "snake_case",
   dialect: "postgresql",
 } as const;

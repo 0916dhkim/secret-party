@@ -31,7 +31,7 @@ async function buildDrizzle() {
     const { schema: _ignore, ...configWithoutSchema } = DRIZZLE_CONFIG;
     const inMemoryDb = new PGlite();
     await migrate(pgliteDrizzle(inMemoryDb, configWithoutSchema), {
-      migrationsFolder: "./drizzle",
+      migrationsFolder: "../drizzle",
     });
     globalThis.__pglite_db__ = pgliteDrizzle(inMemoryDb, DRIZZLE_CONFIG);
     return globalThis.__pglite_db__;

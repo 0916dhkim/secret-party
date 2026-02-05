@@ -1,6 +1,5 @@
 import { eq } from "drizzle-orm";
-import { db } from "../db/db";
-import { userTable } from "../db/schema";
+import { db, userTable } from "@secret-party/database";
 import { verifyPassword, hashPassword } from "./hash";
 import {
   createSession,
