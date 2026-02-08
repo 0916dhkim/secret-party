@@ -315,6 +315,49 @@ function buildPublicApiServer() {
 
         return c.body(null, 200);
       },
+    )
+
+    .delete(
+      "/secrets/:key",
+      zValidator(
+        "param",
+        z.object({
+          environmentId: z.coerce.number(),
+          key: z.string(),
+        }),
+      ),
+      async (c) => {
+        const { environmentId, key } = c.req.valid("param");
+        const apiClient = c.get("apiClient");
+
+        const existingSecret = await db.query.secretTable.findFirst({
+          where: and(
+            eq(secretTable.environmentId, environmentId),
+            eq(secretTable.key, key),
+          ),
+        });
+
+        if (existingSecret == null) {
+          return c.json({ error: "Secret not found" }, 404);
+        }
+
+        await db
+          .delete(secretTable)
+          .where(
+            and(
+              eq(secretTable.environmentId, environmentId),
+              eq(secretTable.key, key),
+            ),
+          );
+
+        await logAuditEvent({
+          action: "secret_delete",
+          apiClientId: apiClient.id,
+          details: { environmentId, secretKey: key },
+        });
+
+        return c.body(null, 200);
+      },
     );
   const v1 = new Hono<{ Variables: ApiVariables }>()
     .use(authorizationMiddleware)
