@@ -21,7 +21,9 @@ export type AuditAction =
   | "api_client_create"
   | "api_client_delete"
   | "environment_access_grant"
-  | "environment_access_revoke";
+  | "environment_access_revoke"
+  | "backup_created"
+  | "backup_restored";
 
 export async function logAuditEvent(event: {
   action: AuditAction;

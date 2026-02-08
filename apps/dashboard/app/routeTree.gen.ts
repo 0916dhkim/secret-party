@@ -18,6 +18,7 @@ import { Route as DesignRouteImport } from './routes/design'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ProjectsIndexRouteImport } from './routes/projects.index'
 import { Route as ApiKeysIndexRouteImport } from './routes/api-keys.index'
+import { Route as AdminBackupsRouteImport } from './routes/admin.backups'
 import { Route as ProjectsProjectIdIndexRouteImport } from './routes/projects.$projectId.index'
 import { Route as ApiKeysApiClientIdIndexRouteImport } from './routes/api-keys.$apiClientId.index'
 import { Route as ProjectsProjectIdEnvironmentsEnvironmentIdRouteImport } from './routes/projects.$projectId.environments.$environmentId'
@@ -60,6 +61,11 @@ const ApiKeysIndexRoute = ApiKeysIndexRouteImport.update({
   path: '/api-keys/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminBackupsRoute = AdminBackupsRouteImport.update({
+  id: '/admin/backups',
+  path: '/admin/backups',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ProjectsProjectIdIndexRoute = ProjectsProjectIdIndexRouteImport.update({
   id: '/projects/$projectId/',
   path: '/projects/$projectId/',
@@ -88,6 +94,7 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/signup': typeof SignupRoute
   '/test-api-key': typeof TestApiKeyRoute
+  '/admin/backups': typeof AdminBackupsRoute
   '/api-keys': typeof ApiKeysIndexRoute
   '/projects': typeof ProjectsIndexRoute
   '/api-keys/$apiClientId': typeof ApiKeysApiClientIdIndexRoute
@@ -100,6 +107,7 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/signup': typeof SignupRoute
   '/test-api-key': typeof TestApiKeyRoute
+  '/admin/backups': typeof AdminBackupsRoute
   '/api-keys': typeof ApiKeysIndexRoute
   '/projects': typeof ProjectsIndexRoute
   '/api-keys/$apiClientId': typeof ApiKeysApiClientIdIndexRoute
@@ -113,6 +121,7 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/signup': typeof SignupRoute
   '/test-api-key': typeof TestApiKeyRoute
+  '/admin/backups': typeof AdminBackupsRoute
   '/api-keys/': typeof ApiKeysIndexRoute
   '/projects/': typeof ProjectsIndexRoute
   '/api-keys/$apiClientId/': typeof ApiKeysApiClientIdIndexRoute
@@ -127,6 +136,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/signup'
     | '/test-api-key'
+    | '/admin/backups'
     | '/api-keys'
     | '/projects'
     | '/api-keys/$apiClientId'
@@ -139,6 +149,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/signup'
     | '/test-api-key'
+    | '/admin/backups'
     | '/api-keys'
     | '/projects'
     | '/api-keys/$apiClientId'
@@ -151,6 +162,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/signup'
     | '/test-api-key'
+    | '/admin/backups'
     | '/api-keys/'
     | '/projects/'
     | '/api-keys/$apiClientId/'
@@ -164,6 +176,7 @@ export interface RootRouteChildren {
   LoginRoute: typeof LoginRoute
   SignupRoute: typeof SignupRoute
   TestApiKeyRoute: typeof TestApiKeyRoute
+  AdminBackupsRoute: typeof AdminBackupsRoute
   ApiKeysIndexRoute: typeof ApiKeysIndexRoute
   ProjectsIndexRoute: typeof ProjectsIndexRoute
   ApiKeysApiClientIdIndexRoute: typeof ApiKeysApiClientIdIndexRoute
@@ -243,6 +256,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiKeysIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/backups': {
+      id: '/admin/backups'
+      path: '/admin/backups'
+      fullPath: '/admin/backups'
+      preLoaderRoute: typeof AdminBackupsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/projects/$projectId/': {
       id: '/projects/$projectId/'
       path: '/projects/$projectId'
@@ -284,6 +304,7 @@ const rootRouteChildren: RootRouteChildren = {
   LoginRoute: LoginRoute,
   SignupRoute: SignupRoute,
   TestApiKeyRoute: TestApiKeyRoute,
+  AdminBackupsRoute: AdminBackupsRoute,
   ApiKeysIndexRoute: ApiKeysIndexRoute,
   ProjectsIndexRoute: ProjectsIndexRoute,
   ApiKeysApiClientIdIndexRoute: ApiKeysApiClientIdIndexRoute,

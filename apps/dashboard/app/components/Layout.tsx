@@ -5,9 +5,10 @@ import { css } from "@flow-css/core/css";
 interface LayoutProps {
   children: ReactNode;
   userEmail?: string;
+  isAdmin?: boolean;
 }
 
-export function Layout({ children, userEmail }: LayoutProps) {
+export function Layout({ children, userEmail, isAdmin }: LayoutProps) {
   return (
     <div
       className={css({
@@ -16,7 +17,7 @@ export function Layout({ children, userEmail }: LayoutProps) {
         flexDirection: "column",
       })}
     >
-      {userEmail && <NavigationMenu userEmail={userEmail} />}
+      {userEmail && <NavigationMenu userEmail={userEmail} isAdmin={isAdmin} />}
       {children}
     </div>
   );

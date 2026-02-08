@@ -8,9 +8,10 @@ import logoUrl from "../assets/logo-transparent.png?url";
 
 interface NavigationMenuProps {
   userEmail: string;
+  isAdmin?: boolean;
 }
 
-export function NavigationMenu({ userEmail }: NavigationMenuProps) {
+export function NavigationMenu({ userEmail, isAdmin }: NavigationMenuProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const location = useLocation();
 
@@ -18,6 +19,7 @@ export function NavigationMenu({ userEmail }: NavigationMenuProps) {
     { path: "/projects", label: "Projects" },
     { path: "/api-keys", label: "API Keys" },
     { path: "/test-api-key", label: "API Test" },
+    ...(isAdmin ? [{ path: "/admin/backups", label: "Backups" }] : []),
   ];
 
   const isActive = (path: string) => {

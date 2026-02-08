@@ -9,7 +9,7 @@ Simple self-hostable secrets manager
 - Organize your secrets by projects and environments (e.g. prod & staging)
   - Secrets are stored as key-value pairs.
   - No versioning.
-- Backup & restore (admin-only). Full encrypted database backup to server filesystem with wipe-and-restore.
+- Backup & restore (admin-only). Full encrypted database backup to server filesystem with transactional wipe-and-restore. Auto-creates a safety backup before each restore.
 - Public API for managing secrets.
   - Authentication: Bearer token using public key in Authorization header
   - Endpoints:

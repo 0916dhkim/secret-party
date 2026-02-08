@@ -140,64 +140,30 @@ The following items are explicitly **not** included in this implementation:
 
 ### Admin Role
 
-- Add `isAdmin` column to `userTable` (integer, 0 or 1)
-- First registered user is automatically promoted to admin
-- Add `requireAdmin()` helper alongside existing `requireAuth()`
-- All backup/restore operations require admin role
+- `isAdmin` flag on user table; first registered user is automatically admin
+- `requireAdmin()` helper guards all backup/restore operations
 
 ### Backup
 
-- **Trigger**: Manual only (button in dashboard)
-- **Format**: JSON file containing all tables except sessions (which are ephemeral)
-- **Storage**: Server filesystem, configurable via `BACKUP_DIR` env var (default `./backups/`)
-- **Filename**: `backup-YYYY-MM-DDTHH-MM-SS.json`
-- **Contents**: Full encrypted database dump — secrets remain encrypted (DEKs stay wrapped), so backups are safe at rest without additional encryption layer
-- **Structure**:
-  ```json
-  {
-    "version": 1,
-    "createdAt": "ISO timestamp",
-    "tables": {
-      "user": [...],
-      "project": [...],
-      "environment": [...],
-      "secret": [...],
-      "api_client": [...],
-      "environment_access": [...],
-      "audit_log": [...]
-    }
-  }
-  ```
+- Manual trigger from dashboard
+- Saves full encrypted database dump as JSON to server filesystem (`BACKUP_DIR` env var, default `./backups/`)
+- Includes all tables except sessions (ephemeral)
+- Secrets remain encrypted (DEKs stay wrapped), so backups are safe at rest
 
 ### Restore
 
-- **Behavior**: Full wipe-and-replace (truncate all tables, then insert from backup)
-- **Ordering** (respects FK constraints):
-  - Truncate: audit_log, environment_access, secret, session, environment, api_client, project, user
-  - Insert: user, project, environment, secret, api_client, environment_access, audit_log
-- **Validation**: Check backup `version` and table schema before restoring
-- **Session handling**: Re-create the current admin user's session after restore
-- **Confirmation**: Requires explicit user confirmation ("This will wipe all existing data")
+- Full wipe-and-replace, wrapped in a database transaction (rolls back on failure)
+- Automatically creates a safety backup before restoring
+- Can restore from an existing backup on disk or upload an external file
+- Validates backup format before restoring
+- Admin session is invalidated after restore; admin must log in again
 
 ### Dashboard UI (`/admin/backups`)
 
-- **Backup section**: "Create Backup Now" button, list of existing backups with timestamps and file sizes
-- **Restore section**: File upload, confirmation modal, progress/status indicator
-- Page guarded behind `requireAdmin()`
-- "Backups" link in navigation menu (visible to admin users only)
-
-### Audit Logging
-
-- Log `backup.created` and `backup.restored` events via existing audit logger
-
-### Implementation Files
-
-- `packages/database/src/schema.ts` — add `isAdmin` column to `userTable`
-- `apps/dashboard/app/auth/actions.tsx` — auto-promote first user to admin on signup
-- `apps/dashboard/app/auth/session.tsx` — add `requireAdmin()` helper
-- `apps/dashboard/app/backup/backup.ts` — `createBackup()`, `listBackups()`
-- `apps/dashboard/app/backup/restore.ts` — `restoreFromBackup()`
-- `apps/dashboard/app/routes/admin.backups.tsx` — dashboard UI page
+- List of existing backups with timestamps, sizes, and per-row "Restore" button
+- "Create Backup Now" and "Restore from File" actions
+- Confirmation modal with destructive-action warning
+- Admin-only (nav link hidden for non-admin users)
 
 ## Implementation Order:
 
@@ -242,6 +208,7 @@ The following items are explicitly **not** included in this implementation:
   - `BACKUP_SCHEDULE` env var — cron expression (default: daily at midnight)
   - `BACKUP_RETENTION` env var — number of backups to keep (default: 30, oldest auto-deleted)
   - Initialize scheduler in server entry point
+- **Streaming backup for large datasets** - Current backup loads all tables into memory at once; switch to sequential queries and streamed JSON writing to handle large audit logs without exhausting memory
 
 ## Security Concerns
 
@@ -303,4 +270,4 @@ The following items are explicitly **not** included in this implementation:
   - **Shared:** Drizzle ORM + PostgreSQL (PGLite on local, pg on prod)
 - Client-side crypto operations for API key usage
 - Proper error handling without information leakage
-- Backup saves full encrypted DB to filesystem; restore wipes and replaces all data
+- Backup saves full encrypted DB to filesystem; restore wipes and replaces all data within a transaction

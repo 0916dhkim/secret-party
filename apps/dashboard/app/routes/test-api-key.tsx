@@ -179,7 +179,7 @@ function TestApiKey() {
   };
 
   return (
-    <Layout userEmail={loaderData.user.email}>
+    <Layout userEmail={loaderData.user.email} isAdmin={!!loaderData.user.isAdmin}>
       <Breadcrumb items={[{ label: "Test API Key" }]} />
       <div className={mainContent}>
         <h1
