@@ -273,7 +273,7 @@ function EnvironmentDetail() {
   };
 
   return (
-    <Layout userEmail={user.email}>
+    <Layout userEmail={user.email} isAdmin={!!user.isAdmin}>
       <Breadcrumb
         items={[
           { label: "Projects", path: "/projects" },
@@ -397,109 +397,221 @@ function EnvironmentDetail() {
         open={isCreateModalOpen}
         onClose={() => setIsCraeteModalOpen(false)}
       >
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            createSecretForm.handleSubmit();
-          }}
+        <div
+          className={css({
+            display: "flex",
+            flexDirection: "column",
+            padding: "2rem",
+            gap: "1rem",
+          })}
         >
-          <createSecretForm.Field name="secretKey">
-            {(field) => (
-              <div>
-                <label>Secret key</label>
-                <input
-                  name={field.name}
-                  type="text"
-                  placeholder="Enter secret key"
-                  value={field.state.value}
-                  onBlur={field.handleBlur}
-                  onChange={(e) => field.handleChange(e.target.value)}
-                />
-                {!field.state.meta.isValid && (
-                  <div
-                    className={css(({ v }) => ({
-                      color: v("--c-danger"),
-                      fontSize: "0.875rem",
-                      marginTop: "0.25rem",
-                    }))}
-                  >
-                    {field.state.meta.errors.map((x) => x?.message).join(", ")}
-                  </div>
-                )}
-              </div>
-            )}
-          </createSecretForm.Field>
-          <createSecretForm.Field name="secretValue">
-            {(field) => (
-              <div>
-                <label>Secret value</label>
-                <input
-                  name={field.name}
-                  type="text"
-                  placeholder="Enter secret value"
-                  value={field.state.value}
-                  onBlur={field.handleBlur}
-                  onChange={(e) => field.handleChange(e.target.value)}
-                />
-                {!field.state.meta.isValid && (
-                  <div
-                    className={css(({ v }) => ({
-                      color: v("--c-danger"),
-                      fontSize: "0.875rem",
-                      marginTop: "0.25rem",
-                    }))}
-                  >
-                    {field.state.meta.errors.map((x) => x?.message).join(", ")}
-                  </div>
-                )}
-              </div>
-            )}
-          </createSecretForm.Field>
-          <createSecretForm.Field name="password">
-            {(field) => (
-              <div>
-                <label>Password</label>
-                <input
-                  name={field.name}
-                  type="password"
-                  placeholder="Enter password"
-                  value={field.state.value}
-                  onBlur={field.handleBlur}
-                  onChange={(e) => field.handleChange(e.target.value)}
-                />
-                {!field.state.meta.isValid && (
-                  <div
-                    className={css(({ v }) => ({
-                      color: v("--c-danger"),
-                      fontSize: "0.875rem",
-                      marginTop: "0.25rem",
-                    }))}
-                  >
-                    {field.state.meta.errors.map((x) => x?.message).join(", ")}
-                  </div>
-                )}
-              </div>
-            )}
-          </createSecretForm.Field>
-          <button
-            type="button"
-            onClick={closeModal}
-            disabled={createSecretMutation.isPending}
+          <h2
+            className={css({
+              fontSize: "1.5rem",
+              fontWeight: "600",
+              margin: 0,
+            })}
           >
-            Cancel
-          </button>
-          <createSecretForm.Subscribe selector={(state) => state.canSubmit}>
-            {(canSubmit) => (
-              <button
-                type="submit"
-                disabled={!canSubmit || createSecretMutation.isPending}
+            Add Secret
+          </h2>
+
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              createSecretForm.handleSubmit();
+            }}
+            className={css({
+              display: "flex",
+              flexDirection: "column",
+              gap: "1rem",
+            })}
+          >
+            <createSecretForm.Field name="secretKey">
+              {(field) => (
+                <div
+                  className={css({
+                    display: "flex",
+                    flexDirection: "column",
+                  })}
+                >
+                  <label
+                    htmlFor="secretKey"
+                    className={css(({ v }) => ({
+                      fontSize: "0.875rem",
+                      fontWeight: "500",
+                      marginBottom: "0.5rem",
+                      color: v("--c-text"),
+                    }))}
+                  >
+                    Secret Key
+                  </label>
+                  <input
+                    id="secretKey"
+                    name={field.name}
+                    type="text"
+                    placeholder="Enter secret key"
+                    value={field.state.value}
+                    onBlur={field.handleBlur}
+                    onChange={(e) => field.handleChange(e.target.value)}
+                    className={clsx(
+                      Styles.input,
+                      field.state.meta.isValid
+                        ? Styles.inputValid
+                        : Styles.inputInvalid
+                    )}
+                    autoFocus
+                  />
+                  {!field.state.meta.isValid && (
+                    <div
+                      className={css(({ v }) => ({
+                        color: v("--c-danger"),
+                        fontSize: "0.875rem",
+                        marginTop: "0.25rem",
+                      }))}
+                    >
+                      {field.state.meta.errors
+                        .map((x) => x?.message)
+                        .join(", ")}
+                    </div>
+                  )}
+                </div>
+              )}
+            </createSecretForm.Field>
+            <createSecretForm.Field name="secretValue">
+              {(field) => (
+                <div
+                  className={css({
+                    display: "flex",
+                    flexDirection: "column",
+                  })}
+                >
+                  <label
+                    htmlFor="secretValue"
+                    className={css(({ v }) => ({
+                      fontSize: "0.875rem",
+                      fontWeight: "500",
+                      marginBottom: "0.5rem",
+                      color: v("--c-text"),
+                    }))}
+                  >
+                    Secret Value
+                  </label>
+                  <input
+                    id="secretValue"
+                    name={field.name}
+                    type="text"
+                    placeholder="Enter secret value"
+                    value={field.state.value}
+                    onBlur={field.handleBlur}
+                    onChange={(e) => field.handleChange(e.target.value)}
+                    className={clsx(
+                      Styles.input,
+                      field.state.meta.isValid
+                        ? Styles.inputValid
+                        : Styles.inputInvalid
+                    )}
+                  />
+                  {!field.state.meta.isValid && (
+                    <div
+                      className={css(({ v }) => ({
+                        color: v("--c-danger"),
+                        fontSize: "0.875rem",
+                        marginTop: "0.25rem",
+                      }))}
+                    >
+                      {field.state.meta.errors
+                        .map((x) => x?.message)
+                        .join(", ")}
+                    </div>
+                  )}
+                </div>
+              )}
+            </createSecretForm.Field>
+            <createSecretForm.Field name="password">
+              {(field) => (
+                <div
+                  className={css({
+                    display: "flex",
+                    flexDirection: "column",
+                  })}
+                >
+                  <label
+                    htmlFor="createSecretPassword"
+                    className={css(({ v }) => ({
+                      fontSize: "0.875rem",
+                      fontWeight: "500",
+                      marginBottom: "0.5rem",
+                      color: v("--c-text"),
+                    }))}
+                  >
+                    Your Password
+                  </label>
+                  <input
+                    id="createSecretPassword"
+                    name={field.name}
+                    type="password"
+                    placeholder="Enter your password"
+                    value={field.state.value}
+                    onBlur={field.handleBlur}
+                    onChange={(e) => field.handleChange(e.target.value)}
+                    className={clsx(
+                      Styles.input,
+                      field.state.meta.isValid
+                        ? Styles.inputValid
+                        : Styles.inputInvalid
+                    )}
+                  />
+                  {!field.state.meta.isValid && (
+                    <div
+                      className={css(({ v }) => ({
+                        color: v("--c-danger"),
+                        fontSize: "0.875rem",
+                        marginTop: "0.25rem",
+                      }))}
+                    >
+                      {field.state.meta.errors
+                        .map((x) => x?.message)
+                        .join(", ")}
+                    </div>
+                  )}
+                </div>
+              )}
+            </createSecretForm.Field>
+
+            <div
+              className={css({
+                display: "flex",
+                gap: "0.5rem",
+                justifyContent: "flex-end",
+              })}
+            >
+              <Button
+                type="button"
+                variant="secondary"
+                onClick={closeModal}
+                disabled={createSecretMutation.isPending}
               >
-                {createSecretMutation.isPending ? "Adding..." : "Add"}
-              </button>
-            )}
-          </createSecretForm.Subscribe>
-        </form>
+                Cancel
+              </Button>
+              <createSecretForm.Subscribe
+                selector={(state) => [state.canSubmit]}
+              >
+                {([canSubmit]) => (
+                  <Button
+                    type="submit"
+                    variant="success"
+                    disabled={!canSubmit || createSecretMutation.isPending}
+                  >
+                    {createSecretMutation.isPending
+                      ? "Adding..."
+                      : "Add Secret"}
+                  </Button>
+                )}
+              </createSecretForm.Subscribe>
+            </div>
+          </form>
+        </div>
       </Modal>
       <Modal
         open={selectedSecretKey != null}
@@ -508,14 +620,131 @@ function EnvironmentDetail() {
           setDecryptedValue(null);
         }}
       >
-        {decryptedValue ? (
-          decryptedValue
-        ) : (
-          <form onSubmit={handleViewSubmit}>
-            <p>User password</p>
-            <input className="password2" type="password" />
-          </form>
-        )}
+        <div
+          className={css({
+            display: "flex",
+            flexDirection: "column",
+            padding: "2rem",
+            gap: "1rem",
+          })}
+        >
+          <h2
+            className={css({
+              fontSize: "1.5rem",
+              fontWeight: "600",
+              margin: 0,
+            })}
+          >
+            View Secret
+          </h2>
+
+          {decryptedValue ? (
+            <div
+              className={css({
+                display: "flex",
+                flexDirection: "column",
+                gap: "0.5rem",
+              })}
+            >
+              <label
+                className={css(({ v }) => ({
+                  fontSize: "0.875rem",
+                  fontWeight: "500",
+                  color: v("--c-text"),
+                }))}
+              >
+                Decrypted Value
+              </label>
+              <code
+                className={css(({ v }) => ({
+                  padding: "0.75rem",
+                  borderRadius: "6px",
+                  fontSize: "0.875rem",
+                  fontFamily: "monospace",
+                  backgroundColor: v("--c-bg-light"),
+                  color: v("--c-text"),
+                  border: `1px solid ${v("--c-border")}`,
+                  wordBreak: "break-all",
+                }))}
+              >
+                {decryptedValue}
+              </code>
+              <div
+                className={css({
+                  display: "flex",
+                  justifyContent: "flex-end",
+                  marginTop: "0.5rem",
+                })}
+              >
+                <Button
+                  variant="secondary"
+                  onClick={() => {
+                    setSelectedSecretKey(null);
+                    setDecryptedValue(null);
+                  }}
+                >
+                  Close
+                </Button>
+              </div>
+            </div>
+          ) : (
+            <form
+              onSubmit={handleViewSubmit}
+              className={css({
+                display: "flex",
+                flexDirection: "column",
+                gap: "1rem",
+              })}
+            >
+              <div
+                className={css({
+                  display: "flex",
+                  flexDirection: "column",
+                })}
+              >
+                <label
+                  htmlFor="viewSecretPassword"
+                  className={css(({ v }) => ({
+                    fontSize: "0.875rem",
+                    fontWeight: "500",
+                    marginBottom: "0.5rem",
+                    color: v("--c-text"),
+                  }))}
+                >
+                  Your Password
+                </label>
+                <input
+                  id="viewSecretPassword"
+                  className={clsx(Styles.input, Styles.inputValid, "password2")}
+                  type="password"
+                  placeholder="Enter your password"
+                  autoFocus
+                />
+              </div>
+              <div
+                className={css({
+                  display: "flex",
+                  gap: "0.5rem",
+                  justifyContent: "flex-end",
+                })}
+              >
+                <Button
+                  type="button"
+                  variant="secondary"
+                  onClick={() => {
+                    setSelectedSecretKey(null);
+                    setDecryptedValue(null);
+                  }}
+                >
+                  Cancel
+                </Button>
+                <Button type="submit" variant="primary">
+                  Decrypt
+                </Button>
+              </div>
+            </form>
+          )}
+        </div>
       </Modal>
     </Layout>
   );
@@ -550,4 +779,25 @@ const Styles = {
     alignItems: "center",
     fontSize: "0.875rem",
   }),
+
+  input: css({
+    padding: "0.75rem",
+    borderRadius: "6px",
+    fontSize: "0.875rem",
+    backgroundColor: "var(--c-bg-light)",
+    color: "var(--c-text)",
+    "&:focus": {
+      outline: "none",
+      borderColor: "var(--c-primary)",
+      boxShadow: "0 0 0 2px oklch(from var(--c-primary) l c h / 0.2)",
+    },
+  }),
+
+  inputValid: css(({ v }) => ({
+    border: `1px solid ${v("--c-border")}`,
+  })),
+
+  inputInvalid: css(({ v }) => ({
+    border: `1px solid ${v("--c-danger")}`,
+  })),
 };

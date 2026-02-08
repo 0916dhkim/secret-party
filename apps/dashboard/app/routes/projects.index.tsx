@@ -201,7 +201,7 @@ function Projects() {
   };
 
   return (
-    <Layout userEmail={loaderData.user.email}>
+    <Layout userEmail={loaderData.user.email} isAdmin={!!loaderData.user.isAdmin}>
       <Breadcrumb
         items={[
           { label: "Projects" },

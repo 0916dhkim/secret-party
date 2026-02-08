@@ -9,7 +9,7 @@ Simple self-hostable secrets manager
 - Organize your secrets by projects and environments (e.g. prod & staging)
   - Secrets are stored as key-value pairs.
   - No versioning.
-- Easy backup & restore.
+- Backup & restore (admin-only). Full encrypted database backup to server filesystem with transactional wipe-and-restore. Auto-creates a safety backup before each restore.
 - Public API for managing secrets.
   - Authentication: Bearer token using public key in Authorization header
   - Endpoints:
@@ -29,18 +29,21 @@ There is one DEK per environment, and each DEK is saved on db after encrypted wi
 ### Security
 
 **Password-to-Key Derivation:**
+
 - Uses Argon2id with production-grade parameters (64MB memory, 3 iterations, 4 threads)
 - Unique salt per environment (prevents rainbow table attacks)
 - ~100ms derivation time (resistant to brute force attacks at ~10 attempts/sec)
 - Same security parameters as login authentication
 
 **Encryption:**
+
 - DEK: 256-bit AES keys
 - Secrets: AES-256-GCM (authenticated encryption)
 - API Keys: RSA-2048 with OAEP padding
 - All cryptographic operations use audited libraries (@noble/ciphers, @noble/hashes)
 
 **Performance:**
+
 - Initial environment access: ~100ms (one-time password-to-key derivation)
 - Subsequent secret operations: <10ms (DEK cached in memory)
 - API key-based access: Client-side decryption (zero server overhead)
@@ -65,6 +68,7 @@ There is one DEK per environment, and each DEK is saved on db after encrypted wi
 ### Password Requirements
 
 For optimal security, use passwords with:
+
 - Minimum 12 characters (16+ recommended)
 - Mix of uppercase, lowercase, numbers, and symbols
 - No dictionary words or common patterns
@@ -74,11 +78,13 @@ For optimal security, use passwords with:
 ### Threat Model
 
 **Protected Against:**
+
 - ✅ Database breach + offline brute force attacks (Argon2id makes this infeasible)
 - ✅ Rainbow table attacks (unique salt per environment)
 - ✅ API key compromise (each key limited to specific environments)
 
 **Not Protected Against:**
+
 - ❌ Password phishing or keyloggers (user password compromise)
 - ❌ Server compromise with live memory access (DEK cached during session)
 - ❌ Physical access to running server
@@ -86,6 +92,7 @@ For optimal security, use passwords with:
 ### Performance Impact
 
 Password-to-key derivation using Argon2id adds ~100ms latency to:
+
 - Environment creation
 - First secret access per environment per session
 - API key creation

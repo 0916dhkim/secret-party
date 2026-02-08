@@ -58,11 +58,8 @@ async function authorizationMiddleware(
     return c.json({ error: "Public key cannot be empty" }, 401);
   }
 
-  // Decode escaped newlines from HTTP header
-  const publicKeyDecoded = publicKey.replace(/\\n/g, "\n");
-
   const apiClient = await db.query.apiClientTable.findFirst({
-    where: eq(apiClientTable.publicKey, publicKeyDecoded),
+    where: eq(apiClientTable.publicKey, publicKey),
   });
 
   if (apiClient == null) {
@@ -309,6 +306,49 @@ function buildPublicApiServer() {
 
         await logAuditEvent({
           action: "secret_update",
+          apiClientId: apiClient.id,
+          details: { environmentId, secretKey: key },
+        });
+
+        return c.body(null, 200);
+      },
+    )
+
+    .delete(
+      "/secrets/:key",
+      zValidator(
+        "param",
+        z.object({
+          environmentId: z.coerce.number(),
+          key: z.string(),
+        }),
+      ),
+      async (c) => {
+        const { environmentId, key } = c.req.valid("param");
+        const apiClient = c.get("apiClient");
+
+        const existingSecret = await db.query.secretTable.findFirst({
+          where: and(
+            eq(secretTable.environmentId, environmentId),
+            eq(secretTable.key, key),
+          ),
+        });
+
+        if (existingSecret == null) {
+          return c.json({ error: "Secret not found" }, 404);
+        }
+
+        await db
+          .delete(secretTable)
+          .where(
+            and(
+              eq(secretTable.environmentId, environmentId),
+              eq(secretTable.key, key),
+            ),
+          );
+
+        await logAuditEvent({
+          action: "secret_delete",
           apiClientId: apiClient.id,
           details: { environmentId, secretKey: key },
         });

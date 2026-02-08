@@ -15,7 +15,7 @@ The following items are explicitly **not** included in this implementation:
 - **Deployment** - No Docker, CI/CD, or production deployment configuration
 - **Internal Management APIs** - Using Tanstack Start server actions instead of REST endpoints
 - **Advanced Security Features** - No 2FA, session management, or security settings page
-- **Database Migrations in Production** - No production migration scripts or backup procedures
+- **Database Migrations in Production** - No production migration scripts
 - **CORS Configuration** - Single domain architecture, no cross-origin requests
 - **UI Polish** - No focus on making polished UI. Rough UI is ok as long as the functionality is there.
 
@@ -136,6 +136,35 @@ The following items are explicitly **not** included in this implementation:
    - Returns: status 200 with empty body
    - Authentication: API public key in Authorization header
 
+## Phase 5: Backup & Restore
+
+### Admin Role
+
+- `isAdmin` flag on user table; first registered user is automatically admin
+- `requireAdmin()` helper guards all backup/restore operations
+
+### Backup
+
+- Manual trigger from dashboard
+- Saves full encrypted database dump as JSON to server filesystem (`BACKUP_DIR` env var, default `./backups/`)
+- Includes all tables except sessions (ephemeral)
+- Secrets remain encrypted (DEKs stay wrapped), so backups are safe at rest
+
+### Restore
+
+- Full wipe-and-replace, wrapped in a database transaction (rolls back on failure)
+- Automatically creates a safety backup before restoring
+- Can restore from an existing backup on disk or upload an external file
+- Validates backup format before restoring
+- Admin session is invalidated after restore; admin must log in again
+
+### Dashboard UI (`/admin/backups`)
+
+- List of existing backups with timestamps, sizes, and per-row "Restore" button
+- "Create Backup Now" and "Restore from File" actions
+- Confirmation modal with destructive-action warning
+- Admin-only (nav link hidden for non-admin users)
+
 ## Implementation Order:
 
 1. ✅ Basic auth system (already exists)
@@ -175,6 +204,11 @@ The following items are explicitly **not** included in this implementation:
 - **Unique environment name per project** - Add unique constraint on (projectId, name) in environmentTable
 - **Secret key validation** - Restrict keys to alphanumeric + underscores for env var compatibility
 - **Delete endpoint in public API** - Add `DELETE /api/v1/secret` endpoint
+- **Scheduled Backups** - Add cron-based automatic backups with configurable schedule and retention
+  - `BACKUP_SCHEDULE` env var — cron expression (default: daily at midnight)
+  - `BACKUP_RETENTION` env var — number of backups to keep (default: 30, oldest auto-deleted)
+  - Initialize scheduler in server entry point
+- **Streaming backup for large datasets** - Current backup loads all tables into memory at once; switch to sequential queries and streamed JSON writing to handle large audit logs without exhausting memory
 
 ## Security Concerns
 
@@ -236,4 +270,4 @@ The following items are explicitly **not** included in this implementation:
   - **Shared:** Drizzle ORM + PostgreSQL (PGLite on local, pg on prod)
 - Client-side crypto operations for API key usage
 - Proper error handling without information leakage
-- Backup and recovery procedures for encrypted data
+- Backup saves full encrypted DB to filesystem; restore wipes and replaces all data within a transaction

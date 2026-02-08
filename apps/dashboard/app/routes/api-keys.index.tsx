@@ -70,14 +70,13 @@ const createApiKey = createServerFn({
     }
 
     const keyPair = await generateKeyPair();
-    const { publicKey: publicKeyPEM, privateKey: privateKeyPEM } =
-      await serializeKeyPair(keyPair);
+    const { publicKey, privateKey } = await serializeKeyPair(keyPair);
 
     const [apiClient] = await db
       .insert(apiClientTable)
       .values({
         name,
-        publicKey: publicKeyPEM,
+        publicKey,
         userId: session.user.id,
       })
       .returning();
@@ -94,7 +93,7 @@ const createApiKey = createServerFn({
 
     return {
       apiClient,
-      privateKey: privateKeyPEM,
+      privateKey,
     };
   });
 
@@ -158,7 +157,7 @@ function ApiKeys() {
   };
 
   return (
-    <Layout userEmail={loaderData.user.email}>
+    <Layout userEmail={loaderData.user.email} isAdmin={!!loaderData.user.isAdmin}>
       <Breadcrumb
         items={[
           { label: "API Keys" },
@@ -257,7 +256,7 @@ function ApiKeys() {
                 border: `1px solid ${v("--c-border")}`,
               }))}
             >
-              Authorization: Bearer sp_prod_your_api_key_here
+              Authorization: Bearer &lt;base64-encoded-public-key&gt;
             </code>
             <p>
               API keys provide access to the secrets within their assigned

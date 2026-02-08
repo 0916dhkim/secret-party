@@ -8,9 +8,10 @@ import {
 } from "drizzle-orm/pg-core";
 
 export const userTable = pgTable("user", {
-  id: integer().primaryKey().generatedAlwaysAsIdentity(),
+  id: integer().primaryKey().generatedByDefaultAsIdentity(),
   email: text().notNull().unique(),
   passwordHash: text().notNull(),
+  isAdmin: integer().notNull().default(0),
 });
 
 export const userRelations = relations(userTable, ({ many }) => ({
@@ -21,13 +22,13 @@ export const userRelations = relations(userTable, ({ many }) => ({
 }));
 
 export const sessionTable = pgTable("session", {
-  id: integer().primaryKey().generatedAlwaysAsIdentity(),
+  id: integer().primaryKey().generatedByDefaultAsIdentity(),
   userId: integer()
     .notNull()
     .references(() => userTable.id, { onDelete: "cascade" }),
   token: text().notNull().unique(),
-  expiresAt: timestamp().notNull(),
-  createdAt: timestamp().notNull().defaultNow(),
+  expiresAt: timestamp({ mode: "string" }).notNull(),
+  createdAt: timestamp({ mode: "string" }).notNull().defaultNow(),
 });
 
 export const sessionRelations = relations(sessionTable, ({ one }) => ({
@@ -38,7 +39,7 @@ export const sessionRelations = relations(sessionTable, ({ one }) => ({
 }));
 
 export const projectTable = pgTable("project", {
-  id: integer().primaryKey().generatedAlwaysAsIdentity(),
+  id: integer().primaryKey().generatedByDefaultAsIdentity(),
   name: text().notNull(),
   ownerId: integer()
     .notNull()
@@ -54,7 +55,7 @@ export const projectRelations = relations(projectTable, ({ one, many }) => ({
 }));
 
 export const environmentTable = pgTable("environment", {
-  id: integer().primaryKey().generatedAlwaysAsIdentity(),
+  id: integer().primaryKey().generatedByDefaultAsIdentity(),
   name: text().notNull(),
   projectId: integer()
     .notNull()
@@ -94,7 +95,7 @@ export const secretRelations = relations(secretTable, ({ one }) => ({
 }));
 
 export const apiClientTable = pgTable("api_client", {
-  id: integer().primaryKey().generatedAlwaysAsIdentity(),
+  id: integer().primaryKey().generatedByDefaultAsIdentity(),
   name: text().notNull(),
   publicKey: text().notNull().unique(),
   userId: integer()
@@ -143,8 +144,8 @@ export const environmentAccessRelations = relations(
 );
 
 export const auditLogTable = pgTable("audit_log", {
-  id: integer().primaryKey().generatedAlwaysAsIdentity(),
-  timestamp: timestamp().notNull().defaultNow(),
+  id: integer().primaryKey().generatedByDefaultAsIdentity(),
+  timestamp: timestamp({ mode: "string" }).notNull().defaultNow(),
   action: text().notNull(),
   userId: integer().references(() => userTable.id, { onDelete: "set null" }),
   apiClientId: integer().references(() => apiClientTable.id, {

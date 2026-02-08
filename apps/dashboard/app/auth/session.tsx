@@ -14,7 +14,7 @@ export async function hasFirstUser() {
 
 export async function createSession(userId: number) {
   const token = generateSessionToken();
-  const expiresAt = new Date(Date.now() + SESSION_DURATION_MS);
+  const expiresAt = new Date(Date.now() + SESSION_DURATION_MS).toISOString();
 
   const [session] = await db
     .insert(sessionTable)
@@ -69,11 +69,24 @@ async function findValidSessionByToken(token: string) {
     with: { user: true },
   });
 
-  if (!result || result.expiresAt < new Date()) {
+  if (!result || result.expiresAt < new Date().toISOString()) {
     return null;
   }
 
   return result;
+}
+
+/**
+ * Utility for admin-only routes - throws redirect if not authenticated or not admin
+ */
+export async function requireAdmin(redirectTo: string = "/login") {
+  const session = await requireAuth(redirectTo);
+
+  if (!session.user.isAdmin) {
+    throw redirect({ to: "/" });
+  }
+
+  return session;
 }
 
 /**

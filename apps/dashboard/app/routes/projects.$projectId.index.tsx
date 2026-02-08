@@ -165,7 +165,7 @@ function ProjectDetail() {
   };
 
   return (
-    <Layout userEmail={user.email}>
+    <Layout userEmail={user.email} isAdmin={!!user.isAdmin}>
       <Breadcrumb
         items={[
           { label: "Projects", path: "/projects" },

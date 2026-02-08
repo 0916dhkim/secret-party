@@ -85,12 +85,14 @@ export const signUp = createServerFn({ method: "POST" })
     // Hash password
     const passwordHash = await hashPassword(password);
 
-    // Create user
+    // Create user (first user is automatically admin)
+    const isFirstUser = !(await hasFirstUser());
     const [user] = await db
       .insert(userTable)
       .values({
         email,
         passwordHash,
+        isAdmin: isFirstUser ? 1 : 0,
       })
       .returning();
 
