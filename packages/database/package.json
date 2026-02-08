@@ -3,6 +3,9 @@
   "version": "0.0.0",
   "description": "Secret Party Database Package",
   "type": "module",
+  "scripts": {
+    "dev": "tsx dev.ts"
+  },
   "exports": {
     "./*": {
       "secret-party": "./src/*.ts",
@@ -10,7 +13,6 @@
     }
   },
   "dependencies": {
-    "@electric-sql/pglite": "^0.3.8",
     "dotenv": "^17.2.2",
     "pg": "^8.16.3"
   },
