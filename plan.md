@@ -15,7 +15,7 @@ The following items are explicitly **not** included in this implementation:
 - **Deployment** - No Docker, CI/CD, or production deployment configuration
 - **Internal Management APIs** - Using Tanstack Start server actions instead of REST endpoints
 - **Advanced Security Features** - No 2FA, session management, or security settings page
-- **Database Migrations in Production** - No production migration scripts or backup procedures
+- **Database Migrations in Production** - No production migration scripts
 - **CORS Configuration** - Single domain architecture, no cross-origin requests
 - **UI Polish** - No focus on making polished UI. Rough UI is ok as long as the functionality is there.
 
@@ -136,6 +136,69 @@ The following items are explicitly **not** included in this implementation:
    - Returns: status 200 with empty body
    - Authentication: API public key in Authorization header
 
+## Phase 5: Backup & Restore
+
+### Admin Role
+
+- Add `isAdmin` column to `userTable` (integer, 0 or 1)
+- First registered user is automatically promoted to admin
+- Add `requireAdmin()` helper alongside existing `requireAuth()`
+- All backup/restore operations require admin role
+
+### Backup
+
+- **Trigger**: Manual only (button in dashboard)
+- **Format**: JSON file containing all tables except sessions (which are ephemeral)
+- **Storage**: Server filesystem, configurable via `BACKUP_DIR` env var (default `./backups/`)
+- **Filename**: `backup-YYYY-MM-DDTHH-MM-SS.json`
+- **Contents**: Full encrypted database dump — secrets remain encrypted (DEKs stay wrapped), so backups are safe at rest without additional encryption layer
+- **Structure**:
+  ```json
+  {
+    "version": 1,
+    "createdAt": "ISO timestamp",
+    "tables": {
+      "user": [...],
+      "project": [...],
+      "environment": [...],
+      "secret": [...],
+      "api_client": [...],
+      "environment_access": [...],
+      "audit_log": [...]
+    }
+  }
+  ```
+
+### Restore
+
+- **Behavior**: Full wipe-and-replace (truncate all tables, then insert from backup)
+- **Ordering** (respects FK constraints):
+  - Truncate: audit_log, environment_access, secret, session, environment, api_client, project, user
+  - Insert: user, project, environment, secret, api_client, environment_access, audit_log
+- **Validation**: Check backup `version` and table schema before restoring
+- **Session handling**: Re-create the current admin user's session after restore
+- **Confirmation**: Requires explicit user confirmation ("This will wipe all existing data")
+
+### Dashboard UI (`/admin/backups`)
+
+- **Backup section**: "Create Backup Now" button, list of existing backups with timestamps and file sizes
+- **Restore section**: File upload, confirmation modal, progress/status indicator
+- Page guarded behind `requireAdmin()`
+- "Backups" link in navigation menu (visible to admin users only)
+
+### Audit Logging
+
+- Log `backup.created` and `backup.restored` events via existing audit logger
+
+### Implementation Files
+
+- `packages/database/src/schema.ts` — add `isAdmin` column to `userTable`
+- `apps/dashboard/app/auth/actions.tsx` — auto-promote first user to admin on signup
+- `apps/dashboard/app/auth/session.tsx` — add `requireAdmin()` helper
+- `apps/dashboard/app/backup/backup.ts` — `createBackup()`, `listBackups()`
+- `apps/dashboard/app/backup/restore.ts` — `restoreFromBackup()`
+- `apps/dashboard/app/routes/admin.backups.tsx` — dashboard UI page
+
 ## Implementation Order:
 
 1. ✅ Basic auth system (already exists)
@@ -175,6 +238,10 @@ The following items are explicitly **not** included in this implementation:
 - **Unique environment name per project** - Add unique constraint on (projectId, name) in environmentTable
 - **Secret key validation** - Restrict keys to alphanumeric + underscores for env var compatibility
 - **Delete endpoint in public API** - Add `DELETE /api/v1/secret` endpoint
+- **Scheduled Backups** - Add cron-based automatic backups with configurable schedule and retention
+  - `BACKUP_SCHEDULE` env var — cron expression (default: daily at midnight)
+  - `BACKUP_RETENTION` env var — number of backups to keep (default: 30, oldest auto-deleted)
+  - Initialize scheduler in server entry point
 
 ## Security Concerns
 
@@ -236,4 +303,4 @@ The following items are explicitly **not** included in this implementation:
   - **Shared:** Drizzle ORM + PostgreSQL (PGLite on local, pg on prod)
 - Client-side crypto operations for API key usage
 - Proper error handling without information leakage
-- Backup and recovery procedures for encrypted data
+- Backup saves full encrypted DB to filesystem; restore wipes and replaces all data
