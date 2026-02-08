@@ -21,13 +21,7 @@ const loader = createServerFn({
   return { user: session.user };
 });
 
-// Helper functions for key extraction
-function pemToBuffer(pem: string, type: string): ArrayBuffer {
-  const base64 = pem
-    .replace(`-----BEGIN ${type}-----`, "")
-    .replace(`-----END ${type}-----`, "")
-    .replace(/\s/g, "");
-
+function base64ToBuffer(base64: string): ArrayBuffer {
   const binaryString = atob(base64);
   const bytes = new Uint8Array(binaryString.length);
   for (let i = 0; i < binaryString.length; i++) {
@@ -36,17 +30,11 @@ function pemToBuffer(pem: string, type: string): ArrayBuffer {
   return bytes.buffer;
 }
 
-function bufferToPEM(buffer: ArrayBuffer, type: string): string {
-  const base64 = btoa(String.fromCharCode(...new Uint8Array(buffer)));
-  const lines = base64.match(/.{1,64}/g) || [];
-  return `-----BEGIN ${type}-----\n${lines.join("\n")}\n-----END ${type}-----`;
-}
-
 async function extractPublicKeyFromPrivateKey(
-  privateKeyPEM: string,
+  privateKeyBase64: string,
 ): Promise<string> {
   // Import private key (make it extractable)
-  const privateKeyBuffer = pemToBuffer(privateKeyPEM.trim(), "PRIVATE KEY");
+  const privateKeyBuffer = base64ToBuffer(privateKeyBase64.trim());
   const privateKey = await crypto.subtle.importKey(
     "pkcs8",
     privateKeyBuffer,
@@ -76,9 +64,9 @@ async function extractPublicKeyFromPrivateKey(
     ["encrypt"],
   );
 
-  // Export as SPKI (public key format)
+  // Export as SPKI and return as base64
   const publicKeyBuffer = await crypto.subtle.exportKey("spki", publicKey);
-  return bufferToPEM(publicKeyBuffer, "PUBLIC KEY");
+  return btoa(String.fromCharCode(...new Uint8Array(publicKeyBuffer)));
 }
 
 type TestState =
@@ -106,16 +94,13 @@ function TestApiKey() {
 
     try {
       // Extract public key from private key
-      const publicKeyPEM =
+      const publicKeyBase64 =
         await extractPublicKeyFromPrivateKey(privateKeyInput);
-
-      // Replace newlines with literal \n for HTTP header
-      const publicKeyHeader = publicKeyPEM.replace(/\n/g, "\\n");
 
       // Create API client with authentication
       const client = createPublicApiClient("", {
         headers: {
-          Authorization: `Bearer ${publicKeyHeader}`,
+          Authorization: `Bearer ${publicKeyBase64}`,
         },
       });
 
@@ -259,7 +244,7 @@ function TestApiKey() {
             <textarea
               id="privateKey"
               name="privateKey"
-              placeholder="Paste your private key here&#10;&#10;-----BEGIN PRIVATE KEY-----&#10;...&#10;-----END PRIVATE KEY-----"
+              placeholder="Paste your private key here"
               value={privateKeyInput}
               onChange={(e) => setPrivateKeyInput(e.target.value)}
               disabled={testState.status === "loading"}

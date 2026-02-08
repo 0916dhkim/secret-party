@@ -23,21 +23,16 @@ export async function serializeKeyPair(keyPair: CryptoKeyPair) {
     keyPair.privateKey
   );
 
-  const publicKeyPEM = bufferToPEM(publicKeyBuffer, "PUBLIC KEY");
-  const privateKeyPEM = bufferToPEM(privateKeyBuffer, "PRIVATE KEY");
-
   return {
-    publicKey: publicKeyPEM,
-    privateKey: privateKeyPEM,
+    publicKey: Buffer.from(publicKeyBuffer).toString("base64"),
+    privateKey: Buffer.from(privateKeyBuffer).toString("base64"),
   };
 }
 
-export async function deserializePublicKey(publicKeyPEM: string) {
-  const publicKeyBuffer = pemToBuffer(publicKeyPEM, "PUBLIC KEY");
-
+export async function deserializePublicKey(base64: string) {
   const publicKey = await crypto.subtle.importKey(
     "spki",
-    publicKeyBuffer,
+    Buffer.from(base64, "base64"),
     {
       name: "RSA-OAEP",
       hash: "SHA-256",
@@ -49,12 +44,10 @@ export async function deserializePublicKey(publicKeyPEM: string) {
   return publicKey;
 }
 
-export async function deserializePrivateKey(privateKeyPEM: string) {
-  const privateKeyBuffer = pemToBuffer(privateKeyPEM, "PRIVATE KEY");
-
+export async function deserializePrivateKey(base64: string) {
   const privateKey = await crypto.subtle.importKey(
     "pkcs8",
-    privateKeyBuffer,
+    Buffer.from(base64, "base64"),
     {
       name: "RSA-OAEP",
       hash: "SHA-256",
@@ -67,11 +60,11 @@ export async function deserializePrivateKey(privateKeyPEM: string) {
 }
 
 export async function deserializeKeyPair(
-  publicKeyPEM: string,
-  privateKeyPEM: string
+  publicKeyBase64: string,
+  privateKeyBase64: string
 ) {
-  const publicKey = await deserializePublicKey(publicKeyPEM);
-  const privateKey = await deserializePrivateKey(privateKeyPEM);
+  const publicKey = await deserializePublicKey(publicKeyBase64);
+  const privateKey = await deserializePrivateKey(privateKeyBase64);
 
   return { publicKey, privateKey };
 }
@@ -94,18 +87,3 @@ export async function decryptWithPrivateKey(
   );
 }
 
-function bufferToPEM(buffer: ArrayBuffer, type: string): string {
-  const base64 = Buffer.from(buffer).toString("base64");
-  const lines = base64.match(/.{1,64}/g) || [];
-  return `-----BEGIN ${type}-----\n${lines.join("\n")}\n-----END ${type}-----`;
-}
-
-function pemToBuffer(pem: string, type: string) {
-  // Remove the PEM headers and footers, including any surrounding whitespace
-  const base64 = pem
-    .replace(`-----BEGIN ${type}-----`, "")
-    .replace(`-----END ${type}-----`, "")
-    .replace(/\s/g, "");
-
-  return Buffer.from(base64, "base64");
-}

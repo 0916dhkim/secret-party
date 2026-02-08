@@ -58,11 +58,8 @@ async function authorizationMiddleware(
     return c.json({ error: "Public key cannot be empty" }, 401);
   }
 
-  // Decode escaped newlines from HTTP header
-  const publicKeyDecoded = publicKey.replace(/\\n/g, "\n");
-
   const apiClient = await db.query.apiClientTable.findFirst({
-    where: eq(apiClientTable.publicKey, publicKeyDecoded),
+    where: eq(apiClientTable.publicKey, publicKey),
   });
 
   if (apiClient == null) {

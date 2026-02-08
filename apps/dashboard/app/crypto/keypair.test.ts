@@ -8,7 +8,7 @@ import {
   decryptWithPrivateKey,
 } from "./keypair";
 
-test("serializeKeyPair converts keys to PEM format", async () => {
+test("serializeKeyPair converts keys to base64 strings", async () => {
   const keyPair = await generateKeyPair();
   const serialized = await serializeKeyPair(keyPair);
 
@@ -16,20 +16,12 @@ test("serializeKeyPair converts keys to PEM format", async () => {
   assert.strictEqual(typeof serialized.publicKey, "string");
   assert.strictEqual(typeof serialized.privateKey, "string");
 
-  // Should have proper PEM headers
-  assert.ok(serialized.publicKey.startsWith("-----BEGIN PUBLIC KEY-----"));
-  assert.ok(serialized.publicKey.endsWith("-----END PUBLIC KEY-----"));
-  assert.ok(serialized.privateKey.startsWith("-----BEGIN PRIVATE KEY-----"));
-  assert.ok(serialized.privateKey.endsWith("-----END PRIVATE KEY-----"));
-
-  // Should contain base64 data
-  const publicKeyLines = serialized.publicKey.split("\n");
-  const privateKeyLines = serialized.privateKey.split("\n");
-  assert.ok(publicKeyLines.length > 3); // At least header, data, footer
-  assert.ok(privateKeyLines.length > 3);
+  // Should be valid base64
+  assert.match(serialized.publicKey, /^[A-Za-z0-9+/]+=*$/);
+  assert.match(serialized.privateKey, /^[A-Za-z0-9+/]+=*$/);
 });
 
-test("deserializeKeyPair converts PEM back to CryptoKeys", async () => {
+test("deserializeKeyPair converts base64 back to CryptoKeys", async () => {
   const originalKeyPair = await generateKeyPair();
   const serialized = await serializeKeyPair(originalKeyPair);
   const deserializedKeyPair = await deserializeKeyPair(
