@@ -55,16 +55,31 @@ function startPostgres() {
     process.exit(code ?? 1);
   });
 
-  process.on("SIGINT", () => docker.kill("SIGINT"));
-  process.on("SIGTERM", () => docker.kill("SIGTERM"));
+  const kill = () => {
+    if (docker.exitCode === null && !docker.killed) {
+      docker.kill("SIGTERM");
+    }
+  };
+
+  process.on("SIGINT", kill);
+  process.on("SIGTERM", kill);
+
+  return kill;
 }
 
 async function main() {
-  startPostgres();
-  await waitForPostgres();
-  console.log("Postgres is ready. Running migrations...");
-  execSync("pnpm drizzle-kit migrate", { stdio: "inherit" });
-  console.log("Migrations complete.");
+  const killPostgres = startPostgres();
+
+  try {
+    await waitForPostgres();
+    console.log("Postgres is ready. Running migrations...");
+    execSync("pnpm drizzle-kit migrate", { stdio: "inherit" });
+    console.log("Migrations complete.");
+  } catch (err) {
+    console.error(err);
+    killPostgres();
+    process.exit(1);
+  }
 }
 
 main();
