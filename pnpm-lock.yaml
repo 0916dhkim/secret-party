@@ -126,9 +126,6 @@ importers:
 
   packages/database:
     dependencies:
-      '@electric-sql/pglite':
-        specifier: ^0.3.8
-        version: 0.3.8
       dotenv:
         specifier: ^17.2.2
         version: 17.2.2
@@ -3887,7 +3884,8 @@ snapshots:
 
   '@drizzle-team/brocli@0.10.2': {}
 
-  '@electric-sql/pglite@0.3.8': {}
+  '@electric-sql/pglite@0.3.8':
+    optional: true
 
   '@esbuild-kit/core-utils@3.3.2':
     dependencies:

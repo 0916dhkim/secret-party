@@ -5,7 +5,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "pnpm --filter @secret-party/dashboard dev",
+    "dev": "pnpm --filter @secret-party/dashboard --filter @secret-party/database -r --parallel dev",
     "build": "pnpm --filter @secret-party/dashboard build",
     "start": "pnpm --filter @secret-party/dashboard start",
     "test": "pnpm --filter @secret-party/dashboard test"

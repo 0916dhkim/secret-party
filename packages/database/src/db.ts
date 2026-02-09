@@ -1,46 +1,28 @@
 import "dotenv/config";
-import { drizzle } from "drizzle-orm/node-postgres";
-import { migrate } from "drizzle-orm/pglite/migrator";
-import { PGlite } from "@electric-sql/pglite";
+import { drizzle, type NodePgDatabase } from "drizzle-orm/node-postgres";
 import * as schema from "./schema";
-import { PgliteDatabase } from "drizzle-orm/pglite";
-import { fileURLToPath } from "node:url";
-import { dirname, join } from "node:path";
-
-const DRIZZLE_CONFIG = {
-  casing: "snake_case",
-  schema,
-} as const;
+import { LOCAL_DATABASE_URL } from "./local";
 
 declare global {
   /**
-   * Global cache for in-memory db.
+   * Global cache for the drizzle db client.
    *
-   * To prevent re-creating db client on dev hot-reload.
+   * Prevents connection pool accumulation on dev hot-reload — without this,
+   * each Vite HMR update re-executes this module and creates a new pg.Pool,
+   * eventually exhausting postgres's max_connections limit.
    */
-  var __pglite_db__: PgliteDatabase<typeof schema> | undefined;
+  var __db__: NodePgDatabase<typeof schema> | undefined;
 }
 
-async function buildDrizzle() {
-  if (process.env.DATABASE_URL) {
-    return drizzle(process.env.DATABASE_URL, DRIZZLE_CONFIG);
-  } else {
-    // Do not create another pglite db if there's already one in memory.
-    if (globalThis.__pglite_db__ != null) {
-      return globalThis.__pglite_db__;
-    }
-    const { drizzle: pgliteDrizzle } = await import("drizzle-orm/pglite");
-    const { schema: _ignore, ...configWithoutSchema } = DRIZZLE_CONFIG;
-    const inMemoryDb = new PGlite();
-    const __filename = fileURLToPath(import.meta.url);
-    const __dirname = dirname(__filename);
-    const migrationsPath = join(__dirname, "..", "drizzle");
-    await migrate(pgliteDrizzle(inMemoryDb, configWithoutSchema), {
-      migrationsFolder: migrationsPath,
-    });
-    globalThis.__pglite_db__ = pgliteDrizzle(inMemoryDb, DRIZZLE_CONFIG);
-    return globalThis.__pglite_db__;
-  }
+function buildDrizzle() {
+  return drizzle(process.env.DATABASE_URL ?? LOCAL_DATABASE_URL, {
+    casing: "snake_case",
+    schema,
+  });
 }
 
-export const db = await buildDrizzle();
+export const db = globalThis.__db__ ?? buildDrizzle();
+
+if (process.env.NODE_ENV !== "production") {
+  globalThis.__db__ = db;
+}
