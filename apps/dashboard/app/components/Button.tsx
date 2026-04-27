@@ -1,6 +1,7 @@
 import { css } from "@flow-css/core/css";
 import clsx from "clsx";
 import { Slot } from "radix-ui";
+import { forwardRef } from "react";
 
 type ButtonVariant =
   | "default"
@@ -17,18 +18,22 @@ interface Props extends React.ComponentProps<"button"> {
   asChild?: boolean;
 }
 
-export function Button({
-  variant,
-  size,
-  asChild,
-  className,
-  children,
-  ...forwardProps
-}: Props) {
+export const Button = forwardRef<HTMLButtonElement, Props>(function Button(
+  {
+    variant,
+    size,
+    asChild,
+    className,
+    children,
+    ...forwardProps
+  },
+  ref
+) {
   const Component = asChild ? Slot.Root : "button";
 
   return (
     <Component
+      ref={ref}
       {...forwardProps}
       className={clsx(
         className,
@@ -40,7 +45,7 @@ export function Button({
       <Slot.Slottable>{children}</Slot.Slottable>
     </Component>
   );
-}
+});
 
 const Styles = {
   base: css(() => ({

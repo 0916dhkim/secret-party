@@ -8,6 +8,8 @@ import { clsx } from "clsx";
 import { createServerFn } from "@tanstack/react-start";
 import z from "zod";
 import { Button } from "../components/Button";
+import { useRef } from "react";
+import { useRegisterPageApi } from "../testing/useRegisterPageApi";
 
 export const Route = createFileRoute("/signup")({
   component: Signup,
@@ -26,6 +28,7 @@ const beforeLoad = createServerFn({ method: "GET" }).handler(async () => {
 
 export default function Signup() {
   const { error } = Route.useSearch();
+  const formRef = useRef<HTMLFormElement>(null);
 
   const form = useForm({
     defaultValues: {
@@ -38,6 +41,41 @@ export default function Signup() {
     },
   });
 
+  // Register the signup page API for testing
+  useRegisterPageApi("signupPage", {
+    isReady: () => {
+      return formRef.current !== null && form.state.values.email !== undefined;
+    },
+    inputEmail: (email: string) => {
+      form.setFieldValue("email", email);
+    },
+    inputPassword: (password: string) => {
+      form.setFieldValue("password", password);
+    },
+    inputConfirmPassword: (confirmPassword: string) => {
+      form.setFieldValue("confirmPassword", confirmPassword);
+    },
+    isSubmitEnabled: () => {
+      return form.state.canSubmit;
+    },
+    pressSubmit: () => {
+      const submitButton = formRef.current?.querySelector('button[type="submit"]');
+      if (submitButton instanceof HTMLButtonElement) {
+        submitButton.click();
+      }
+    },
+    getValidationErrors: () => {
+      const errors: Record<string, string> = {};
+      // Get validation errors from form state
+      Object.entries(form.state.fieldMeta).forEach(([fieldName, fieldMeta]) => {
+        if (fieldMeta?.errors && fieldMeta.errors.length > 0) {
+          errors[fieldName] = String(fieldMeta.errors[0]);
+        }
+      });
+      return errors;
+    },
+  });
+
   return (
     <div className={Styles.container}>
       <h1>Create Account</h1>
@@ -45,7 +83,7 @@ export default function Signup() {
         Create the first and only account for this system.
       </p>
 
-      <form className={Styles.form} action={signUp.url} method="POST">
+      <form ref={formRef} className={Styles.form} action={signUp.url} method="POST">
         <form.Field name="email">
           {(field) => (
             <div>

@@ -8,7 +8,8 @@
     "dev": "pnpm --filter @secret-party/dashboard --filter @secret-party/database -r --parallel dev",
     "build": "pnpm --filter @secret-party/dashboard build",
     "start": "pnpm --filter @secret-party/database migrate && pnpm --filter @secret-party/dashboard start",
-    "test": "pnpm --filter @secret-party/dashboard test"
+    "test": "pnpm --filter @secret-party/dashboard test",
+    "test:e2e": "playwright test"
   },
   "author": "Danny Kim",
   "license": "MIT",
@@ -18,7 +19,10 @@
     "zod": "^4.1.8"
   },
   "devDependencies": {
+    "@playwright/test": "^1.48.2",
     "@types/node": "^24.3.1",
+    "@types/pg": "^8.15.5",
+    "pg": "^8.16.3",
     "tsx": "^4.20.5",
     "typescript": "^5.9.2"
   }

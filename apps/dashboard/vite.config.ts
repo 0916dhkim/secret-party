@@ -17,4 +17,7 @@ export default defineConfig({
     }),
     viteReact(),
   ],
+  server: {
+    port: parseInt(process.env.PORT || "3000"),
+  },
 });

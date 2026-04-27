@@ -15,6 +15,7 @@ import { mainContent } from "../styles/shared";
 import { Modal } from "../components/Modal";
 import { Button } from "../components/Button";
 import { logAuditEvent } from "@secret-party/audit/logger";
+import { useRegisterPageApi } from "../testing/useRegisterPageApi";
 
 export const Route = createFileRoute("/projects/")({
   component: Projects,
@@ -93,6 +94,7 @@ interface ProjectCardProps {
   name: string;
   environmentCount: number;
   secretCount: number;
+  ref?: (el: HTMLDivElement) => void;
 }
 
 function ProjectCard(props: ProjectCardProps) {
@@ -106,7 +108,7 @@ function ProjectCard(props: ProjectCardProps) {
   };
 
   return (
-    <div className={Styles.projectCard}>
+    <div className={Styles.projectCard} ref={props.ref}>
       <h3
         className={css(({ v }) => ({
           fontSize: "1.25rem",
@@ -161,6 +163,12 @@ function Projects() {
   const router = useRouter();
   const [isModalOpen, setIsModalOpen] = useState(false);
 
+  // Refs for tracking DOM elements needed by the test registry
+  const projectCardRefs = useRef<Record<string, HTMLDivElement>>({});
+  const projectNameInputRef = useRef<HTMLInputElement>(null);
+  const createProjectButtonRef = useRef<HTMLButtonElement>(null);
+  const submitProjectButtonRef = useRef<HTMLButtonElement>(null);
+
   const createProjectForm = useForm({
     defaultValues: {
       name: "",
@@ -199,6 +207,57 @@ function Projects() {
     createProjectForm.reset();
   };
 
+  // Register the page API with the testing registry
+  useRegisterPageApi("projectListPage", {
+    isReady: () => {
+      // TanStack Start resolves loaders before rendering, so loader data is always present
+      return true;
+    },
+
+    getVisibleProjectIds: () => {
+      return loaderData.projectCardProps.map((p) => p.id);
+    },
+
+    pressProjectItem: ({ id }: { id: string }) => {
+      const button = projectCardRefs.current[id]?.querySelector("button");
+      if (button instanceof HTMLButtonElement) {
+        button.click();
+      } else {
+        throw new Error(`Project card button not found for ID: ${id}`);
+      }
+    },
+
+    pressCreateProjectButton: () => {
+      createProjectButtonRef.current?.click();
+    },
+
+    isCreateProjectModalOpen: () => {
+      return isModalOpen;
+    },
+
+    inputProjectName: (name: string) => {
+      // Use the form's setFieldValue to ensure React sees the change
+      createProjectForm.setFieldValue("name", name);
+    },
+
+    pressCreateProjectSubmit: () => {
+      // Use the submit button ref directly (variant is a React prop, not a DOM attribute)
+      if (submitProjectButtonRef.current) {
+        submitProjectButtonRef.current.click();
+      } else {
+        throw new Error("Create project submit button not found");
+      }
+    },
+
+    pressCreateProjectCancel: () => {
+      closeModal();
+    },
+
+    isCreatingProject: () => {
+      return createProjectMutation.isPending;
+    },
+  });
+
   return (
     <Layout userEmail={loaderData.user.email} isAdmin={!!loaderData.user.isAdmin}>
       <Breadcrumb
@@ -218,7 +277,11 @@ function Projects() {
           <h1 className={css({ fontSize: "2rem", fontWeight: "bold" })}>
             Projects
           </h1>
-          <Button variant="primary" onClick={() => setIsModalOpen(true)}>
+          <Button
+            ref={createProjectButtonRef}
+            variant="primary"
+            onClick={() => setIsModalOpen(true)}
+          >
             + New Project
           </Button>
         </div>
@@ -234,7 +297,17 @@ function Projects() {
         >
           {loaderData.projectCardProps.length > 0 ? (
             loaderData.projectCardProps.map((project) => (
-              <ProjectCard key={project.id} {...project} />
+              <ProjectCard
+                key={project.id}
+                {...project}
+                ref={(el) => {
+                  if (el) {
+                    projectCardRefs.current[project.id] = el;
+                  } else {
+                    delete projectCardRefs.current[project.id];
+                  }
+                }}
+              />
             ))
           ) : (
             <div
@@ -293,6 +366,7 @@ function Projects() {
                     })}
                   >
                     <input
+                      ref={projectNameInputRef}
                       id="projectName"
                       name="name"
                       type="text"
@@ -357,6 +431,7 @@ function Projects() {
                 >
                   {([canSubmit]) => (
                     <Button
+                      ref={submitProjectButtonRef}
                       type="submit"
                       variant="success"
                       disabled={!canSubmit || createProjectMutation.isPending}

@@ -143,3 +143,10 @@ build/
 .output/
 .nitro/
 .tanstack/
+
+# Playwright e2e testing artifacts
+playwright-report/
+test-results/
+
+# Per-worker auth state files
+.storage-state-worker-*.json

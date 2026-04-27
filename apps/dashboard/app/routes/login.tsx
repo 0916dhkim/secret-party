@@ -6,9 +6,10 @@ import { clsx } from "clsx";
 import { hasFirstUser } from "../auth/session";
 import { createFileRoute, redirect } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import z from "zod";
 import { Button } from "../components/Button";
+import { useRegisterPageApi } from "../testing/useRegisterPageApi";
 
 export const Route = createFileRoute("/login")({
   component: Login,
@@ -31,6 +32,7 @@ const loader = createServerFn({
 
 export default function Login() {
   const [generalError, setGeneralError] = useState("");
+  const formRef = useRef<HTMLFormElement>(null);
 
   const loginForm = useForm({
     defaultValues: {
@@ -46,6 +48,31 @@ export default function Login() {
     },
   });
 
+  // Register the login page API for testing
+  useRegisterPageApi("loginPage", {
+    isReady: () => {
+      return formRef.current !== null && loginForm.state.values.email !== undefined;
+    },
+    inputEmail: (email: string) => {
+      loginForm.setFieldValue("email", email);
+    },
+    inputPassword: (password: string) => {
+      loginForm.setFieldValue("password", password);
+    },
+    isSubmitEnabled: () => {
+      return loginForm.state.canSubmit;
+    },
+    pressSubmit: () => {
+      const submitButton = formRef.current?.querySelector('button[type="submit"]');
+      if (submitButton instanceof HTMLButtonElement) {
+        submitButton.click();
+      }
+    },
+    getGeneralError: () => {
+      return generalError || null;
+    },
+  });
+
   return (
     <div
       className={css({
@@ -57,6 +84,7 @@ export default function Login() {
       <h1>Login</h1>
 
       <form
+        ref={formRef}
         className={css(({ v }) => ({
           display: "flex",
           flexDirection: "column",

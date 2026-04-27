@@ -10,6 +10,7 @@ import appCssUrl from "../app.css?url";
 import faviconUrl from "../assets/favicon.ico?url";
 import { CSS_VARIABLES } from "../theme";
 import { css } from "@flow-css/core/css";
+import { initializeRegistry } from "../testing/registry";
 
 // Have this until React resolve the missing type.
 // https://github.com/DefinitelyTyped/DefinitelyTyped/pull/73651
@@ -49,6 +50,9 @@ export const Route = createRootRoute({
 });
 
 function RootComponent() {
+  // Initialize the testing registry on first render
+  initializeRegistry();
+
   return (
     <QueryClientProvider client={queryClient}>
       <RootDocument>
